@@ -1,106 +1,13 @@
-<!-- OWF | One World Feed — Social View -->
-<section class="view view-social" id="view-social" aria-label="Social feed">
-
-  <!-- Social header -->
-  <header class="view-section-header" aria-labelledby="social-heading">
-    <h1 class="view-heading" id="social-heading">Social</h1>
-    <p class="view-subheading">See what people around the world are sharing.</p>
+<section class="view view-social">
+  <header class="view-header">
+    <h1 class="view-title">Social</h1>
+    <p class="view-subtitle">Global moments, shared together.</p>
   </header>
 
-  <!-- Compose / post box -->
-  <div class="social-compose" role="region" aria-label="Create a post">
-    <div class="social-compose-avatar" aria-hidden="true">
-      <!-- Current user avatar rendered by JS -->
+  <div class="view-body">
+    <div class="social-shell">
+      <!-- Composer, feed, and interactions will be hydrated here -->
+      <p class="placeholder">Your social feed will appear here.</p>
     </div>
-    <button type="button" class="social-compose-trigger"
-            id="compose-post-btn"
-            aria-label="Compose a new post"
-            aria-haspopup="dialog">
-      What's happening in your world?
-    </button>
   </div>
-
-  <!-- Friend activity -->
-  <section class="social-activity" aria-labelledby="friend-activity-heading">
-    <div class="social-section-header">
-      <h2 class="social-section-title" id="friend-activity-heading">Friend activity</h2>
-      <button type="button" class="btn btn-ghost btn-sm"
-              aria-label="See all friend activity">
-        See all
-      </button>
-    </div>
-
-    <ul class="social-activity-list" role="list"
-        aria-label="Recent friend activity"
-        id="friend-activity-list">
-
-      <!-- Activity item template (rendered by JS) -->
-      <li class="social-activity-item">
-        <div class="social-activity-avatar" aria-hidden="true"></div>
-        <div class="social-activity-text">
-          <span class="social-activity-name">Loading…</span>
-          <span class="social-activity-action"> is active</span>
-        </div>
-        <time class="social-activity-time" datetime="">now</time>
-      </li>
-
-    </ul>
-  </section>
-
-  <!-- Trending on social -->
-  <section class="social-trending" aria-labelledby="social-trending-heading">
-    <div class="social-section-header">
-      <h2 class="social-section-title" id="social-trending-heading">Trending now</h2>
-    </div>
-    <ul class="social-trending-tags" role="list"
-        id="social-trending-list" aria-label="Trending hashtags"></ul>
-  </section>
-
-  <!-- Social feed tabs -->
-  <nav class="feed-tabs" aria-label="Social feed filter">
-    <ul class="feed-tabs-list" role="tablist" aria-label="Filter social feed">
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab feed-tab--active"
-                id="social-tab-for-you"
-                aria-selected="true"
-                aria-controls="social-feed-container"
-                data-tab="for-you">
-          For you
-        </button>
-      </li>
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab"
-                id="social-tab-following"
-                aria-selected="false"
-                aria-controls="social-feed-container"
-                data-tab="following">
-          Following
-        </button>
-      </li>
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab"
-                id="social-tab-trending"
-                aria-selected="false"
-                aria-controls="social-feed-container"
-                data-tab="trending">
-          Trending
-        </button>
-      </li>
-    </ul>
-  </nav>
-
-  <!-- Social posts feed -->
-  <div id="social-feed-container"
-       class="feed-container"
-       role="feed"
-       aria-label="Social posts feed"
-       aria-live="polite"
-       aria-busy="false">
-    <ul id="social-post-list" class="feed-list" role="list"
-        aria-label="Social posts"></ul>
-  </div>
-
 </section>
