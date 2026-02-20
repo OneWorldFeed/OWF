@@ -1,129 +1,13 @@
-<!-- OWF | One World Feed — Podcasts View -->
-<section class="view view-podcasts" id="view-podcasts" aria-label="Podcasts">
-
-  <!-- Header -->
-  <header class="view-section-header" aria-labelledby="podcasts-heading">
-    <h1 class="view-heading" id="podcasts-heading">Podcasts</h1>
-    <p class="view-subheading">Discover stories, interviews, and deep dives.</p>
+<section class="view view-podcasts">
+  <header class="view-header">
+    <h1 class="view-title">Podcasts</h1>
+    <p class="view-subtitle">Stories, voices, and global conversations.</p>
   </header>
 
-  <!-- Currently playing bar -->
-  <div class="podcast-player-bar" id="podcast-player-bar" role="region"
-       aria-label="Currently playing podcast" aria-live="polite">
-    <div class="podcast-player-cover" aria-hidden="true" id="player-cover"></div>
-    <div class="podcast-player-info">
-      <p class="podcast-player-title" id="player-episode-title">No episode playing</p>
-      <p class="podcast-player-show" id="player-show-name">Select an episode to start listening</p>
-    </div>
-    <div class="podcast-player-controls" aria-label="Playback controls">
-      <button type="button" class="btn btn-ghost btn-icon"
-              id="podcast-prev-btn" aria-label="Previous episode" disabled>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round"
-             width="16" height="16" aria-hidden="true" focusable="false">
-          <polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5"/>
-        </svg>
-      </button>
-      <button type="button" class="btn btn-primary btn-icon"
-              id="podcast-play-btn" aria-label="Play episode" disabled>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-             fill="currentColor" aria-hidden="true" focusable="false"
-             width="16" height="16" id="player-play-icon">
-          <polygon points="5 3 19 12 5 21 5 3"/>
-        </svg>
-      </button>
-      <button type="button" class="btn btn-ghost btn-icon"
-              id="podcast-next-btn" aria-label="Next episode" disabled>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round"
-             width="16" height="16" aria-hidden="true" focusable="false">
-          <polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/>
-        </svg>
-      </button>
-    </div>
-    <div class="podcast-player-progress" aria-label="Playback progress">
-      <input type="range" id="podcast-progress" min="0" max="100" value="0"
-             class="podcast-progress-slider"
-             aria-label="Seek through episode"
-             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" />
-    </div>
-    <div class="podcast-player-volume">
-      <button type="button" class="btn btn-ghost btn-icon"
-              id="podcast-mute-btn" aria-label="Mute audio">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round"
-             width="14" height="14" aria-hidden="true" focusable="false">
-          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
-          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
-          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
-        </svg>
-      </button>
+  <div class="view-body">
+    <div class="podcasts-shell">
+      <!-- Podcast episodes and shelves will be hydrated here -->
+      <p class="placeholder">Your podcast feed will appear here.</p>
     </div>
   </div>
-
-  <!-- Podcast categories -->
-  <nav class="feed-tabs" aria-label="Podcast categories">
-    <ul class="feed-tabs-list" role="tablist" aria-label="Filter podcasts by category">
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab feed-tab--active"
-                id="ptab-all" aria-selected="true"
-                aria-controls="podcast-feed-container"
-                data-tab="all">
-          All
-        </button>
-      </li>
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab"
-                id="ptab-news-tab" aria-selected="false"
-                aria-controls="podcast-feed-container"
-                data-tab="news">
-          News &amp; Politics
-        </button>
-      </li>
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab"
-                id="ptab-tech-tab" aria-selected="false"
-                aria-controls="podcast-feed-container"
-                data-tab="tech">
-          Technology
-        </button>
-      </li>
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab"
-                id="ptab-culture-tab" aria-selected="false"
-                aria-controls="podcast-feed-container"
-                data-tab="culture">
-          Culture
-        </button>
-      </li>
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab"
-                id="ptab-science-tab" aria-selected="false"
-                aria-controls="podcast-feed-container"
-                data-tab="science">
-          Science
-        </button>
-      </li>
-    </ul>
-  </nav>
-
-  <!-- Episode list feed -->
-  <div id="podcast-feed-container"
-       class="feed-container"
-       role="feed"
-       aria-label="Podcast episodes feed"
-       aria-live="polite"
-       aria-busy="false">
-    <ul id="podcast-episode-list" class="feed-list" role="list"
-        aria-label="Podcast episodes"></ul>
-  </div>
-
 </section>
