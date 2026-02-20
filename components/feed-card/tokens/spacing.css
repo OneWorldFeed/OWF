@@ -1,0 +1,14 @@
+/* ==========================================================================
+   OWF — Feed Card | Spacing Tokens
+   ========================================================================== */
+
+:root {
+  --card-padding:    1rem;
+  --card-padding-sm: 0.75rem;
+
+  --card-gap:        0.5rem;
+  --card-gap-sm:     0.25rem;
+
+  --card-radius:     0.75rem;
+  --card-radius-sm:  0.5rem;
+}

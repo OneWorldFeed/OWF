@@ -1,0 +1,30 @@
+/* ==========================================================================
+   OWF — Feed Card | Pulse Animation
+   Used to indicate a card is live or actively updating.
+   ========================================================================== */
+
+@keyframes cardPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(220, 38, 38, 0);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   .card-pulse — adds a repeating glow pulse around the card border.
+   Primarily used on live/breaking cards.
+   -------------------------------------------------------------------------- */
+.card-pulse {
+  animation: cardPulse 2s ease-in-out infinite;
+}
+
+/* --------------------------------------------------------------------------
+   Reduced-motion override
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .card-pulse {
+    animation: none;
+  }
+}

@@ -1,0 +1,31 @@
+/* ==========================================================================
+   OWF — Feed Card | Tag: "breaking"
+   Red pill badge with pulse animation for breaking news.
+   ========================================================================== */
+
+@keyframes breakingPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.65; }
+}
+
+.card__tag--breaking {
+  background-color: rgba(220, 38, 38, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  animation: breakingPulse 1.6s ease-in-out infinite;
+}
+
+[data-theme="light"] .card__tag--breaking {
+  background-color: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card__tag--breaking {
+    animation: none;
+  }
+}

@@ -1,0 +1,55 @@
+/* ==========================================================================
+   OWF — Feed Card | Hover Effects
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   .card-hover-scale — subtle scale on hover, no lift
+   -------------------------------------------------------------------------- */
+.card-hover-scale {
+  transition: transform 180ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+
+.card-hover-scale:hover  { transform: scale(1.02); }
+.card-hover-scale:active { transform: scale(0.99); }
+
+/* --------------------------------------------------------------------------
+   .card-hover-glow — type-colour glow on hover using the --type-color var
+   -------------------------------------------------------------------------- */
+.card-hover-glow {
+  transition: box-shadow 200ms ease;
+}
+
+.card-hover-glow:hover {
+  box-shadow:
+    0 0 0 2px var(--type-color, var(--color-primary, #6c63ff)),
+    var(--card-shadow-hover, 0 4px 12px rgba(0, 0, 0, 0.15));
+}
+
+/* --------------------------------------------------------------------------
+   Interactive state utilities
+   -------------------------------------------------------------------------- */
+
+/* Focus-visible ring that matches the type accent */
+.card-focus-ring:focus-visible {
+  outline: 2px solid var(--type-color, var(--color-border-focus, #6c63ff));
+  outline-offset: 3px;
+}
+
+/* Dim siblings on sibling hover */
+.feed-list:has(.card-hover-dim:hover) .card-hover-dim:not(:hover) {
+  opacity: 0.6;
+  transition: opacity 200ms ease;
+}
+
+/* --------------------------------------------------------------------------
+   Reduced-motion override
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .card-hover-scale,
+  .card-hover-glow {
+    transition: none;
+    transform:  none;
+    box-shadow: none;
+  }
+}

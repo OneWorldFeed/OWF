@@ -1,0 +1,14 @@
+/* ==========================================================================
+   OWF — Feed Card | Region: Oceania
+   Subtle teal left-border accent for Oceanian content.
+   ========================================================================== */
+
+feed-card[region="oceania"] .card,
+.card[data-region="oceania"] {
+  border-left-color: #14b8a6;
+}
+
+feed-card[region="oceania"] .card::before,
+.card[data-region="oceania"]::before {
+  background-color: #14b8a6;
+}

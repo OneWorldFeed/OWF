@@ -1,0 +1,19 @@
+/* ==========================================================================
+   OWF — Feed Card | Tag: "urgent"
+   Orange pill badge with a solid border for high-priority content.
+   ========================================================================== */
+
+.card__tag--urgent {
+  background-color: rgba(234, 88, 12, 0.12);
+  color: #fb923c;
+  border: 1px solid rgba(251, 146, 60, 0.45);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+[data-theme="light"] .card__tag--urgent {
+  background-color: rgba(234, 88, 12, 0.08);
+  color: #ea580c;
+  border-color: rgba(234, 88, 12, 0.4);
+}

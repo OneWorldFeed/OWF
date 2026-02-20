@@ -1,0 +1,20 @@
+/* ==========================================================================
+   OWF — Feed Card | Color Tokens
+   References global theme variables so cards respond to theme changes.
+   ========================================================================== */
+
+:root {
+  /* ── Surface & text ───────────────────────────────────────────── */
+  --card-bg:             var(--color-bg-card);
+  --card-border:         var(--color-border);
+  --card-text:           var(--color-text);
+  --card-text-secondary: var(--color-text-secondary);
+
+  /* ── Per-type accent colours ──────────────────────────────────── */
+  --card-type-news:    #2563eb;
+  --card-type-music:   #7c3aed;
+  --card-type-social:  #059669;
+  --card-type-live:    #dc2626;
+  --card-type-podcast: #d97706;
+  --card-type-ai:      #0891b2;
+}

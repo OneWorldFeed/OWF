@@ -1,0 +1,37 @@
+/* ==========================================================================
+   OWF — Feed Card | Lift Animation
+   Elevates the card on hover via transform + shadow transition.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   .card-lift — standard hover lift for feed cards
+   -------------------------------------------------------------------------- */
+.card-lift {
+  transition:
+    transform  200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 200ms ease;
+  will-change: transform, box-shadow;
+}
+
+.card-lift:hover {
+  transform:  translateY(-3px) scale(1.005);
+  box-shadow: var(--card-shadow-hover, 0 4px 12px rgba(0, 0, 0, 0.15));
+}
+
+.card-lift:active {
+  transform:  translateY(0) scale(0.998);
+  box-shadow: var(--card-shadow-active, 0 1px 2px rgba(0, 0, 0, 0.1));
+  transition-duration: 80ms;
+}
+
+/* --------------------------------------------------------------------------
+   Reduced-motion override
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .card-lift,
+  .card-lift:hover,
+  .card-lift:active {
+    transform: none;
+    transition: none;
+  }
+}

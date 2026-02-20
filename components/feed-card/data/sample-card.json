@@ -1,0 +1,14 @@
+{
+  "id": "card-001",
+  "type": "news",
+  "title": "Sample news headline about a global event",
+  "source": "World News Daily",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "summary": "A brief excerpt summarising the article content. This gives readers enough context to decide whether they want to read the full piece.",
+  "url": "https://example.com/articles/sample-news-headline",
+  "thumbnail": "https://picsum.photos/seed/owf-news/400/300",
+  "tags": ["breaking", "global"],
+  "mood": "urgent",
+  "region": "global",
+  "isLive": false
+}

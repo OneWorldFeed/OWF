@@ -1,0 +1,50 @@
+/* ==========================================================================
+   OWF — Feed Card | Entry Animation
+   Fade-in + slide-up with optional stagger via --delay custom property.
+   ========================================================================== */
+
+@keyframes cardEntry {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   .card-entry — apply to each card as it enters the feed.
+   Set --delay on the element to stagger multiple cards, e.g.:
+     style="--delay: 100ms"
+   -------------------------------------------------------------------------- */
+.card-entry {
+  animation: cardEntry 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+/* --------------------------------------------------------------------------
+   Stagger helpers — add these classes (or set --delay inline) on feed items
+   to produce a cascading entrance effect.
+   -------------------------------------------------------------------------- */
+.card-entry:nth-child(1)  { --delay:  0ms; }
+.card-entry:nth-child(2)  { --delay: 50ms; }
+.card-entry:nth-child(3)  { --delay: 100ms; }
+.card-entry:nth-child(4)  { --delay: 150ms; }
+.card-entry:nth-child(5)  { --delay: 200ms; }
+.card-entry:nth-child(6)  { --delay: 250ms; }
+.card-entry:nth-child(7)  { --delay: 300ms; }
+.card-entry:nth-child(8)  { --delay: 350ms; }
+.card-entry:nth-child(n+9) { --delay: 400ms; }
+
+/* --------------------------------------------------------------------------
+   Reduced-motion override
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .card-entry {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

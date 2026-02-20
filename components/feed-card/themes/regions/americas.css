@@ -1,0 +1,14 @@
+/* ==========================================================================
+   OWF — Feed Card | Region: Americas
+   Subtle purple left-border accent for content from the Americas.
+   ========================================================================== */
+
+feed-card[region="americas"] .card,
+.card[data-region="americas"] {
+  border-left-color: #a855f7;
+}
+
+feed-card[region="americas"] .card::before,
+.card[data-region="americas"]::before {
+  background-color: #a855f7;
+}
