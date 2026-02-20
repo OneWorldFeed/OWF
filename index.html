@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#1a1a2e" />
+    <meta name="description" content="OWF - One World Feed: Your personalized global news and social media feed" />
+
+    <title>OWF | One World Feed</title>
+
+    <!-- Root stylesheet (imports all global partials) -->
+    <link rel="stylesheet" href="/styles.css" />
+
+    <!-- Theme CSS -->
+    <link rel="stylesheet" href="/assets/css/themes/theme-dark.css" />
+    <link rel="stylesheet" href="/assets/css/themes/theme-light.css" />
+    <link rel="stylesheet" href="/assets/css/themes/theme-midnight.css" />
+    <link rel="stylesheet" href="/assets/css/themes/theme-neon.css" />
+
+    <!-- Motion CSS -->
+    <link rel="stylesheet" href="/assets/css/motion/transitions.css" />
+    <link rel="stylesheet" href="/assets/css/motion/animations.css" />
+    <link rel="stylesheet" href="/assets/css/motion/reduced-motion.css" />
+  </head>
+  <body class="theme-dark" data-theme="dark">
+
+    <div id="app">
+
+      <!-- Left Navigation Sidebar -->
+      <nav id="main-nav" role="navigation" aria-label="Main navigation">
+        <div id="nav-logo" aria-label="OWF Home">
+          <span class="logo-mark">OWF</span>
+          <span class="logo-text">One World Feed</span>
+        </div>
+        <ul id="nav-links" role="list"></ul>
+        <div id="nav-footer"></div>
+      </nav>
+
+      <!-- Main Content Area -->
+      <main id="main-content" role="main" aria-label="Feed content">
+        <header id="feed-header">
+          <div id="feed-controls"></div>
+          <div id="mood-selector" aria-label="Mood filter"></div>
+        </header>
+
+        <div id="feed-container" aria-live="polite" aria-label="News feed">
+          <div id="feed-loader-indicator" class="loader" aria-label="Loading feed" hidden>
+            <span class="spinner"></span>
+            <span class="sr-only">Loading feed…</span>
+          </div>
+          <ul id="feed-list" role="list" aria-label="Feed items"></ul>
+        </div>
+
+        <footer id="feed-footer">
+          <button id="load-more-btn" type="button" aria-label="Load more feed items">Load more</button>
+        </footer>
+      </main>
+
+      <!-- Right Panel -->
+      <aside id="right-panel" role="complementary" aria-label="Spotlight and trending">
+        <section id="spotlight-section" aria-label="Spotlight">
+          <h2 class="panel-heading">Spotlight</h2>
+          <div id="spotlight-container"></div>
+        </section>
+
+        <section id="trending-section" aria-label="Trending tags">
+          <h2 class="panel-heading">Trending</h2>
+          <div id="trending-tags"></div>
+        </section>
+
+        <section id="city-widget" aria-label="City weather and time">
+          <h2 class="panel-heading">Around the World</h2>
+          <div id="city-list"></div>
+        </section>
+      </aside>
+
+    </div><!-- /#app -->
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
