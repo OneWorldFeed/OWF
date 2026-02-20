@@ -1,0 +1,14 @@
+/* ==========================================================================
+   OWF — Feed Card | Region: Asia
+   Subtle red left-border accent for Asian content.
+   ========================================================================== */
+
+feed-card[region="asia"] .card,
+.card[data-region="asia"] {
+  border-left-color: #ef4444;
+}
+
+feed-card[region="asia"] .card::before,
+.card[data-region="asia"]::before {
+  background-color: #ef4444;
+}

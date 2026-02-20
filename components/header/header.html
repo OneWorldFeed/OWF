@@ -1,0 +1,108 @@
+<!-- OWF | One World Feed — Header Component Template -->
+<header class="header" id="site-header" role="banner">
+
+  <!-- Logo / Brand -->
+  <a href="/" class="header-logo" aria-label="OWF — One World Feed, go to home">
+    <div class="header-logo-mark" aria-hidden="true">OWF</div>
+    <div class="header-logo-text">
+      <span class="header-logo-name">One World Feed</span>
+      <span class="header-logo-tagline">Your world, all in one place</span>
+    </div>
+  </a>
+
+  <!-- Search bar -->
+  <div class="header-search" role="search">
+    <label for="global-search" class="sr-only">Search OWF</label>
+    <span class="header-search-icon" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round"
+           aria-hidden="true" focusable="false">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </span>
+    <input
+      type="search"
+      id="global-search"
+      class="header-search-input"
+      name="q"
+      placeholder="Search topics, people, places…"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      spellcheck="false"
+      aria-label="Search OWF"
+      aria-haspopup="listbox"
+      aria-autocomplete="list"
+      aria-expanded="false"
+    />
+    <button type="button" class="header-search-clear"
+            aria-label="Clear search" tabindex="-1">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="3"
+           stroke-linecap="round" stroke-linejoin="round"
+           aria-hidden="true" focusable="false">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="header-actions" aria-label="Header actions">
+
+    <!-- Notifications -->
+    <div class="header-notif-btn">
+      <button type="button" class="btn btn-ghost btn-icon"
+              id="notifications-btn"
+              aria-label="Notifications — 3 unread"
+              aria-haspopup="true"
+              aria-expanded="false">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true" focusable="false">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </button>
+      <span class="header-notif-badge" aria-hidden="true">3</span>
+    </div>
+
+    <!-- Settings -->
+    <button type="button" class="btn btn-ghost btn-icon"
+            id="settings-btn"
+            aria-label="Settings"
+            aria-haspopup="dialog">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round"
+           aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06
+                 a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09
+                 A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83
+                 l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09
+                 A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83
+                 l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09
+                 a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83
+                 l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09
+                 a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
+    </button>
+
+    <!-- Profile avatar -->
+    <button type="button" class="header-avatar-btn"
+            id="profile-menu-btn"
+            aria-label="Open profile menu"
+            aria-haspopup="true"
+            aria-expanded="false">
+      <div class="header-avatar" role="img" aria-label="Your profile avatar">
+        <!-- Initials rendered by JS, e.g. "AK" -->
+      </div>
+    </button>
+
+  </div>
+
+</header>

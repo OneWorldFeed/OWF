@@ -1,0 +1,92 @@
+<!-- OWF | One World Feed — Live View -->
+<section class="view view-live" id="view-live" aria-label="Live streams">
+
+  <!-- Header -->
+  <header class="view-section-header" aria-labelledby="live-heading">
+    <h1 class="view-heading" id="live-heading">
+      <span class="live-indicator-dot" aria-hidden="true"></span>
+      Live
+    </h1>
+    <p class="view-subheading">Watch and interact with live streams from around the world.</p>
+  </header>
+
+  <!-- Live now section -->
+  <section class="live-section" aria-labelledby="live-now-heading">
+    <div class="live-section-header">
+      <h2 class="live-section-title" id="live-now-heading">
+        <span class="live-badge" aria-hidden="true">LIVE</span>
+        Happening now
+      </h2>
+      <span class="live-count" id="live-stream-count" aria-live="polite">
+        <!-- JS fills: "12 streams" -->
+      </span>
+    </div>
+
+    <div class="live-now-grid" id="live-now-grid"
+         role="list" aria-label="Currently live streams">
+      <!-- Live stream cards rendered by JS -->
+      <div class="live-card-skeleton" aria-hidden="true">
+        <div class="skeleton skeleton-media"></div>
+      </div>
+      <div class="live-card-skeleton" aria-hidden="true">
+        <div class="skeleton skeleton-media"></div>
+      </div>
+      <div class="live-card-skeleton" aria-hidden="true">
+        <div class="skeleton skeleton-media"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured live stream -->
+  <section class="live-featured" id="live-featured-section"
+           aria-labelledby="live-featured-heading" hidden>
+    <h2 class="sr-only" id="live-featured-heading">Featured live stream</h2>
+    <div class="live-featured-player" id="live-featured-player"
+         role="region" aria-label="Featured live stream player">
+      <div class="live-player-placeholder" aria-label="Live stream video area">
+        <p class="live-player-message">Select a stream to watch</p>
+      </div>
+      <div class="live-player-meta">
+        <div class="live-player-info" id="live-player-info"></div>
+        <div class="live-player-stats" id="live-player-stats" aria-live="polite"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Schedule section -->
+  <section class="live-section" aria-labelledby="live-schedule-heading">
+    <div class="live-section-header">
+      <h2 class="live-section-title" id="live-schedule-heading">📅 Upcoming</h2>
+      <nav class="live-schedule-days" aria-label="Schedule day selector">
+        <button type="button" class="btn btn-secondary btn-sm live-day-btn live-day-btn--active"
+                aria-pressed="true" data-day="today">Today</button>
+        <button type="button" class="btn btn-ghost btn-sm live-day-btn"
+                aria-pressed="false" data-day="tomorrow">Tomorrow</button>
+        <button type="button" class="btn btn-ghost btn-sm live-day-btn"
+                aria-pressed="false" data-day="week">This week</button>
+      </nav>
+    </div>
+
+    <ul class="live-schedule-list" id="live-schedule-list"
+        role="list" aria-label="Upcoming live stream schedule">
+      <!-- Schedule items rendered by JS -->
+    </ul>
+  </section>
+
+  <!-- Live feed container -->
+  <section class="live-section" aria-labelledby="live-feed-heading">
+    <div class="live-section-header">
+      <h2 class="live-section-title" id="live-feed-heading">All streams</h2>
+    </div>
+    <div id="live-feed-container"
+         class="feed-container"
+         role="feed"
+         aria-label="All live streams feed"
+         aria-live="polite"
+         aria-busy="false">
+      <ul id="live-feed-list" class="feed-list" role="list"
+          aria-label="Live stream list"></ul>
+    </div>
+  </section>
+
+</section>

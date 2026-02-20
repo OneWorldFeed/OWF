@@ -1,0 +1,17 @@
+/* ==========================================================================
+   OWF — Feed Card | Tag: "celebratory"
+   Gold/yellow pill badge for positive, festive, or milestone content.
+   ========================================================================== */
+
+.card__tag--celebratory {
+  background-color: rgba(217, 119, 6, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  font-weight: 600;
+}
+
+[data-theme="light"] .card__tag--celebratory {
+  background-color: rgba(217, 119, 6, 0.12);
+  color: #b45309;
+  border-color: rgba(217, 119, 6, 0.3);
+}

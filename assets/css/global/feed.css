@@ -1,0 +1,576 @@
+/* ==========================================================================
+   OWF — Feed Container & Post Cards
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Feed Container
+   -------------------------------------------------------------------------- */
+
+.feed {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--content-max-width);
+  margin-inline: auto;
+}
+
+/* --------------------------------------------------------------------------
+   2. Feed Tabs / Filter Bar
+   -------------------------------------------------------------------------- */
+
+.feed-tabs {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-index-raised);
+  display: flex;
+  align-items: stretch;
+  background-color: var(--color-surface-overlay);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.feed-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.feed-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-4) var(--spacing-4);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    background-color var(--transition-fast);
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}
+
+.feed-tab:hover {
+  color: var(--color-text);
+  background-color: var(--color-primary-subtle);
+}
+
+.feed-tab.is-active,
+.feed-tab[aria-selected="true"] {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* --------------------------------------------------------------------------
+   3. Feed Scroll Container
+   -------------------------------------------------------------------------- */
+
+.feed-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  scroll-padding-top: var(--header-height);
+}
+
+/* --------------------------------------------------------------------------
+   4. New Posts Notification Banner
+   -------------------------------------------------------------------------- */
+
+.feed-new-posts {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2) var(--spacing-4);
+  background-color: var(--color-primary);
+  color: #fff;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  border: none;
+  width: 100%;
+}
+
+.feed-new-posts:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* --------------------------------------------------------------------------
+   5. Post Card
+   -------------------------------------------------------------------------- */
+
+.post-card {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  background-color: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  text-decoration: none;
+  color: inherit;
+}
+
+.post-card:hover {
+  background-color: var(--color-primary-subtle);
+}
+
+.post-card:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+
+/* Featured / promoted card */
+.post-card.is-featured {
+  border-left: 3px solid var(--color-primary);
+}
+
+/* --------------------------------------------------------------------------
+   6. Post Card — Avatar Column
+   -------------------------------------------------------------------------- */
+
+.post-card__avatar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.post-card__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  background-color: var(--color-primary-subtle);
+  flex-shrink: 0;
+}
+
+.post-card__thread-line {
+  flex: 1;
+  width: 2px;
+  background-color: var(--color-border);
+  border-radius: var(--radius-full);
+  min-height: 16px;
+}
+
+/* --------------------------------------------------------------------------
+   7. Post Card — Content Column
+   -------------------------------------------------------------------------- */
+
+.post-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  min-width: 0;
+}
+
+.post-card__header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.post-card__author-name {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.post-card__author-handle {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.post-card__dot {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-xs);
+}
+
+.post-card__timestamp {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.post-card__source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: 0 var(--spacing-2);
+  background-color: var(--color-primary-subtle);
+  color: var(--color-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+}
+
+/* Post body text */
+.post-card__body {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  color: var(--color-text);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.post-card__body a {
+  color: var(--color-primary);
+}
+
+/* Post media */
+.post-card__media {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  max-height: 300px;
+}
+
+.post-card__media img,
+.post-card__media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.post-card__media-grid {
+  display: grid;
+  gap: 2px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.post-card__media-grid--2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.post-card__media-grid--3 {
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.post-card__media-grid--3 > :first-child {
+  grid-row: span 2;
+}
+
+.post-card__media-grid--4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+/* Link preview card */
+.post-card__link-preview {
+  display: flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color var(--transition-fast);
+}
+
+.post-card__link-preview:hover {
+  background-color: var(--color-primary-subtle);
+}
+
+.post-card__link-preview-img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background-color: var(--color-border);
+}
+
+.post-card__link-preview-body {
+  flex: 1;
+  padding: var(--spacing-3);
+  min-width: 0;
+}
+
+.post-card__link-preview-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.post-card__link-preview-url {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-top: var(--spacing-1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Post tags */
+.post-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-1);
+}
+
+.post-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px var(--spacing-2);
+  background-color: var(--color-primary-subtle);
+  color: var(--color-primary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-full);
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
+}
+
+.post-tag:hover {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+/* --------------------------------------------------------------------------
+   8. Post Card — Action Bar
+   -------------------------------------------------------------------------- */
+
+.post-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  margin-top: var(--spacing-1);
+}
+
+.post-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-full);
+  border: none;
+  background: none;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.post-action:hover {
+  background-color: var(--color-primary-subtle);
+  color: var(--color-primary);
+}
+
+.post-action.is-active {
+  color: var(--color-primary);
+}
+
+.post-action--like:hover,
+.post-action--like.is-active {
+  color: var(--color-accent);
+  background-color: var(--color-accent-subtle);
+}
+
+.post-action--repost:hover,
+.post-action--repost.is-active {
+  color: var(--color-success);
+  background-color: var(--color-success-subtle);
+}
+
+.post-action__count {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------------------
+   9. Feed Loading States
+   -------------------------------------------------------------------------- */
+
+/* Skeleton post card */
+.post-card--skeleton {
+  pointer-events: none;
+  user-select: none;
+}
+
+.post-card--skeleton .post-card__avatar {
+  background-color: var(--color-border);
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-border);
+  margin-bottom: var(--spacing-2);
+}
+
+.skeleton-line--short  { width: 40%; }
+.skeleton-line--medium { width: 70%; }
+.skeleton-line--long   { width: 90%; }
+.skeleton-line--full   { width: 100%; }
+
+/* Feed loading spinner */
+.feed-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-8);
+}
+
+.feed-loader__spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  animation: feedSpinner 0.7s linear infinite;
+}
+
+@keyframes feedSpinner {
+  to { transform: rotate(360deg); }
+}
+
+/* Infinite scroll sentinel */
+.feed-sentinel {
+  height: 1px;
+  width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   10. Empty Feed State
+   -------------------------------------------------------------------------- */
+
+.feed-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-4);
+  padding: var(--spacing-16) var(--spacing-8);
+  text-align: center;
+}
+
+.feed-empty__icon {
+  width: 64px;
+  height: 64px;
+  color: var(--color-text-tertiary);
+  opacity: 0.5;
+}
+
+.feed-empty__title {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.feed-empty__description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  max-width: 320px;
+  line-height: var(--line-height-relaxed);
+}
+
+/* --------------------------------------------------------------------------
+   11. Feed Error State
+   -------------------------------------------------------------------------- */
+
+.feed-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-12) var(--spacing-8);
+  text-align: center;
+}
+
+.feed-error__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.feed-error__message {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   12. Compose / Post Box
+   -------------------------------------------------------------------------- */
+
+.compose-box {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-bg-card);
+}
+
+.compose-box__textarea {
+  width: 100%;
+  resize: none;
+  border: none;
+  outline: none;
+  background: none;
+  font-size: var(--font-size-md);
+  color: var(--color-text);
+  line-height: var(--line-height-relaxed);
+  min-height: 52px;
+  font-family: var(--font-sans);
+}
+
+.compose-box__textarea::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.compose-box__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--spacing-2);
+  border-top: 1px solid var(--color-border);
+  grid-column: 2;
+}
+
+.compose-box__tools {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.compose-tool-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: none;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.compose-tool-btn:hover {
+  background-color: var(--color-primary-subtle);
+}

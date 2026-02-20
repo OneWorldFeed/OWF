@@ -1,0 +1,14 @@
+/* ==========================================================================
+   OWF — Feed Card | Region: Europe
+   Subtle blue left-border accent for European content.
+   ========================================================================== */
+
+feed-card[region="europe"] .card,
+.card[data-region="europe"] {
+  border-left-color: #3b82f6;
+}
+
+feed-card[region="europe"] .card::before,
+.card[data-region="europe"]::before {
+  background-color: #3b82f6;
+}

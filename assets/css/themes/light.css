@@ -1,0 +1,95 @@
+/* ==========================================================================
+   OWF — Light Theme
+   ========================================================================== */
+
+[data-theme="light"] {
+  /* --- Surfaces --- */
+  --color-bg:              #f8f9fa;
+  --color-bg-secondary:    #ffffff;
+  --color-bg-card:         #ffffff;
+  --color-surface:         #ffffff;
+  --color-surface-raised:  #ffffff;
+  --color-surface-overlay: rgba(248, 249, 250, 0.92);
+
+  /* --- Text --- */
+  --color-text:            #1a1a2e;
+  --color-text-secondary:  #6c757d;
+  --color-text-tertiary:   #9ca3af;
+  --color-text-disabled:   #c4c9d0;
+  --color-text-inverse:    #ffffff;
+  --color-text-link:       #6c63ff;
+  --color-text-link-hover: #5a52e0;
+
+  /* --- Borders --- */
+  --color-border:          #e9ecef;
+  --color-border-strong:   #ced4da;
+  --color-border-focus:    #6c63ff;
+
+  /* --- Brand --- */
+  --color-primary:         #6c63ff;
+  --color-primary-hover:   #5a52e0;
+  --color-primary-active:  #4a43cc;
+  --color-primary-subtle:  rgba(108, 99, 255, 0.1);
+
+  --color-accent:          #ff6584;
+  --color-accent-hover:    #e55575;
+  --color-accent-subtle:   rgba(255, 101, 132, 0.1);
+
+  --color-success:         #22c55e;
+  --color-success-subtle:  rgba(34, 197, 94, 0.1);
+  --color-warning:         #f59e0b;
+  --color-warning-subtle:  rgba(245, 158, 11, 0.1);
+  --color-danger:          #ef4444;
+  --color-danger-subtle:   rgba(239, 68, 68, 0.1);
+  --color-info:            #3b82f6;
+  --color-info-subtle:     rgba(59, 130, 246, 0.1);
+
+  /* --- Shadows --- */
+  --color-shadow:          rgba(0, 0, 0, 0.1);
+  --color-shadow-strong:   rgba(0, 0, 0, 0.2);
+
+  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-sm:  0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md:  0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg:  0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl:  0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.18);
+
+  /* --- Scrollbar --- */
+  --scrollbar-thumb:       #ced4da;
+  --scrollbar-thumb-hover: #adb5bd;
+}
+
+/* Light-theme-specific component overrides */
+[data-theme="light"] .post-card:hover {
+  background-color: #f1f3f5;
+}
+
+[data-theme="light"] .app-nav {
+  background-color: #ffffff;
+}
+
+[data-theme="light"] .app-panel {
+  background-color: #ffffff;
+}
+
+[data-theme="light"] .shimmer,
+[data-theme="light"] .skeleton {
+  background-color: #e9ecef;
+  background-image: linear-gradient(
+    90deg,
+    #e9ecef 0%,
+    #f8f9fa 40%,
+    #dee2e6 55%,
+    #e9ecef 100%
+  );
+}
+
+[data-theme="light"] .skeleton::after {
+  background-image: linear-gradient(
+    90deg,
+    transparent           0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent           100%
+  );
+}

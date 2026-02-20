@@ -1,0 +1,323 @@
+<!-- OWF | One World Feed — Settings View -->
+<section class="view view-settings" id="view-settings" aria-label="Settings">
+
+  <!-- Header -->
+  <header class="view-section-header" aria-labelledby="settings-heading">
+    <h1 class="view-heading" id="settings-heading">Settings</h1>
+    <p class="view-subheading">Manage your preferences, privacy, and account.</p>
+  </header>
+
+  <div class="settings-layout">
+
+    <!-- Settings sidebar nav -->
+    <nav class="settings-nav" aria-label="Settings sections">
+      <ul class="settings-nav-list" role="list">
+        <li>
+          <a href="#settings-appearance" class="settings-nav-link settings-nav-link--active"
+             aria-current="true">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10
+                       15.3 15.3 0 0 1 4-10z"/>
+              <path d="M2 12h20"/>
+            </svg>
+            Appearance
+          </a>
+        </li>
+        <li>
+          <a href="#settings-notifications" class="settings-nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            Notifications
+          </a>
+        </li>
+        <li>
+          <a href="#settings-privacy" class="settings-nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            Privacy
+          </a>
+        </li>
+        <li>
+          <a href="#settings-language" class="settings-nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10
+                       15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            Language
+          </a>
+        </li>
+        <li>
+          <a href="#settings-accessibility" class="settings-nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                 stroke-linejoin="round" aria-hidden="true" focusable="false">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 8v4l3 3"/>
+            </svg>
+            Accessibility
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Settings content panels -->
+    <div class="settings-content">
+
+      <!-- Appearance -->
+      <section id="settings-appearance" class="settings-panel"
+               aria-labelledby="settings-appearance-heading">
+        <h2 class="settings-panel-heading" id="settings-appearance-heading">Appearance</h2>
+        <p class="settings-panel-description">
+          Customise how OWF looks and feels.
+        </p>
+        <form class="form" id="appearance-settings-form" novalidate>
+          <div class="form-section">
+            <div class="form-group" role="group" aria-labelledby="theme-settings-label">
+              <span id="theme-settings-label" class="form-label">Theme</span>
+              <div class="form-radio-group form-radio-group--horizontal"
+                   role="radiogroup" aria-labelledby="theme-settings-label">
+                <label class="form-radio-option">
+                  <input type="radio" name="setting-theme" value="dark" checked />
+                  Dark
+                </label>
+                <label class="form-radio-option">
+                  <input type="radio" name="setting-theme" value="light" />
+                  Light
+                </label>
+                <label class="form-radio-option">
+                  <input type="radio" name="setting-theme" value="winter" />
+                  Winter
+                </label>
+                <label class="form-radio-option">
+                  <input type="radio" name="setting-theme" value="autumn" />
+                  Autumn
+                </label>
+                <label class="form-radio-option">
+                  <input type="radio" name="setting-theme" value="summer" />
+                  Summer
+                </label>
+                <label class="form-radio-option">
+                  <input type="radio" name="setting-theme" value="spring" />
+                  Spring
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="form-actions form-actions--end">
+            <button type="submit" class="btn btn-primary">Save appearance</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Notifications -->
+      <section id="settings-notifications" class="settings-panel"
+               aria-labelledby="settings-notif-heading">
+        <h2 class="settings-panel-heading" id="settings-notif-heading">Notifications</h2>
+        <p class="settings-panel-description">
+          Choose what you get notified about and how.
+        </p>
+        <form class="form" id="notifications-settings-form" novalidate>
+          <div class="form-section">
+            <div class="form-group form-group--inline">
+              <label for="setting-push" class="form-label">
+                Push notifications
+                <span class="form-hint">Notify me even when OWF is closed.</span>
+              </label>
+              <div class="form-toggle">
+                <input type="checkbox" id="setting-push" name="pushEnabled"
+                       role="switch" aria-checked="false" />
+                <span class="form-toggle-track" aria-hidden="true"></span>
+                <span class="form-toggle-thumb" aria-hidden="true"></span>
+              </div>
+            </div>
+            <div class="form-group form-group--inline">
+              <label for="setting-email-digest" class="form-label">
+                Email digest
+                <span class="form-hint">Receive a daily summary by email.</span>
+              </label>
+              <div class="form-toggle">
+                <input type="checkbox" id="setting-email-digest" name="emailDigest"
+                       role="switch" aria-checked="true" checked />
+                <span class="form-toggle-track" aria-hidden="true"></span>
+                <span class="form-toggle-thumb" aria-hidden="true"></span>
+              </div>
+            </div>
+            <div class="form-group form-group--inline">
+              <label for="setting-breaking" class="form-label">
+                Breaking news alerts
+                <span class="form-hint">Urgent, high-priority news alerts.</span>
+              </label>
+              <div class="form-toggle">
+                <input type="checkbox" id="setting-breaking" name="breakingNews"
+                       role="switch" aria-checked="true" checked />
+                <span class="form-toggle-track" aria-hidden="true"></span>
+                <span class="form-toggle-thumb" aria-hidden="true"></span>
+              </div>
+            </div>
+          </div>
+          <div class="form-actions form-actions--end">
+            <button type="submit" class="btn btn-primary">Save notifications</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Privacy -->
+      <section id="settings-privacy" class="settings-panel"
+               aria-labelledby="settings-privacy-heading">
+        <h2 class="settings-panel-heading" id="settings-privacy-heading">Privacy</h2>
+        <p class="settings-panel-description">
+          Control who can see your activity and how your data is used.
+        </p>
+        <form class="form" id="privacy-settings-form" novalidate>
+          <div class="form-section">
+            <div class="form-group form-group--inline">
+              <label for="setting-private-account" class="form-label">
+                Private account
+                <span class="form-hint">Only approved followers can see your posts.</span>
+              </label>
+              <div class="form-toggle">
+                <input type="checkbox" id="setting-private-account"
+                       name="privateAccount" role="switch" aria-checked="false" />
+                <span class="form-toggle-track" aria-hidden="true"></span>
+                <span class="form-toggle-thumb" aria-hidden="true"></span>
+              </div>
+            </div>
+            <div class="form-group form-group--inline">
+              <label for="setting-activity-status" class="form-label">
+                Show activity status
+                <span class="form-hint">Let others see when you were last active.</span>
+              </label>
+              <div class="form-toggle">
+                <input type="checkbox" id="setting-activity-status"
+                       name="activityStatus" role="switch" aria-checked="true" checked />
+                <span class="form-toggle-track" aria-hidden="true"></span>
+                <span class="form-toggle-thumb" aria-hidden="true"></span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="setting-data-sharing" class="form-label">Data sharing</label>
+              <select id="setting-data-sharing" name="dataSharing" class="form-select">
+                <option value="minimal" selected>Minimal — essential only</option>
+                <option value="standard">Standard</option>
+                <option value="full">Full — help improve OWF</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions form-actions--end">
+            <button type="submit" class="btn btn-primary">Save privacy</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Language -->
+      <section id="settings-language" class="settings-panel"
+               aria-labelledby="settings-lang-heading">
+        <h2 class="settings-panel-heading" id="settings-lang-heading">Language &amp; Region</h2>
+        <p class="settings-panel-description">
+          Set your preferred language, region, and content filters.
+        </p>
+        <form class="form" id="language-settings-form" novalidate>
+          <div class="form-section">
+            <div class="form-group">
+              <label for="setting-language" class="form-label form-label--required">
+                Display language
+              </label>
+              <select id="setting-language" name="language" class="form-select"
+                      aria-required="true">
+                <option value="en" selected>English</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+                <option value="pt">Português</option>
+                <option value="ar">العربية</option>
+                <option value="zh">中文</option>
+                <option value="ja">日本語</option>
+                <option value="hi">हिन्दी</option>
+                <option value="sw">Kiswahili</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="setting-region" class="form-label">Content region</label>
+              <select id="setting-region" name="region" class="form-select">
+                <option value="global" selected>Global</option>
+                <option value="africa">Africa</option>
+                <option value="americas">Americas</option>
+                <option value="asia">Asia</option>
+                <option value="europe">Europe</option>
+                <option value="oceania">Oceania</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions form-actions--end">
+            <button type="submit" class="btn btn-primary">Save language</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Accessibility -->
+      <section id="settings-accessibility" class="settings-panel"
+               aria-labelledby="settings-a11y-heading">
+        <h2 class="settings-panel-heading" id="settings-a11y-heading">Accessibility</h2>
+        <p class="settings-panel-description">
+          Make OWF work better for you.
+        </p>
+        <form class="form" id="accessibility-settings-form" novalidate>
+          <div class="form-section">
+            <div class="form-group form-group--inline">
+              <label for="setting-reduce-motion" class="form-label">
+                Reduce motion
+                <span class="form-hint">Minimise animations throughout the app.</span>
+              </label>
+              <div class="form-toggle">
+                <input type="checkbox" id="setting-reduce-motion"
+                       name="reduceMotion" role="switch" aria-checked="false" />
+                <span class="form-toggle-track" aria-hidden="true"></span>
+                <span class="form-toggle-thumb" aria-hidden="true"></span>
+              </div>
+            </div>
+            <div class="form-group form-group--inline">
+              <label for="setting-high-contrast" class="form-label">
+                High contrast
+                <span class="form-hint">Increase colour contrast for readability.</span>
+              </label>
+              <div class="form-toggle">
+                <input type="checkbox" id="setting-high-contrast"
+                       name="highContrast" role="switch" aria-checked="false" />
+                <span class="form-toggle-track" aria-hidden="true"></span>
+                <span class="form-toggle-thumb" aria-hidden="true"></span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="setting-font-size" class="form-label">Text size</label>
+              <select id="setting-font-size" name="fontSize" class="form-select">
+                <option value="sm">Small</option>
+                <option value="base" selected>Default</option>
+                <option value="lg">Large</option>
+                <option value="xl">Extra large</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-actions form-actions--end">
+            <button type="submit" class="btn btn-primary">Save accessibility</button>
+          </div>
+        </form>
+      </section>
+
+    </div><!-- /.settings-content -->
+  </div><!-- /.settings-layout -->
+
+</section>

@@ -1,0 +1,216 @@
+/*
+ * OWF | One World Feed
+ * Root stylesheet — imports global partials and defines app-level layout.
+ */
+
+/* ── Global partials ───────────────────────────────────────────────────── */
+@import '/assets/css/global/global.css';
+@import '/assets/css/global/layout.css';
+@import '/assets/css/global/nav.css';
+@import '/assets/css/global/right-panel.css';
+@import '/assets/css/global/feed.css';
+@import '/assets/css/global/style.css';
+@import '/assets/css/global/screenreader.css';
+@import '/assets/css/global/reduced-motion.css';
+@import '/assets/css/global/high-contrast.css';
+
+/* ── App-level CSS custom properties ───────────────────────────────────── */
+:root {
+  /* Spacing scale */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* App shell dimensions */
+  --nav-width:          260px;
+  --nav-collapsed-width: 64px;
+  --right-panel-width:  320px;
+  --feed-max-width:     680px;
+  --header-height:       56px;
+
+  /* Typography */
+  --font-sans:   'Inter', 'Segoe UI', system-ui, sans-serif;
+  --font-mono:   'JetBrains Mono', 'Fira Code', monospace;
+  --font-size-xs:   0.75rem;
+  --font-size-sm:   0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg:   1.125rem;
+  --font-size-xl:   1.25rem;
+  --font-size-2xl:  1.5rem;
+  --font-size-3xl:  1.875rem;
+  --line-height-tight:  1.25;
+  --line-height-normal: 1.5;
+  --line-height-loose:  1.75;
+
+  /* Border radius */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+  --radius-lg:   12px;
+  --radius-xl:   16px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm:  0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md:  0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-lg:  0 8px 24px rgba(0, 0, 0, 0.3);
+
+  /* Transitions */
+  --transition-fast:   150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow:   400ms ease;
+
+  /* Z-index scale */
+  --z-base:    0;
+  --z-raised:  10;
+  --z-overlay: 100;
+  --z-modal:   200;
+  --z-toast:   300;
+}
+
+/* ── Base reset / normalize ─────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+video,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+/* ── App shell — CSS grid layout ────────────────────────────────────────── */
+#app {
+  display: grid;
+  grid-template-columns: var(--nav-width) 1fr var(--right-panel-width);
+  grid-template-rows: 100dvh;
+  grid-template-areas: "nav main aside";
+  overflow: hidden;
+}
+
+#main-nav {
+  grid-area: nav;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+}
+
+#main-content {
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--color-bg);
+}
+
+#right-panel {
+  grid-area: aside;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  padding: var(--space-6);
+  gap: var(--space-8);
+}
+
+/* Feed container */
+#feed-container {
+  flex: 1;
+  padding: var(--space-6) var(--space-4);
+  max-width: var(--feed-max-width);
+  width: 100%;
+  margin-inline: auto;
+}
+
+/* ── Responsive breakpoints ─────────────────────────────────────────────── */
+@media (max-width: 1200px) {
+  #app {
+    grid-template-columns: var(--nav-width) 1fr;
+    grid-template-areas: "nav main";
+  }
+  #right-panel {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  #app {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+      "nav"
+      "main"
+      "nav";
+  }
+  #main-nav {
+    flex-direction: row;
+    height: var(--header-height);
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: var(--z-overlay);
+  }
+}
+
+/* ── Utility: screen-reader only ────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

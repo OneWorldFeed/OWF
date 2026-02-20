@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables — never commit secrets
+.env
+.env.*
+*.local
+
+# macOS metadata
+.DS_Store
+
+# Windows thumbnail cache
+Thumbs.db
+
+# Editor directories
+.idea/
+.vscode/
+
+# Firebase cache
+.firebase/

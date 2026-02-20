@@ -1,0 +1,17 @@
+/* ==========================================================================
+   OWF — Feed Card | Tag: "new"
+   Green pill badge indicating fresh or recently-published content.
+   ========================================================================== */
+
+.card__tag--new {
+  background-color: rgba(5, 150, 105, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  font-weight: 600;
+}
+
+[data-theme="light"] .card__tag--new {
+  background-color: rgba(5, 150, 105, 0.1);
+  color: #059669;
+  border-color: rgba(5, 150, 105, 0.25);
+}

@@ -1,0 +1,31 @@
+{
+  "spotlight": [
+    {
+      "id": "spot-001",
+      "title": "The Rise of Afrobeats: How West Africa Is Reshaping Global Music",
+      "description": "From Lagos nightclubs to the Billboard Hot 100, Afrobeats has become the world's fastest-growing music genre. We trace its roots, its stars, and the cultural movement powering its global ascent.",
+      "type": "feature",
+      "timestamp": "2025-01-15T08:00:00Z",
+      "featured": true,
+      "image": "https://picsum.photos/seed/afrobeats-spotlight/800/450"
+    },
+    {
+      "id": "spot-002",
+      "title": "Inside the Lab: Scientists Engineer Coral That Survives 35°C Ocean Temperatures",
+      "description": "A team of marine biologists at the Australian Institute of Marine Science have successfully stress-tested heat-resistant coral strains that could save the Great Barrier Reef — and reefs worldwide — from bleaching.",
+      "type": "science",
+      "timestamp": "2025-01-14T12:00:00Z",
+      "featured": false,
+      "image": "https://picsum.photos/seed/coral-science/800/450"
+    },
+    {
+      "id": "spot-003",
+      "title": "Live: World Economic Forum 2025 — Day 2 Highlights",
+      "description": "CEOs, heads of state, and civil society leaders convened in Davos to debate AI governance, deglobalisation, and the future of work. Catch up on the key moments, quotes, and commitments from today's sessions.",
+      "type": "live",
+      "timestamp": "2025-01-15T16:30:00Z",
+      "featured": false,
+      "image": "https://picsum.photos/seed/davos-2025/800/450"
+    }
+  ]
+}

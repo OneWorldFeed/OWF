@@ -1,0 +1,14 @@
+/* ==========================================================================
+   OWF — Feed Card | Region: Africa
+   Subtle green left-border accent for African content.
+   ========================================================================== */
+
+feed-card[region="africa"] .card,
+.card[data-region="africa"] {
+  border-left-color: #22c55e;
+}
+
+feed-card[region="africa"] .card::before,
+.card[data-region="africa"]::before {
+  background-color: #22c55e;
+}

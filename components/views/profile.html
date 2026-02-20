@@ -1,0 +1,146 @@
+<!-- OWF | One World Feed — Profile View -->
+<section class="view view-profile" id="view-profile" aria-label="User profile">
+
+  <!-- Profile header -->
+  <header class="profile-header" aria-labelledby="profile-name">
+
+    <!-- Cover image -->
+    <div class="profile-cover" aria-hidden="true" role="img" aria-label="Profile cover image">
+      <div class="profile-cover-placeholder"></div>
+    </div>
+
+    <!-- Avatar + actions row -->
+    <div class="profile-meta-row">
+      <div class="profile-avatar-wrapper">
+        <div class="profile-avatar" role="img" aria-label="Profile avatar"
+             id="profile-avatar">
+          <!-- Initials or img rendered by JS -->
+        </div>
+        <span class="profile-status-dot" aria-label="Online" title="Online"></span>
+      </div>
+      <div class="profile-actions">
+        <button type="button" class="btn btn-ghost btn-icon"
+                aria-label="More options">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+               fill="currentColor" aria-hidden="true" focusable="false">
+            <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/>
+            <circle cx="12" cy="19" r="1.5"/>
+          </svg>
+        </button>
+        <button type="button" class="btn btn-secondary"
+                id="edit-profile-btn" aria-label="Edit your profile">
+          Edit profile
+        </button>
+      </div>
+    </div>
+
+    <!-- Name, handle, bio -->
+    <div class="profile-info">
+      <h1 class="profile-name" id="profile-name">Display Name</h1>
+      <p class="profile-handle" aria-label="Username">@username</p>
+      <p class="profile-bio">
+        Passionate about global stories, music, and tech. Building things at the
+        intersection of people &amp; technology. 🌍
+      </p>
+
+      <!-- Profile metadata -->
+      <ul class="profile-details" aria-label="Profile details">
+        <li class="profile-detail-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true" focusable="false">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+          <span>Earth</span>
+        </li>
+        <li class="profile-detail-item">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true" focusable="false">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span>Joined January 2025</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Stats row -->
+    <div class="profile-stats" role="list" aria-label="Profile statistics">
+      <div class="profile-stat" role="listitem">
+        <span class="profile-stat-value" id="stat-following">248</span>
+        <span class="profile-stat-label">Following</span>
+      </div>
+      <div class="profile-stat" role="listitem">
+        <span class="profile-stat-value" id="stat-followers">1.4K</span>
+        <span class="profile-stat-label">Followers</span>
+      </div>
+      <div class="profile-stat" role="listitem">
+        <span class="profile-stat-value" id="stat-posts">312</span>
+        <span class="profile-stat-label">Posts</span>
+      </div>
+    </div>
+
+  </header>
+
+  <!-- Profile content tabs -->
+  <nav class="profile-tabs" aria-label="Profile content tabs">
+    <ul class="profile-tabs-list" role="tablist">
+      <li role="presentation">
+        <button type="button" role="tab"
+                class="profile-tab profile-tab--active"
+                id="ptab-posts"
+                aria-selected="true"
+                aria-controls="profile-feed"
+                data-tab="posts">
+          Posts
+        </button>
+      </li>
+      <li role="presentation">
+        <button type="button" role="tab"
+                class="profile-tab"
+                id="ptab-media"
+                aria-selected="false"
+                aria-controls="profile-feed"
+                data-tab="media">
+          Media
+        </button>
+      </li>
+      <li role="presentation">
+        <button type="button" role="tab"
+                class="profile-tab"
+                id="ptab-likes"
+                aria-selected="false"
+                aria-controls="profile-feed"
+                data-tab="likes">
+          Likes
+        </button>
+      </li>
+      <li role="presentation">
+        <button type="button" role="tab"
+                class="profile-tab"
+                id="ptab-saved"
+                aria-selected="false"
+                aria-controls="profile-feed"
+                data-tab="saved">
+          Saved
+        </button>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Profile feed -->
+  <div id="profile-feed"
+       class="profile-feed"
+       role="feed"
+       aria-label="Profile posts"
+       aria-live="polite">
+    <ul class="feed-list" role="list" aria-label="Profile post list" id="profile-post-list"></ul>
+  </div>
+
+</section>
