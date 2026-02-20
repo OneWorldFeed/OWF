@@ -1,115 +1,34 @@
 /**
  * OWF | One World Feed
- * modules/music/music.js — Music page module.
+ * modules/music/music.js – Music view module
  */
 
-import { loadFeed } from '../feed-loader/feed-loader.js';
+import { loadView } from '../global/view-loader.js';
 
-// ── Player state ──────────────────────────────────────────────────────────────
+let rootEl = null;
 
-const _player = {
-  currentTrack: null,
-  isPlaying:    false,
-  volume:       1.0,
-};
+export async function init({ root, state }) {
+  rootEl = root;
 
-// ── Now Playing bar ───────────────────────────────────────────────────────────
+  // Load the HTML template for this view
+  const html = await loadView('music');
+  rootEl.innerHTML = html;
 
-function _updateNowPlaying(track) {
-  const bar = document.getElementById('music-now-playing');
-  if (!bar) return;
-
-  bar.hidden = !track;
-  if (!track) return;
-
-  const titleEl = bar.querySelector('.now-playing__title');
-  const artistEl = bar.querySelector('.now-playing__artist');
-
-  if (titleEl)  titleEl.textContent  = track.title  ?? '';
-  if (artistEl) artistEl.textContent = track.source ?? '';
+  // Attach listeners, hydrate UI, etc.
+  // Example:
+  // const playBtn = rootEl.querySelector('.music-play');
+  // playBtn?.addEventListener('click', () => {
+  //   console.log('Playing track…');
+  // });
 }
 
-// ── Player controls ───────────────────────────────────────────────────────────
+export function destroy() {
+  if (!rootEl) return;
 
-function _setupPlayerControls() {
-  const playBtn = document.getElementById('music-play-btn');
-  const prevBtn = document.getElementById('music-prev-btn');
-  const nextBtn = document.getElementById('music-next-btn');
-  const volSlider = document.getElementById('music-volume');
+  // Remove listeners, timers, observers, etc.
+  // Example:
+  // const playBtn = rootEl.querySelector('.music-play');
+  // playBtn?.removeEventListener('click', ...);
 
-  if (playBtn) {
-    playBtn.addEventListener('click', () => {
-      _player.isPlaying = !_player.isPlaying;
-      playBtn.textContent = _player.isPlaying ? '⏸' : '▶';
-      playBtn.setAttribute('aria-label', _player.isPlaying ? 'Pause' : 'Play');
-    });
-  }
-
-  if (prevBtn) {
-    prevBtn.addEventListener('click', () => {
-      console.info('[music] Previous track');
-    });
-  }
-
-  if (nextBtn) {
-    nextBtn.addEventListener('click', () => {
-      console.info('[music] Next track');
-    });
-  }
-
-  if (volSlider) {
-    volSlider.addEventListener('input', (e) => {
-      _player.volume = Number(e.target.value) / 100;
-    });
-  }
+  rootEl = null;
 }
-
-// ── Genre filter ──────────────────────────────────────────────────────────────
-
-const GENRES = ['All', 'Afrobeats', 'Pop', 'Hip-Hop', 'Electronic', 'Classical', 'Jazz', 'Rock'];
-
-function _renderGenreFilter() {
-  const container = document.getElementById('music-genre-filter')
-    ?? document.querySelector('.music-genre-filter');
-  if (!container) return;
-
-  container.innerHTML = '';
-
-  const label = document.createElement('span');
-  label.className = 'sr-only';
-  label.id = 'genre-filter-label';
-  label.textContent = 'Filter by genre:';
-  container.appendChild(label);
-
-  GENRES.forEach((genre, i) => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'genre-filter-btn';
-    btn.textContent = genre;
-    btn.dataset.genre = genre.toLowerCase();
-    btn.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
-    if (i === 0) btn.classList.add('genre-filter-btn--active');
-
-    btn.addEventListener('click', () => {
-      container.querySelectorAll('.genre-filter-btn').forEach((b) => {
-        b.setAttribute('aria-pressed', 'false');
-        b.classList.remove('genre-filter-btn--active');
-      });
-      btn.setAttribute('aria-pressed', 'true');
-      btn.classList.add('genre-filter-btn--active');
-    });
-
-    container.appendChild(btn);
-  });
-}
-
-// ── init ──────────────────────────────────────────────────────────────────────
-
-export async function init() {
-  _renderGenreFilter();
-  await loadFeed('music');
-  _setupPlayerControls();
-  console.info('[OWF:music] Initialised.');
-}
-
-export default { init };
