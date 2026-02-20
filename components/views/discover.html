@@ -1,120 +1,13 @@
-<!-- OWF | One World Feed — Discover View -->
-<section class="view view-discover" id="view-discover" aria-label="Discover content">
-
-  <!-- Header -->
-  <header class="view-section-header" aria-labelledby="discover-heading">
-    <h1 class="view-heading" id="discover-heading">Discover</h1>
-    <p class="view-subheading">Explore trending topics and curated content from around the world.</p>
+<section class="view view-discover">
+  <header class="view-header">
+    <h1 class="view-title">Discover</h1>
+    <p class="view-subtitle">Explore the world’s ideas.</p>
   </header>
 
-  <!-- Search prompt -->
-  <div class="discover-search" role="search" aria-label="Search to discover content">
-    <label for="discover-search-input" class="sr-only">Search to discover content</label>
-    <span class="header-search-icon" aria-hidden="true">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-           fill="none" stroke="currentColor" stroke-width="2"
-           stroke-linecap="round" stroke-linejoin="round"
-           width="16" height="16" aria-hidden="true" focusable="false">
-        <circle cx="11" cy="11" r="8"/>
-        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
-    </span>
-    <input type="search"
-           id="discover-search-input"
-           class="form-input"
-           placeholder="Search topics, people, places…"
-           autocomplete="off"
-           aria-label="Search to discover content"
-           aria-autocomplete="list"
-           aria-haspopup="listbox" />
+  <div class="view-body">
+    <div class="discover-shell">
+      <!-- Discover feed and modules will be hydrated here -->
+      <p class="placeholder">Your discovery feed will appear here.</p>
+    </div>
   </div>
-
-  <!-- Trending topics -->
-  <section class="discover-section" aria-labelledby="trending-heading">
-    <div class="discover-section-header">
-      <h2 class="discover-section-title" id="trending-heading">
-        🔥 Trending now
-      </h2>
-      <button type="button" class="btn btn-ghost btn-sm"
-              aria-label="Refresh trending topics">
-        Refresh
-      </button>
-    </div>
-    <ul class="discover-trending-list" role="list"
-        id="discover-trending-list" aria-label="Trending topics">
-      <!-- Rendered by JS -->
-    </ul>
-  </section>
-
-  <!-- Featured / editor's picks -->
-  <section class="discover-section" aria-labelledby="featured-heading">
-    <div class="discover-section-header">
-      <h2 class="discover-section-title" id="featured-heading">
-        ✨ Featured
-      </h2>
-    </div>
-    <div class="discover-featured-grid" id="discover-featured-grid"
-         role="list" aria-label="Featured content">
-      <!-- Featured cards rendered by JS -->
-    </div>
-  </section>
-
-  <!-- Category grid -->
-  <section class="discover-section" aria-labelledby="categories-heading">
-    <h2 class="discover-section-title" id="categories-heading">
-      Browse by category
-    </h2>
-
-    <ul class="discover-category-grid" role="list" aria-label="Content categories">
-      <li role="listitem">
-        <a href="#/news" class="discover-category-card discover-category-card--news"
-           aria-label="Browse News">
-          <span class="discover-category-icon" aria-hidden="true">📰</span>
-          <span class="discover-category-name">News</span>
-          <span class="discover-category-desc">Global &amp; local headlines</span>
-        </a>
-      </li>
-      <li role="listitem">
-        <a href="#/music" class="discover-category-card discover-category-card--music"
-           aria-label="Browse Music">
-          <span class="discover-category-icon" aria-hidden="true">🎵</span>
-          <span class="discover-category-name">Music</span>
-          <span class="discover-category-desc">Charts, new releases &amp; more</span>
-        </a>
-      </li>
-      <li role="listitem">
-        <a href="#/podcasts" class="discover-category-card discover-category-card--podcasts"
-           aria-label="Browse Podcasts">
-          <span class="discover-category-icon" aria-hidden="true">🎙️</span>
-          <span class="discover-category-name">Podcasts</span>
-          <span class="discover-category-desc">Stories, interviews &amp; deep dives</span>
-        </a>
-      </li>
-      <li role="listitem">
-        <a href="#/social" class="discover-category-card discover-category-card--social"
-           aria-label="Browse Social">
-          <span class="discover-category-icon" aria-hidden="true">💬</span>
-          <span class="discover-category-name">Social</span>
-          <span class="discover-category-desc">Connect with the world</span>
-        </a>
-      </li>
-      <li role="listitem">
-        <a href="#/live" class="discover-category-card discover-category-card--live"
-           aria-label="Browse Live streams">
-          <span class="discover-category-icon" aria-hidden="true">🔴</span>
-          <span class="discover-category-name">Live</span>
-          <span class="discover-category-desc">Watch &amp; interact in real time</span>
-        </a>
-      </li>
-      <li role="listitem">
-        <a href="#/ai" class="discover-category-card discover-category-card--ai"
-           aria-label="Browse AI content">
-          <span class="discover-category-icon" aria-hidden="true">🤖</span>
-          <span class="discover-category-name">AI</span>
-          <span class="discover-category-desc">Curated &amp; assisted content</span>
-        </a>
-      </li>
-    </ul>
-  </section>
-
 </section>
