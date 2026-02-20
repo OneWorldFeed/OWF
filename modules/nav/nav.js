@@ -10,7 +10,7 @@ import { router } from '../router/router.js';
 
 const NAV_ROUTES = [
   { path: '/',          label: 'Home',     icon: '/assets/icons/home.svg',    iconFallback: '🏠' },
-  { path: '/discover',  label: 'Discover', icon: '/assets/icons/home.svg',    iconFallback: '🔭' },
+  { path: '/discover',  label: 'Discover', icon: '/assets/icons/discover.svg', iconFallback: '🔭' },
   { path: '/news',      label: 'News',     icon: '/assets/icons/news.svg',    iconFallback: '📰' },
   { path: '/social',    label: 'Social',   icon: '/assets/icons/social.svg',  iconFallback: '💬' },
   { path: '/music',     label: 'Music',    icon: '/assets/icons/music.svg',   iconFallback: '🎵' },
@@ -18,7 +18,7 @@ const NAV_ROUTES = [
   { path: '/live',      label: 'Live',     icon: '/assets/icons/live.svg',    iconFallback: '🔴' },
   { path: '/ai',        label: 'AI',       icon: '/assets/icons/ai.svg',      iconFallback: '🤖' },
   { path: '/profile',   label: 'Profile',  icon: '/assets/icons/profile.svg', iconFallback: '👤' },
-  { path: '/settings',  label: 'Settings', icon: '/assets/icons/home.svg',    iconFallback: '⚙️' },
+  { path: '/settings',  label: 'Settings', icon: '/assets/icons/settings.svg', iconFallback: '⚙️' },
 ];
 
 // ── Module state ──────────────────────────────────────────────────────────────
