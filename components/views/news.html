@@ -1,121 +1,13 @@
-<!-- OWF | One World Feed — News View -->
-<section class="view view-news" id="view-news" aria-label="News feed">
-
-  <!-- Header -->
-  <header class="view-section-header" aria-labelledby="news-heading">
-    <h1 class="view-heading" id="news-heading">📰 News</h1>
-    <p class="view-subheading">Stay informed with global and local headlines.</p>
+<section class="view view-news">
+  <header class="view-header">
+    <h1 class="view-title">News</h1>
+    <p class="view-subtitle">A calm view of the world.</p>
   </header>
 
-  <!-- Breaking news banner -->
-  <div class="news-breaking-banner" id="news-breaking-banner"
-       role="alert" aria-live="assertive" aria-atomic="true"
-       aria-label="Breaking news alert" hidden>
-    <div class="news-breaking-inner">
-      <span class="news-breaking-label" aria-hidden="true">🔴 BREAKING</span>
-      <p class="news-breaking-text" id="news-breaking-text"></p>
-      <a href="#" class="news-breaking-link btn btn-ghost btn-sm"
-         id="news-breaking-link" aria-label="Read the full breaking news story">
-        Read more
-        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-             fill="none" stroke="currentColor" stroke-width="2.5"
-             stroke-linecap="round" stroke-linejoin="round"
-             aria-hidden="true" focusable="false">
-          <line x1="5" y1="12" x2="19" y2="12"/>
-          <polyline points="12 5 19 12 12 19"/>
-        </svg>
-      </a>
+  <div class="view-body">
+    <div class="news-shell">
+      <!-- News grid, summaries, and global moments will be hydrated here -->
+      <p class="placeholder">Your global news feed will appear here.</p>
     </div>
-    <button type="button" class="btn btn-ghost btn-icon news-breaking-dismiss"
-            aria-label="Dismiss breaking news banner">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14"
-           fill="none" stroke="currentColor" stroke-width="2"
-           stroke-linecap="round" stroke-linejoin="round"
-           aria-hidden="true" focusable="false">
-        <line x1="18" y1="6" x2="6" y2="18"/>
-        <line x1="6" y1="6" x2="18" y2="18"/>
-      </svg>
-    </button>
   </div>
-
-  <!-- News category tabs -->
-  <nav class="feed-tabs" aria-label="News categories">
-    <ul class="feed-tabs-list" role="tablist" aria-label="Filter news by category">
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab feed-tab--active"
-                id="news-tab-all" aria-selected="true"
-                aria-controls="news-feed-container"
-                data-tab="all">
-          All
-        </button>
-      </li>
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab"
-                id="news-tab-world" aria-selected="false"
-                aria-controls="news-feed-container"
-                data-tab="world">
-          🌍 World
-        </button>
-      </li>
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab"
-                id="news-tab-politics" aria-selected="false"
-                aria-controls="news-feed-container"
-                data-tab="politics">
-          🏛️ Politics
-        </button>
-      </li>
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab"
-                id="news-tab-tech" aria-selected="false"
-                aria-controls="news-feed-container"
-                data-tab="tech">
-          💻 Tech
-        </button>
-      </li>
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab"
-                id="news-tab-science" aria-selected="false"
-                aria-controls="news-feed-container"
-                data-tab="science">
-          🔬 Science
-        </button>
-      </li>
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab"
-                id="news-tab-sports" aria-selected="false"
-                aria-controls="news-feed-container"
-                data-tab="sports">
-          ⚽ Sports
-        </button>
-      </li>
-      <li role="presentation">
-        <button type="button" role="tab"
-                class="feed-tab"
-                id="news-tab-business" aria-selected="false"
-                aria-controls="news-feed-container"
-                data-tab="business">
-          💼 Business
-        </button>
-      </li>
-    </ul>
-  </nav>
-
-  <!-- News feed container -->
-  <div id="news-feed-container"
-       class="feed-container"
-       role="feed"
-       aria-label="News articles feed"
-       aria-live="polite"
-       aria-busy="false">
-    <ul id="news-feed-list" class="feed-list" role="list"
-        aria-label="News articles"></ul>
-  </div>
-
 </section>
