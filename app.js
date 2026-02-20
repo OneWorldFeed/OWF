@@ -5,11 +5,12 @@
  * Boots all core modules in dependency order and wires up the SPA shell.
  */
 
-import { initGlobal } from './assets/js/modules/global.js';
-import { initRouter } from './assets/js/modules/router.js';
-import { initNav } from './assets/js/modules/nav.js';
-import { initRightPanel } from './assets/js/modules/right-panel.js';
-import { initFeedLoader } from './assets/js/modules/feed-loader.js';
+import { initGlobal } from './modules/global/global.js';
+import { initRouter, router } from './modules/router/router.js';
+import { initNav } from './modules/nav/nav.js';
+import { initRightPanel } from './modules/right-panel/right-panel.js';
+import { initFeedLoader } from './modules/feed-loader/feed-loader.js';
+import { init as initBadges } from './modules/badges/badges.js';
 
 /**
  * Application state shared across modules.
@@ -53,8 +54,9 @@ export async function init() {
     // 2. Initialise global utilities (error handling, event bus, helpers).
     await initGlobal(appState);
 
-    // 3. Initialise the client-side router (hash-based SPA routing).
+    // 3. Initialise the client-side router and register page module handlers.
     await initRouter(appState);
+    _registerRouteHandlers();
 
     // 4. Render navigation sidebar.
     await initNav(appState);
@@ -65,6 +67,12 @@ export async function init() {
     // 6. Kick off the initial feed load.
     await initFeedLoader(appState);
 
+    // 7. Initialise badges (awards early-adopter on first visit).
+    initBadges();
+
+    // Expose router globally for modules that need programmatic navigation.
+    window.__owfRouter = router;
+
     console.info('[OWF] App initialised successfully.');
   } catch (err) {
     console.error('[OWF] Fatal initialisation error:', err);
@@ -73,8 +81,34 @@ export async function init() {
 }
 
 /**
+ * Register per-route page module handlers with the router.
+ * Modules are dynamically imported to keep the initial bundle lean.
+ */
+function _registerRouteHandlers() {
+  const pageModules = {
+    '/':         () => import('./modules/home/home.js'),
+    '/profile':  () => import('./modules/profile/profile.js'),
+    '/social':   () => import('./modules/social/social.js'),
+    '/settings': () => import('./modules/settings/settings.js'),
+    '/discover': () => import('./modules/discover/discover.js'),
+    '/podcasts': () => import('./modules/podcasts/podcasts.js'),
+    '/live':     () => import('./modules/live/live.js'),
+    '/ai':       () => import('./modules/ai/ai.js'),
+    '/news':     () => import('./modules/news/news.js'),
+    '/music':    () => import('./modules/music/music.js'),
+  };
+
+  for (const [path, loader] of Object.entries(pageModules)) {
+    router.register(path, async () => {
+      const mod = await loader();
+      if (typeof mod.init === 'function') await mod.init();
+      else if (mod.default?.init) await mod.default.init();
+    });
+  }
+}
+
+/**
  * Render a minimal fallback error screen when boot fails.
- *
  * @param {Error} err
  */
 function renderErrorScreen(err) {
