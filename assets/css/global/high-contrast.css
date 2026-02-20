@@ -1,0 +1,224 @@
+/* ==========================================================================
+   OWF — High Contrast Styles
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. System Preference: prefers-contrast: high
+   -------------------------------------------------------------------------- */
+
+@media (prefers-contrast: high) {
+  :root {
+    /* Amplify contrast for text */
+    --color-text:           #000000;
+    --color-text-secondary: #1a1a1a;
+    --color-text-tertiary:  #333333;
+    --color-text-disabled:  #666666;
+
+    /* Background — true white/black */
+    --color-bg:             #ffffff;
+    --color-bg-secondary:   #ffffff;
+    --color-bg-card:        #ffffff;
+    --color-surface:        #ffffff;
+
+    /* Borders — fully opaque, thicker feel */
+    --color-border:         #000000;
+    --color-border-strong:  #000000;
+
+    /* Shadows — none (rely on borders instead) */
+    --color-shadow:         transparent;
+    --color-shadow-strong:  transparent;
+    --shadow-xs: none;
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+    --shadow-2xl: none;
+
+    /* Primary — ensure WCAG AA/AAA on white */
+    --color-primary:        #3700b3;
+    --color-primary-hover:  #1a0070;
+    --color-primary-subtle: rgba(55, 0, 179, 0.12);
+
+    --color-accent:         #b30000;
+    --color-accent-hover:   #800000;
+
+    --color-success:        #006400;
+    --color-warning:        #7a4100;
+    --color-danger:         #b30000;
+  }
+
+  /* Force visible borders on interactive elements */
+  .btn,
+  .input,
+  .card,
+  .panel-section,
+  .post-card,
+  .chip,
+  .nav-link,
+  .post-action {
+    border-width: 2px !important;
+    border-style: solid !important;
+  }
+
+  /* Underline all links for non-color distinction */
+  a,
+  .nav-link,
+  .text-primary {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* Active/focus states — use solid outlines */
+  :focus-visible,
+  a:focus-visible,
+  button:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 3px solid #000000;
+    outline-offset: 3px;
+  }
+
+  /* Remove backdrop blurs */
+  .page-header,
+  .feed-tabs {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: var(--color-bg-secondary);
+  }
+
+  /* Ensure skeleton/shimmer is visible */
+  .skeleton-line,
+  .post-card__avatar.skeleton {
+    background-color: #cccccc;
+    border: 1px solid #000000;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. Dark mode + High Contrast
+   -------------------------------------------------------------------------- */
+
+@media (prefers-color-scheme: dark) and (prefers-contrast: high) {
+  :root:not([data-theme="light"]) {
+    --color-text:           #ffffff;
+    --color-text-secondary: #eeeeee;
+    --color-text-tertiary:  #cccccc;
+    --color-text-disabled:  #999999;
+
+    --color-bg:             #000000;
+    --color-bg-secondary:   #000000;
+    --color-bg-card:        #000000;
+    --color-surface:        #111111;
+
+    --color-border:         #ffffff;
+    --color-border-strong:  #ffffff;
+
+    --color-primary:        #bb86fc;
+    --color-primary-hover:  #d7b4fe;
+    --color-primary-subtle: rgba(187, 134, 252, 0.2);
+
+    --color-accent:         #ff6e6e;
+    --color-success:        #69ff6e;
+    --color-danger:         #ff6e6e;
+  }
+
+  :focus-visible,
+  a:focus-visible,
+  button:focus-visible {
+    outline: 3px solid #ffffff;
+    outline-offset: 3px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   3. JS-Controlled High Contrast Class
+      Applied by JavaScript when user toggles high-contrast mode via UI.
+   -------------------------------------------------------------------------- */
+
+.high-contrast {
+  --color-text:           #000000;
+  --color-text-secondary: #1a1a1a;
+  --color-text-tertiary:  #333333;
+  --color-text-disabled:  #666666;
+  --color-text-inverse:   #ffffff;
+
+  --color-bg:             #ffffff;
+  --color-bg-secondary:   #ffffff;
+  --color-bg-card:        #ffffff;
+  --color-surface:        #ffffff;
+  --color-surface-raised: #f0f0f0;
+
+  --color-border:         #000000;
+  --color-border-strong:  #000000;
+  --color-border-focus:   #000000;
+
+  --color-primary:        #3700b3;
+  --color-primary-hover:  #1a0070;
+  --color-primary-subtle: rgba(55, 0, 179, 0.12);
+
+  --color-accent:         #b30000;
+  --color-success:        #006400;
+  --color-warning:        #7a4100;
+  --color-danger:         #b30000;
+
+  --color-shadow:         transparent;
+  --color-shadow-strong:  transparent;
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+}
+
+/* High-contrast element overrides */
+.high-contrast .btn,
+.high-contrast .input,
+.high-contrast .card,
+.high-contrast .panel-section,
+.high-contrast .post-card,
+.high-contrast .chip {
+  border: 2px solid #000000 !important;
+}
+
+.high-contrast a,
+.high-contrast .nav-link,
+.high-contrast .text-primary {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.high-contrast :focus-visible,
+.high-contrast a:focus-visible,
+.high-contrast button:focus-visible {
+  outline: 3px solid #000000;
+  outline-offset: 3px;
+}
+
+.high-contrast .page-header,
+.high-contrast .feed-tabs {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background-color: #ffffff;
+  border-bottom-color: #000000;
+}
+
+.high-contrast .btn--primary {
+  background-color: #3700b3;
+  color: #ffffff;
+  border-color: #3700b3 !important;
+}
+
+.high-contrast .btn--secondary {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* --------------------------------------------------------------------------
+   4. Data attribute variant
+   -------------------------------------------------------------------------- */
+
+[data-high-contrast="true"] {
+  /* Inherits all variables from .high-contrast via JS class toggle,
+     or can be targeted independently for SSR scenarios. */
+  --color-border: #000000;
+  --color-border-strong: #000000;
+}

@@ -1,0 +1,214 @@
+/* ==========================================================================
+   OWF — Shimmer / Skeleton Loading Animations
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Keyframes
+   -------------------------------------------------------------------------- */
+
+@keyframes shimmer {
+  0% {
+    background-position: -600px 0;
+  }
+  100% {
+    background-position: 600px 0;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. Shimmer Mixin (gradient sweep)
+   -------------------------------------------------------------------------- */
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-border);
+  background-image: linear-gradient(
+    90deg,
+    var(--color-border)       0%,
+    var(--color-surface)      40%,
+    var(--color-border-strong) 55%,
+    var(--color-border)       100%
+  );
+  background-size: 1200px 100%;
+  background-repeat: no-repeat;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* --------------------------------------------------------------------------
+   3. .skeleton — full skeleton placeholder system
+   -------------------------------------------------------------------------- */
+
+.skeleton {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    90deg,
+    transparent       0%,
+    var(--color-surface) 50%,
+    transparent       100%
+  );
+  background-size: 600px 100%;
+  background-repeat: no-repeat;
+  background-position: -600px 0;
+  animation: shimmer 1.6s ease-in-out infinite;
+}
+
+/* --------------------------------------------------------------------------
+   4. Skeleton Shape Helpers
+   -------------------------------------------------------------------------- */
+
+/* Single-line text placeholder */
+.skeleton--line {
+  height: 14px;
+  border-radius: var(--radius-full);
+  margin-bottom: var(--spacing-2);
+}
+
+.skeleton--line-sm  { height: 10px; }
+.skeleton--line-lg  { height: 18px; }
+
+/* Width variants */
+.skeleton--w-20  { width: 20%; }
+.skeleton--w-30  { width: 30%; }
+.skeleton--w-40  { width: 40%; }
+.skeleton--w-50  { width: 50%; }
+.skeleton--w-60  { width: 60%; }
+.skeleton--w-70  { width: 70%; }
+.skeleton--w-80  { width: 80%; }
+.skeleton--w-90  { width: 90%; }
+.skeleton--w-full { width: 100%; }
+
+/* Circle (avatar) */
+.skeleton--circle {
+  border-radius: var(--radius-full);
+}
+
+.skeleton--avatar-sm  { width: 32px;  height: 32px; }
+.skeleton--avatar-md  { width: 40px;  height: 40px; }
+.skeleton--avatar-lg  { width: 56px;  height: 56px; }
+.skeleton--avatar-xl  { width: 80px;  height: 80px; }
+
+/* Rectangle (image / card) */
+.skeleton--rect {
+  border-radius: var(--radius-lg);
+}
+
+.skeleton--thumb-sm  { width: 60px;  height: 60px; }
+.skeleton--thumb-md  { width: 80px;  height: 80px; }
+.skeleton--image     { width: 100%;  height: 200px; }
+.skeleton--banner    { width: 100%;  height: 140px; }
+.skeleton--card      { width: 100%;  height: 120px; }
+
+/* Rounded pill (button / tag) */
+.skeleton--pill {
+  border-radius: var(--radius-full);
+  height: 28px;
+  width: 80px;
+  display: inline-block;
+}
+
+/* --------------------------------------------------------------------------
+   5. Skeleton Post Card Composition
+   -------------------------------------------------------------------------- */
+
+.skeleton-post {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: var(--spacing-3);
+  padding: var(--spacing-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.skeleton-post__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+}
+
+.skeleton-post__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+  flex: 1;
+}
+
+.skeleton-post__header {
+  display: flex;
+  gap: var(--spacing-2);
+  align-items: center;
+}
+
+.skeleton-post__name   { height: 12px; width: 100px; border-radius: var(--radius-full); }
+.skeleton-post__handle { height: 10px; width: 72px;  border-radius: var(--radius-full); }
+.skeleton-post__line   { height: 12px; border-radius: var(--radius-full); }
+.skeleton-post__actions {
+  display: flex;
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-2);
+}
+.skeleton-post__action-btn {
+  height: 20px;
+  width: 44px;
+  border-radius: var(--radius-full);
+}
+
+/* Apply shimmer to all skeleton-post children */
+.skeleton-post > *,
+.skeleton-post__avatar,
+.skeleton-post__name,
+.skeleton-post__handle,
+.skeleton-post__line,
+.skeleton-post__action-btn {
+  /* Inherit shimmer via .skeleton class added via JS */
+}
+
+/* --------------------------------------------------------------------------
+   6. Skeleton Panel Item
+   -------------------------------------------------------------------------- */
+
+.skeleton-panel-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-4);
+}
+
+.skeleton-panel-item__avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.skeleton-panel-item__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+/* --------------------------------------------------------------------------
+   7. Shimmer Speed Variants
+   -------------------------------------------------------------------------- */
+
+.shimmer-slow  { animation-duration: 2.4s; }
+.shimmer-fast  { animation-duration: 0.9s; }
+
+/* --------------------------------------------------------------------------
+   8. Pause on hover
+   -------------------------------------------------------------------------- */
+
+.shimmer:hover,
+.skeleton:hover::after {
+  animation-play-state: paused;
+}

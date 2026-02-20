@@ -1,0 +1,91 @@
+/* ==========================================================================
+   OWF — Dark Theme
+   ========================================================================== */
+
+[data-theme="dark"] {
+  /* --- Surfaces --- */
+  --color-bg:              #0f0f0f;
+  --color-bg-secondary:    #1a1a1a;
+  --color-bg-card:         #1e1e1e;
+  --color-surface:         #252525;
+  --color-surface-raised:  #2e2e2e;
+  --color-surface-overlay: rgba(15, 15, 15, 0.92);
+
+  /* --- Text --- */
+  --color-text:            #f0f0f0;
+  --color-text-secondary:  #a0a0a0;
+  --color-text-tertiary:   #6b7280;
+  --color-text-disabled:   #4b5563;
+  --color-text-inverse:    #0f0f0f;
+  --color-text-link:       #8b83ff;
+  --color-text-link-hover: #a09aff;
+
+  /* --- Borders --- */
+  --color-border:          #2a2a2a;
+  --color-border-strong:   #3a3a3a;
+  --color-border-focus:    #6c63ff;
+
+  /* --- Brand --- */
+  --color-primary:         #6c63ff;
+  --color-primary-hover:   #7b74ff;
+  --color-primary-active:  #8b84ff;
+  --color-primary-subtle:  rgba(108, 99, 255, 0.18);
+
+  --color-accent:          #ff6584;
+  --color-accent-hover:    #ff7a96;
+  --color-accent-subtle:   rgba(255, 101, 132, 0.18);
+
+  --color-success:         #4ade80;
+  --color-success-subtle:  rgba(74, 222, 128, 0.18);
+  --color-warning:         #fbbf24;
+  --color-warning-subtle:  rgba(251, 191, 36, 0.18);
+  --color-danger:          #f87171;
+  --color-danger-subtle:   rgba(248, 113, 113, 0.18);
+  --color-info:            #60a5fa;
+  --color-info-subtle:     rgba(96, 165, 250, 0.18);
+
+  /* --- Shadows --- */
+  --color-shadow:          rgba(0, 0, 0, 0.5);
+  --color-shadow-strong:   rgba(0, 0, 0, 0.75);
+
+  --shadow-xs:  0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm:  0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md:  0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg:  0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.4);
+  --shadow-xl:  0 20px 25px -5px rgba(0, 0, 0, 0.55), 0 10px 10px -5px rgba(0, 0, 0, 0.45);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.75);
+
+  /* --- Scrollbar --- */
+  --scrollbar-thumb:       #3a3a3a;
+  --scrollbar-thumb-hover: #4a4a4a;
+}
+
+/* Dark-theme-specific component overrides */
+[data-theme="dark"] .post-card:hover {
+  background-color: rgba(108, 99, 255, 0.08);
+}
+
+[data-theme="dark"] .nav-link:hover {
+  background-color: rgba(108, 99, 255, 0.1);
+}
+
+[data-theme="dark"] .shimmer,
+[data-theme="dark"] .skeleton {
+  background-color: #2a2a2a;
+  background-image: linear-gradient(
+    90deg,
+    #2a2a2a 0%,
+    #333333 40%,
+    #3a3a3a 55%,
+    #2a2a2a 100%
+  );
+}
+
+[data-theme="dark"] .skeleton::after {
+  background-image: linear-gradient(
+    90deg,
+    transparent   0%,
+    rgba(60, 60, 60, 0.5) 50%,
+    transparent   100%
+  );
+}

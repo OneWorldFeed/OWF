@@ -1,0 +1,128 @@
+/* ==========================================================================
+   OWF — Spring Theme
+   Soft cherry blossoms, fresh greens, lavender, and warm cream whites
+   ========================================================================== */
+
+[data-theme="spring"] {
+  /* --- Surfaces --- */
+  --color-bg:              #fef0f5;
+  --color-bg-secondary:    #fff8fb;
+  --color-bg-card:         #fff8fb;
+  --color-surface:         #ffffff;
+  --color-surface-raised:  #ffffff;
+  --color-surface-overlay: rgba(254, 240, 245, 0.93);
+
+  /* --- Text --- */
+  --color-text:            #2a0a18;
+  --color-text-secondary:  #78405a;
+  --color-text-tertiary:   #a87890;
+  --color-text-disabled:   #d8aac0;
+  --color-text-inverse:    #ffffff;
+  --color-text-link:       #c0408a;
+  --color-text-link-hover: #a02878;
+
+  /* --- Borders --- */
+  --color-border:          #f0c8da;
+  --color-border-strong:   #e0a0bc;
+  --color-border-focus:    #c0408a;
+
+  /* --- Brand (blossom pink / fresh green) --- */
+  --color-primary:         #c0408a;
+  --color-primary-hover:   #a02878;
+  --color-primary-active:  #801860;
+  --color-primary-subtle:  rgba(192, 64, 138, 0.12);
+
+  --color-accent:          #58b878;
+  --color-accent-hover:    #409a60;
+  --color-accent-subtle:   rgba(88, 184, 120, 0.12);
+
+  --color-success:         #38a858;
+  --color-success-subtle:  rgba(56, 168, 88, 0.12);
+  --color-warning:         #d88828;
+  --color-warning-subtle:  rgba(216, 136, 40, 0.12);
+  --color-danger:          #d04858;
+  --color-danger-subtle:   rgba(208, 72, 88, 0.12);
+  --color-info:            #5890e0;
+  --color-info-subtle:     rgba(88, 144, 224, 0.12);
+
+  /* --- Shadows (rosy, light) --- */
+  --color-shadow:          rgba(120, 40, 80, 0.10);
+  --color-shadow-strong:   rgba(120, 40, 80, 0.22);
+
+  --shadow-xs:  0 1px 2px rgba(120, 40, 80, 0.07);
+  --shadow-sm:  0 1px 3px rgba(120, 40, 80, 0.09), 0 1px 2px rgba(120, 40, 80, 0.07);
+  --shadow-md:  0 4px 6px -1px rgba(120, 40, 80, 0.09), 0 2px 4px -1px rgba(120, 40, 80, 0.07);
+  --shadow-lg:  0 10px 15px -3px rgba(120, 40, 80, 0.09), 0 4px 6px -2px rgba(120, 40, 80, 0.06);
+  --shadow-xl:  0 20px 25px -5px rgba(120, 40, 80, 0.09), 0 10px 10px -5px rgba(120, 40, 80, 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgba(120, 40, 80, 0.18);
+
+  /* --- Scrollbar --- */
+  --scrollbar-thumb:       #e0a0bc;
+  --scrollbar-thumb-hover: #c07898;
+}
+
+/* Spring-specific shimmer — soft pink blush shimmer */
+[data-theme="spring"] .shimmer,
+[data-theme="spring"] .skeleton {
+  background-color: #f0c8da;
+  background-image: linear-gradient(
+    90deg,
+    #f0c8da 0%,
+    #fff0f8 40%,
+    #f8d8e8 55%,
+    #f0c8da 100%
+  );
+}
+
+[data-theme="spring"] .skeleton::after {
+  background-image: linear-gradient(
+    90deg,
+    transparent             0%,
+    rgba(255, 240, 250, 0.8) 50%,
+    transparent             100%
+  );
+}
+
+/* Active nav — blossom pink */
+[data-theme="spring"] .nav-link.is-active,
+[data-theme="spring"] .nav-link[aria-current="page"] {
+  background-color: rgba(192, 64, 138, 0.1);
+  color: #c0408a;
+}
+
+[data-theme="spring"] .nav-link.is-active::before,
+[data-theme="spring"] .nav-link[aria-current="page"]::before {
+  background-color: #c0408a;
+}
+
+/* Feed tab active — fresh green */
+[data-theme="spring"] .feed-tab.is-active {
+  color: #58b878;
+  border-bottom-color: #58b878;
+}
+
+/* Post tag — spring green */
+[data-theme="spring"] .post-tag {
+  background-color: rgba(88, 184, 120, 0.12);
+  color: #38a858;
+}
+
+[data-theme="spring"] .post-tag:hover {
+  background-color: #58b878;
+  color: #ffffff;
+}
+
+/* Primary button overrides */
+[data-theme="spring"] .btn--primary {
+  background-color: #c0408a;
+}
+
+[data-theme="spring"] .btn--primary:hover {
+  background-color: #a02878;
+}
+
+/* Source badge — lavender tint */
+[data-theme="spring"] .post-card__source-badge {
+  background-color: rgba(192, 64, 138, 0.1);
+  color: #c0408a;
+}

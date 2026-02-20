@@ -1,0 +1,111 @@
+/* ==========================================================================
+   OWF — Reduced Motion
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. System Preference: prefers-reduced-motion
+      Strips all animations and transitions for users who opt out of motion.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable transforms that imply motion */
+  .page-enter,
+  .page-enter-active,
+  .transition-fade,
+  .transition-slide,
+  .lift,
+  .lift-sm,
+  .lift-lg,
+  .hover-scale,
+  .hover-glow,
+  .pulse,
+  .pulse-slow,
+  .pulse-fast,
+  .shimmer,
+  .skeleton {
+    animation: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* Stop looping background-position on shimmer */
+  .shimmer::after,
+  .skeleton::after {
+    animation: none !important;
+  }
+
+  /* Keep opacity transitions very brief for visibility changes */
+  .fade-in,
+  .fade-out {
+    transition: opacity 0.01ms !important;
+  }
+
+  /* View transitions — disable */
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   2. JS-Controlled Reduced Motion
+      Applied by JavaScript when the user toggles motion via UI preference,
+      regardless of the OS-level setting.
+   -------------------------------------------------------------------------- */
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+.reduce-motion .page-enter,
+.reduce-motion .page-enter-active,
+.reduce-motion .transition-fade,
+.reduce-motion .transition-slide,
+.reduce-motion .lift,
+.reduce-motion .lift-sm,
+.reduce-motion .lift-lg,
+.reduce-motion .hover-scale,
+.reduce-motion .pulse,
+.reduce-motion .pulse-slow,
+.reduce-motion .pulse-fast,
+.reduce-motion .shimmer,
+.reduce-motion .skeleton {
+  animation: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+.reduce-motion .shimmer::after,
+.reduce-motion .skeleton::after {
+  animation: none !important;
+}
+
+/* --------------------------------------------------------------------------
+   3. Data attribute variant
+      Allows targeting <html data-reduce-motion="true"> or <body>.
+   -------------------------------------------------------------------------- */
+
+[data-reduce-motion="true"] *,
+[data-reduce-motion="true"] *::before,
+[data-reduce-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
