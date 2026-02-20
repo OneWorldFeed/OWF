@@ -4,11 +4,15 @@
  */
 
 /* ── Global partials ───────────────────────────────────────────────────── */
-@import '/assets/css/global/reset.css';
-@import '/assets/css/global/variables.css';
-@import '/assets/css/global/typography.css';
+@import '/assets/css/global/global.css';
 @import '/assets/css/global/layout.css';
-@import '/assets/css/global/utilities.css';
+@import '/assets/css/global/nav.css';
+@import '/assets/css/global/right-panel.css';
+@import '/assets/css/global/feed.css';
+@import '/assets/css/global/style.css';
+@import '/assets/css/global/screenreader.css';
+@import '/assets/css/global/reduced-motion.css';
+@import '/assets/css/global/high-contrast.css';
 
 /* ── App-level CSS custom properties ───────────────────────────────────── */
 :root {

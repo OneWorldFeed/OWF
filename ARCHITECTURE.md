@@ -70,20 +70,29 @@ OWF/
 └── assets/
     ├── css/
     │   ├── global/         # Base styles imported by styles.css
-    │   │   ├── reset.css
-    │   │   ├── variables.css
-    │   │   ├── typography.css
-    │   │   ├── layout.css
-    │   │   └── utilities.css
+    │   │   ├── global.css          # Design tokens, base resets, dark-mode vars
+    │   │   ├── layout.css          # 3-column CSS Grid app shell, breakpoints
+    │   │   ├── nav.css             # Sidebar navigation styles
+    │   │   ├── right-panel.css     # Right panel (trending, spotlight, weather)
+    │   │   ├── feed.css            # Feed container, post cards, loading states
+    │   │   ├── style.css           # Shared utility classes (typography, spacing, etc.)
+    │   │   ├── screenreader.css    # .sr-only, skip links, focus-visible styles
+    │   │   ├── reduced-motion.css  # prefers-reduced-motion + .reduce-motion class
+    │   │   └── high-contrast.css   # prefers-contrast:high + .high-contrast class
     │   ├── themes/         # One file per named theme
-    │   │   ├── theme-dark.css
-    │   │   ├── theme-light.css
-    │   │   ├── theme-midnight.css
-    │   │   └── theme-neon.css
+    │   │   ├── dark.css
+    │   │   ├── light.css
+    │   │   ├── winter.css
+    │   │   ├── autumn.css
+    │   │   ├── summer.css
+    │   │   └── spring.css
     │   └── motion/         # Animation and transition rules
-    │       ├── transitions.css
-    │       ├── animations.css
-    │       └── reduced-motion.css
+    │       ├── page-entrance.css   # Page/route entrance keyframes
+    │       ├── transitions.css     # Fade/slide transitions + View Transitions API
+    │       ├── pulse.css           # Pulse animations and live indicators
+    │       ├── shimmer.css         # Shimmer/skeleton loading animations
+    │       ├── lift.css            # Lift/elevation hover animations
+    │       └── hover.css           # Hover effect utilities
     │
     ├── js/
     │   ├── modules/        # Core singleton modules (one responsibility each)
@@ -150,7 +159,7 @@ Themes are implemented as **CSS custom property overrides** scoped to `[data-the
 
 ### Adding a New Theme
 
-1. Create `assets/css/themes/theme-<name>.css` with all required variable overrides.
+1. Create `assets/css/themes/<name>.css` with all required variable overrides.
 2. Add a `<link>` to the stylesheet in `index.html`.
 3. Add the theme name to the theme-switcher UI component.
 
