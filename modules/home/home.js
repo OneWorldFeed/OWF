@@ -4,6 +4,7 @@
  */
 
 import { loadView } from '../global/view-loader.js';
+import { registerFeed, loadInitial } from '../feed-loader/feed-loader.js';
 
 let rootEl = null;
 
@@ -13,6 +14,21 @@ export async function init({ root, state }) {
   // Load the HTML template for this view
   const html = await loadView('home');
   rootEl.innerHTML = html;
+
+  // Register the home feed
+  registerFeed('home', async (cursor) => {
+    // TODO: Replace with real API call
+    return {
+      items: [
+        { id: '1', type: 'post', text: 'Welcome to your global feed.' }
+      ],
+      nextCursor: null,
+      hasMore: false
+    };
+  });
+
+  // Load the first page of the feed
+  await loadInitial('home');
 
   // Attach listeners, hydrate UI, etc.
   // Example:
