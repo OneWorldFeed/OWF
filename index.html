@@ -66,17 +66,36 @@
     <!--       RIGHT PANEL         -->
     <!-- ========================= -->
 
-    <aside id="right-panel"
-           role="complementary"
-           aria-label="Spotlight and trending"
-           class="right-panel">
+  <aside id="right-panel"
+       role="complementary"
+       aria-label="Spotlight and trending"
+       class="right-panel">
 
-      <!-- Spotlight + Trending loaded by right-panel module -->
-      <div class="panel-loading">
-        <p>Loading insights…</p>
-      </div>
+  <!-- Spotlight Section -->
+  <section class="right-section" aria-label="Spotlight">
+    <h2 class="right-section-title">Spotlight</h2>
+    <div id="spotlight-container" class="spotlight-container">
+      <!-- Spotlight cards injected here -->
+    </div>
+  </section>
 
-    </aside>
+  <!-- Trending Section -->
+  <section class="right-section" aria-label="Trending topics">
+    <h2 class="right-section-title">Trending</h2>
+    <div id="trending-tags" class="trending-tags">
+      <!-- Trending tags injected here -->
+    </div>
+  </section>
+
+  <!-- World Clock Section -->
+  <section class="right-section" aria-label="World Clock">
+    <h2 class="right-section-title">World Clock</h2>
+    <div id="city-list" class="city-list">
+      <!-- Clock rows injected here -->
+    </div>
+  </section>
+
+</aside>
 
   </div>
 
