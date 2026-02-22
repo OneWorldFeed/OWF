@@ -5,7 +5,7 @@
  */
 
 export async function loadView(name, {
-    containerId = "app",
+    containerId = "main-content",
     retries = 2,
     timeout = 5000,
     showLoader = true
@@ -15,10 +15,11 @@ export async function loadView(name, {
 
     if (!container) {
         console.error(`[OWF] Missing container #${containerId}`);
-        return;
+        return null;
     }
 
-    const viewPath = `/components/views/${name}.html`;
+    // VERCEL-SAFE PATH — views must be inside /public/views/
+    const viewPath = `/views/${name}.html`;
 
     // Optional loading state
     if (showLoader) {
