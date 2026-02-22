@@ -1,86 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#1a1a2e" />
-    <meta name="description" content="OWF - One World Feed: Your personalized global news and social media feed" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>OWF | One World Feed</title>
+  <title>OWF | One World Feed</title>
 
-    <!-- Root stylesheet (imports all global partials) -->
-    <link rel="stylesheet" href="/styles.css" />
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="/styles.css" />
 
-    <!-- Theme CSS (one file per named theme; active theme set via data-theme on <body>) -->
-    <link rel="stylesheet" href="/assets/css/themes/dark.css" />
-    <link rel="stylesheet" href="/assets/css/themes/light.css" />
-    <link rel="stylesheet" href="/assets/css/themes/winter.css" />
-    <link rel="stylesheet" href="/assets/css/themes/autumn.css" />
-    <link rel="stylesheet" href="/assets/css/themes/summer.css" />
-    <link rel="stylesheet" href="/assets/css/themes/spring.css" />
+  <!-- Accessibility & Semantic Metadata -->
+  <meta name="description" content="One World Feed — a calm, cinematic global feed experience." />
+</head>
 
-    <!-- Motion CSS -->
-    <link rel="stylesheet" href="/assets/css/motion/page-entrance.css" />
-    <link rel="stylesheet" href="/assets/css/motion/transitions.css" />
-    <link rel="stylesheet" href="/assets/css/motion/pulse.css" />
-    <link rel="stylesheet" href="/assets/css/motion/shimmer.css" />
-    <link rel="stylesheet" href="/assets/css/motion/lift.css" />
-    <link rel="stylesheet" href="/assets/css/motion/hover.css" />
-  </head>
-  <body class="theme-dark" data-theme="dark">
+<body>
 
-    <div id="app">
+  <!-- ========================= -->
+  <!--        APP SHELL          -->
+  <!-- ========================= -->
 
-      <!-- Left Navigation Sidebar -->
-      <nav id="main-nav" role="navigation" aria-label="Main navigation">
-        <div id="nav-logo" aria-label="OWF Home">
-          <span class="logo-mark">OWF</span>
-          <span class="logo-text">One World Feed</span>
-        </div>
-        <ul id="nav-links" role="list"></ul>
-        <div id="nav-footer"></div>
-      </nav>
+  <div id="app-shell" class="app-shell">
 
-      <!-- Main Content Area -->
-      <main id="main-content" role="main" aria-label="Feed content">
-        <header id="feed-header">
-          <div id="feed-controls"></div>
-          <div id="mood-selector" aria-label="Mood filter"></div>
-        </header>
+    <!-- ========================= -->
+    <!--      LEFT NAVIGATION      -->
+    <!-- ========================= -->
 
-        <div id="feed-container" aria-live="polite" aria-label="News feed">
-          <div id="feed-loader-indicator" class="loader" aria-label="Loading feed" hidden>
-            <span class="spinner"></span>
-            <span class="sr-only">Loading feed…</span>
-          </div>
-          <ul id="feed-list" role="list" aria-label="Feed items"></ul>
-        </div>
+    <nav id="left-nav" class="left-nav" role="navigation" aria-label="Primary navigation">
+      <div class="nav-header">
+        <h1 class="nav-title">OWF</h1>
+        <p class="nav-subtitle">One World Feed</p>
+      </div>
 
-        <footer id="feed-footer">
-          <button id="load-more-btn" type="button" aria-label="Load more feed items">Load more</button>
-        </footer>
-      </main>
+      <ul class="nav-list">
+        <li><button data-view="home">Home</button></li>
+        <li><button data-view="discover">Discover</button></li>
+        <li><button data-view="news">News</button></li>
+        <li><button data-view="social">Social</button></li>
+        <li><button data-view="music">Music</button></li>
+        <li><button data-view="podcasts">Podcasts</button></li>
+        <li><button data-view="live">Live</button></li>
+        <li><button data-view="ai">AI</button></li>
+        <li><button data-view="profile">Profile</button></li>
+        <li><button data-view="settings">Settings</button></li>
+      </ul>
+    </nav>
 
-      <!-- Right Panel -->
-      <aside id="right-panel" role="complementary" aria-label="Spotlight and trending">
-        <section id="spotlight-section" aria-label="Spotlight">
-          <h2 class="panel-heading">Spotlight</h2>
-          <div id="spotlight-container"></div>
-        </section>
+    <!-- ========================= -->
+    <!--       MAIN CONTENT        -->
+    <!-- ========================= -->
 
-        <section id="trending-section" aria-label="Trending tags">
-          <h2 class="panel-heading">Trending</h2>
-          <div id="trending-tags"></div>
-        </section>
+    <main id="main-content"
+          role="main"
+          aria-label="Feed content"
+          aria-busy="false"
+          class="main-content">
 
-        <section id="city-widget" aria-label="City weather and time">
-          <h2 class="panel-heading">Around the World</h2>
-          <div id="city-list"></div>
-        </section>
-      </aside>
+      <!-- Views will be injected here by router.js -->
+      <section class="view-loading">
+        <p>Loading One World Feed…</p>
+      </section>
 
-    </div><!-- /#app -->
+    </main>
 
-    <script type="module" src="/app.js"></script>
-  </body>
+    <!-- ========================= -->
+    <!--       RIGHT PANEL         -->
+    <!-- ========================= -->
+
+    <aside id="right-panel"
+           role="complementary"
+           aria-label="Spotlight and trending"
+           class="right-panel">
+
+      <!-- Spotlight + Trending loaded by right-panel module -->
+      <div class="panel-loading">
+        <p>Loading insights…</p>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- ========================= -->
+  <!--        GLOBAL SCRIPTS     -->
+  <!-- ========================= -->
+
+  <!-- Global utilities -->
+  <script type="module" src="/modules/global/global.js"></script>
+
+  <!-- Router (auto-loads views + modules) -->
+  <script type="module" src="/modules/router/router.js"></script>
+
+  <!-- Navigation interactions -->
+  <script type="module" src="/modules/nav/nav.js"></script>
+
+  <!-- Right panel loader -->
+  <script type="module" src="/modules/right-panel/right-panel.js"></script>
+
+</body>
 </html>
