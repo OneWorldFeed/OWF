@@ -1,63 +1,80 @@
 /**
  * OWF | One World Feed
- * modules/router/router.js – Client-side History API router.
+ * modules/router/router.js
+ * Canonical SPA Router (Vercel‑safe)
  */
 
-import { loadView } from '../global/view-loader.js';
+import { loadView } from "../global/view-loader.js";
 
-const viewModules = {
-  home: () => import('../home/home.js'),
-  profile: () => import('../profile/profile.js'),
-  settings: () => import('../settings/settings.js'),
-  discover: () => import('../discover/discover.js'),
-  podcasts: () => import('../podcasts/podcasts.js'),
-  live: () => import('../live/live.js'),
-  ai: () => import('../ai/ai.js'),
-  news: () => import('../news/news.js'),
-  music: () => import('../music/music.js'),
-  social: () => import('../social/social.js'),
-  badges: () => import('../badges/badges.js'),
-};
+export class Router {
+    constructor() {
+        this.currentView = null;
 
-let current = {
-  name: null,
-  instance: null,
-};
+        // Handle browser back/forward
+        window.addEventListener("popstate", () => {
+            const view = this.getViewFromURL();
+            this.navigate(view, { push: false });
+        });
 
-export async function navigateTo(viewName, { root, state, pushState = true }) {
-  if (!viewModules[viewName]) {
-    console.warn(`Router: No module registered for view "${viewName}"`);
-    return;
-  }
+        console.info("[OWF:router] Initialised.");
+    }
 
-  if (pushState) {
-    history.pushState({ view: viewName }, '', `/${viewName}`);
-  }
+    // Extract view name from URL (/?view=home)
+    getViewFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("view") || "home";
+    }
 
-  if (current.instance && typeof current.instance.destroy === 'function') {
-    current.instance.destroy();
-  }
+    // Main navigation method
+    async navigate(viewName, { push = true } = {}) {
+        if (!viewName) viewName = "home";
 
-  const module = await viewModules[viewName]();
-  const view = module.default || module;
+        // Prevent redundant reloads
+        if (this.currentView === viewName) return;
 
-  const html = await loadView(viewName);
-  root.innerHTML = html;
+        this.currentView = viewName;
 
-  if (typeof view.init === 'function') {
-    await view.init({ root, state });
-  }
+        if (push) {
+            history.pushState({}, "", `/?view=${viewName}`);
+        }
 
-  current = { name: viewName, instance: view };
+        console.info(`[OWF:router] Navigating to: ${viewName}`);
+
+        // Load HTML from /public/views/
+        const html = await loadView(viewName);
+
+        if (!html) {
+            console.error(`[OWF:router] Failed to load view: ${viewName}`);
+            return;
+        }
+
+        // Inject into main content area
+        const container = document.getElementById("main-content");
+        if (container) {
+            container.innerHTML = html;
+        }
+
+        // Initialize the view’s JS module
+        this.initViewModule(viewName);
+    }
+
+    // Dynamically import JS module for the view
+    async initViewModule(viewName) {
+        try {
+            const modulePath = `/modules/${viewName}/${viewName}.js`;
+
+            const module = await import(modulePath);
+
+            if (module && typeof module.init === "function") {
+                module.init();
+                console.info(`[OWF:${viewName}] Initialised.`);
+            }
+        } catch (err) {
+            console.warn(`[OWF:${viewName}] No JS module found or failed to load.`, err);
+        }
+    }
 }
 
-export function initRouter({ root, state }) {
-  const initialView = window.location.pathname.replace('/', '') || 'home';
-
-  navigateTo(initialView, { root, state, pushState: false });
-
-  window.addEventListener('popstate', (e) => {
-    const view = e.state?.view || 'home';
-    navigateTo(view, { root, state, pushState: false });
-  });
-}
+// Auto‑boot router
+export const router = new Router();
+router.navigate(router.getViewFromURL());
