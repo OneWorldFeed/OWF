@@ -7,23 +7,12 @@
  */
 
 import { getFeedItems } from './feed-loader.js';
+import { renderCard } from '../cards/card-registry.js';
 
 /**
  * Render a feed into a container element.
  */
 export function renderFeed(name, container) {
   const items = getFeedItems(name);
-  container.innerHTML = items.map(renderItem).join('');
-}
-
-/**
- * Render a single feed item into HTML.
- * This is a placeholder — will be replaced with card components in 4.4.
- */
-function renderItem(item) {
-  return `
-    <div class="feed-item feed-item-${item.type}">
-      <p>${item.text}</p>
-    </div>
-  `;
+  container.innerHTML = items.map(renderCard).join('');
 }
