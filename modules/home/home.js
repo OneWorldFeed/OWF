@@ -1,50 +1,22 @@
-/**
- * OWF | One World Feed
- * modules/home/home.js – Home view module
- */
+// modules/home/home.js
 
-import { loadView } from '../global/view-loader.js';
-import { registerFeed, loadInitial } from '../feed-loader/feed-loader.js';
+import { createCard } from '../cards/card.js';
+import { loadFeed } from '../feed-loader/feed-loader.js';
 
-let rootEl = null;
+export async function render() {
+  const container = document.getElementById('feed-container');
+  if (!container) return;
 
-export async function init({ root, state }) {
-  rootEl = root;
+  container.innerHTML = '<p class="loading">Loading your global feed…</p>';
 
-  // Load the HTML template for this view
-  const html = await loadView('home');
-  rootEl.innerHTML = html;
+  const items = await loadFeed();
 
-  // Register the home feed
-  registerFeed('home', async (cursor) => {
-    // TODO: Replace with real API call
-    return {
-      items: [
-        { id: '1', type: 'post', text: 'Welcome to your global feed.' }
-      ],
-      nextCursor: null,
-      hasMore: false
-    };
+  container.innerHTML = '';
+  const fragment = document.createDocumentFragment();
+
+  items.forEach((item) => {
+    fragment.appendChild(createCard(item));
   });
 
-  // Load the first page of the feed
-  await loadInitial('home');
-
-  // Attach listeners, hydrate UI, etc.
-  // Example:
-  // const refreshBtn = rootEl.querySelector('.refresh-feed');
-  // refreshBtn?.addEventListener('click', () => {
-  //   console.log('Refreshing home feed…');
-  // });
-}
-
-export function destroy() {
-  if (!rootEl) return;
-
-  // Remove listeners, timers, observers, etc.
-  // Example:
-  // const refreshBtn = rootEl.querySelector('.refresh-feed');
-  // refreshBtn?.removeEventListener('click', ...);
-
-  rootEl = null;
+  container.appendChild(fragment);
 }
