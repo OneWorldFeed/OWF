@@ -8,6 +8,7 @@
 
   <!-- Global Styles -->
   <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/assets/css/global/feed.css" />
 
   <!-- Accessibility & Semantic Metadata -->
   <meta name="description" content="One World Feed — a calm, cinematic global feed experience." />
@@ -55,10 +56,13 @@
           aria-busy="false"
           class="main-content">
 
-      <!-- Views will be injected here by router.js -->
+      <!-- View loader placeholder -->
       <section class="view-loading">
         <p>Loading One World Feed…</p>
       </section>
+
+      <!-- FEED CONTAINER (added for 4.4.4) -->
+      <section id="feed-container" class="feed-container"></section>
 
     </main>
 
@@ -66,36 +70,36 @@
     <!--       RIGHT PANEL         -->
     <!-- ========================= -->
 
-  <aside id="right-panel"
-       role="complementary"
-       aria-label="Spotlight and trending"
-       class="right-panel">
+    <aside id="right-panel"
+           role="complementary"
+           aria-label="Spotlight and trending"
+           class="right-panel">
 
-  <!-- Spotlight Section -->
-  <section class="right-section" aria-label="Spotlight">
-    <h2 class="right-section-title">Spotlight</h2>
-    <div id="spotlight-container" class="spotlight-container">
-      <!-- Spotlight cards injected here -->
-    </div>
-  </section>
+      <!-- Spotlight Section -->
+      <section class="right-section" aria-label="Spotlight">
+        <h2 class="right-section-title">Spotlight</h2>
+        <div id="spotlight-container" class="spotlight-container">
+          <!-- Spotlight cards injected here -->
+        </div>
+      </section>
 
-  <!-- Trending Section -->
-  <section class="right-section" aria-label="Trending topics">
-    <h2 class="right-section-title">Trending</h2>
-    <div id="trending-tags" class="trending-tags">
-      <!-- Trending tags injected here -->
-    </div>
-  </section>
+      <!-- Trending Section -->
+      <section class="right-section" aria-label="Trending topics">
+        <h2 class="right-section-title">Trending</h2>
+        <div id="trending-tags" class="trending-tags">
+          <!-- Trending tags injected here -->
+        </div>
+      </section>
 
-  <!-- World Clock Section -->
-  <section class="right-section" aria-label="World Clock">
-    <h2 class="right-section-title">World Clock</h2>
-    <div id="city-list" class="city-list">
-      <!-- Clock rows injected here -->
-    </div>
-  </section>
+      <!-- World Clock Section -->
+      <section class="right-section" aria-label="World Clock">
+        <h2 class="right-section-title">World Clock</h2>
+        <div id="city-list" class="city-list">
+          <!-- Clock rows injected here -->
+        </div>
+      </section>
 
-</aside>
+    </aside>
 
   </div>
 
@@ -114,6 +118,10 @@
 
   <!-- Right panel loader -->
   <script type="module" src="/modules/right-panel/right-panel.js"></script>
+
+  <!-- FEED SYSTEM (added for 4.4.4) -->
+  <script type="module" src="/modules/cards/card.js"></script>
+  <script type="module" src="/modules/feed-loader/feed-loader.js"></script>
 
 </body>
 </html>
