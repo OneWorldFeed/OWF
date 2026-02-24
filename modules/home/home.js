@@ -1,4 +1,9 @@
-// modules/home/home.js
+/**
+ * OWF | One World Feed
+ * modules/home/home.js
+ *
+ * Home feed renderer — uses the canonical feed-loader + card.js system.
+ */
 
 import { registerFeed, loadInitial, getFeedItems } from '../feed-loader/feed-loader.js';
 import { createCard } from '../cards/card.js';
@@ -9,7 +14,10 @@ export async function render() {
 
   container.innerHTML = '<p class="loading">Loading your global feed…</p>';
 
-  // Register the home feed (placeholder loader)
+  /* -----------------------------------------
+     REGISTER THE HOME FEED
+     (This connects feed-loader → feed.json)
+  ------------------------------------------ */
   registerFeed('home', async (cursor) => {
     const res = await fetch('/data/feed.json');
     const items = await res.json();
@@ -21,12 +29,19 @@ export async function render() {
     };
   });
 
-  // Load first page
+  /* -----------------------------------------
+     LOAD FIRST PAGE
+  ------------------------------------------ */
   await loadInitial('home');
 
-  // Get cached items
+  /* -----------------------------------------
+     GET CACHED ITEMS
+  ------------------------------------------ */
   const items = getFeedItems('home');
 
+  /* -----------------------------------------
+     RENDER CARDS
+  ------------------------------------------ */
   container.innerHTML = '';
   const fragment = document.createDocumentFragment();
 
