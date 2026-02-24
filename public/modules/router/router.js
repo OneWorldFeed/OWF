@@ -11,13 +11,11 @@ export const Router = {
   init() {
     console.info("[OWF:router] Initialised.");
 
-    // Handle back/forward navigation
     window.addEventListener("popstate", () => {
       const view = this.getViewFromURL();
       this.navigate(view, false);
     });
 
-    // Initial load
     const initialView = this.getViewFromURL();
     this.navigate(initialView, false);
   },
@@ -58,7 +56,7 @@ export const Router = {
 
   async loadViewModule(viewName) {
     try {
-      // ⭐ FINAL, CORRECT, VERCEL-SAFE PATH
+      // ✅ FINAL FIX — remove "/public"
       const modulePath = `/modules/${viewName}/${viewName}.js`;
 
       const module = await import(modulePath);
