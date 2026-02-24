@@ -1,7 +1,7 @@
 // modules/home/home.js
 
+import { registerFeed, loadInitial, getFeedItems } from '../feed-loader/feed-loader.js';
 import { createCard } from '../cards/card.js';
-import { loadFeed } from '../feed-loader/feed-loader.js';
 
 export async function render() {
   const container = document.getElementById('feed-container');
@@ -9,7 +9,23 @@ export async function render() {
 
   container.innerHTML = '<p class="loading">Loading your global feed…</p>';
 
-  const items = await loadFeed();
+  // Register the home feed (placeholder loader)
+  registerFeed('home', async (cursor) => {
+    const res = await fetch('/data/feed.json');
+    const items = await res.json();
+
+    return {
+      items,
+      nextCursor: null,
+      hasMore: false
+    };
+  });
+
+  // Load first page
+  await loadInitial('home');
+
+  // Get cached items
+  const items = getFeedItems('home');
 
   container.innerHTML = '';
   const fragment = document.createDocumentFragment();
