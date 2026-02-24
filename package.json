@@ -1,1 +1,11 @@
-
+{
+  "name": "oneworldfeed",
+  "version": "1.0.0",
+  "description": "Cinematic layout rebuild for OneWorldFeed",
+  "main": "app.js",
+  "scripts": {
+    "start": "echo 'Static site - no build step required'"
+  },
+  "author": "James S. Mendoza",
+  "license": "MIT"
+}
