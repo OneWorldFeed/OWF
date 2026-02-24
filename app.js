@@ -5,12 +5,12 @@
  * Boots all core modules in dependency order and wires up the SPA shell.
  */
 
-import { initGlobal } from './modules/global/global.js';
-import { initRouter, router } from './modules/router/router.js';
-import { initNav } from './modules/nav/nav.js';
-import { initRightPanel } from './modules/right-panel/right-panel.js';
-import { initFeedLoader } from './modules/feed-loader/feed-loader.js';
-import { init as initBadges } from './modules/badges/badges.js';
+import { initGlobal } from './public/modules/global/global.js';
+import { initRouter, router } from './public/modules/router/router.js';
+import { initNav } from './public/modules/nav/nav.js';
+import { initRightPanel } from './public/modules/right-panel/right-panel.js';
+import { initFeedLoader } from './public/modules/feed-loader/feed-loader.js';
+import { init as initBadges } from './public/modules/badges/badges.js';
 
 /**
  * Application state shared across modules.
@@ -86,16 +86,16 @@ export async function init() {
  */
 function _registerRouteHandlers() {
   const pageModules = {
-    '/':         () => import('./modules/home/home.js'),
-    '/profile':  () => import('./modules/profile/profile.js'),
-    '/social':   () => import('./modules/social/social.js'),
-    '/settings': () => import('./modules/settings/settings.js'),
-    '/discover': () => import('./modules/discover/discover.js'),
-    '/podcasts': () => import('./modules/podcasts/podcasts.js'),
-    '/live':     () => import('./modules/live/live.js'),
-    '/ai':       () => import('./modules/ai/ai.js'),
-    '/news':     () => import('./modules/news/news.js'),
-    '/music':    () => import('./modules/music/music.js'),
+    '/':         () => import('./public/modules/home/home.js'),
+    '/profile':  () => import('./public/modules/profile/profile.js'),
+    '/social':   () => import('./public/modules/social/social.js'),
+    '/settings': () => import('./public/modules/settings/settings.js'),
+    '/discover': () => import('./public/modules/discover/discover.js'),
+    '/podcasts': () => import('./public/modules/podcasts/podcasts.js'),
+    '/live':     () => import('./public/modules/live/live.js'),
+    '/ai':       () => import('./public/modules/ai/ai.js'),
+    '/news':     () => import('./public/modules/news/news.js'),
+    '/music':    () => import('./public/modules/music/music.js'),
   };
 
   for (const [path, loader] of Object.entries(pageModules)) {

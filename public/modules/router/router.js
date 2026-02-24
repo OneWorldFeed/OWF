@@ -61,7 +61,7 @@ export class Router {
     // Dynamically import JS module for the view
     async initViewModule(viewName) {
         try {
-            const modulePath = `/modules/${viewName}/${viewName}.js`;
+            const modulePath = `/public/modules/${viewName}/${viewName}.js`;
 
             const module = await import(modulePath);
 
