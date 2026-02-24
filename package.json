@@ -1,14 +1,1 @@
-{
-  "name": "owf",
-  "version": "1.0.0",
-  "description": "One World Feed - A personalized global news and social media feed",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "vite": "^5.0.0"
-  }
-}
+
