@@ -1,4 +1,10 @@
-// modules/cards/card.js
+/**
+ * OWF | One World Feed
+ * modules/cards/card.js
+ *
+ * Canonical hybrid-style card factory.
+ * Returns a DOM <article> element for any feed item.
+ */
 
 import { sanitize } from '../global/global.js';
 
@@ -8,13 +14,15 @@ export function createCard(item) {
   card.dataset.type = item.type || 'story';
   card.dataset.id = item.id || '';
 
-  // Header
+  /* -----------------------------
+     HEADER
+  ------------------------------ */
   const header = document.createElement('header');
   header.className = 'feed-card__header';
 
   const avatar = document.createElement('img');
   avatar.className = 'feed-card__avatar';
-  avatar.src = sanitize(item.avatar || '/assets/icons/news.svg');
+  avatar.src = sanitize(item.avatar || '/assets/icons/default-avatar.svg');
   avatar.alt = '';
 
   const meta = document.createElement('div');
@@ -34,7 +42,9 @@ export function createCard(item) {
   header.appendChild(avatar);
   header.appendChild(meta);
 
-  // Body
+  /* -----------------------------
+     BODY
+  ------------------------------ */
   const body = document.createElement('div');
   body.className = 'feed-card__body';
 
@@ -49,7 +59,9 @@ export function createCard(item) {
   body.appendChild(title);
   body.appendChild(summary);
 
-  // Media (optional)
+  /* -----------------------------
+     MEDIA (optional)
+  ------------------------------ */
   const media = document.createElement('div');
   media.className = 'feed-card__media';
 
@@ -62,7 +74,9 @@ export function createCard(item) {
     media.appendChild(img);
   }
 
-  // Footer
+  /* -----------------------------
+     FOOTER
+  ------------------------------ */
   const footer = document.createElement('footer');
   footer.className = 'feed-card__footer';
 
@@ -73,7 +87,9 @@ export function createCard(item) {
     footer.appendChild(btn);
   });
 
-  // Assemble
+  /* -----------------------------
+     ASSEMBLE CARD
+  ------------------------------ */
   card.appendChild(header);
   card.appendChild(body);
   if (item.image) card.appendChild(media);
