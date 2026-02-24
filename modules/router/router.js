@@ -1,7 +1,7 @@
 /**
  * OWF | One World Feed
  * modules/router/router.js
- * Canonical SPA Router (Vercel‑safe)
+ * Canonical SPA Router (Vercel‑safe, render()-based)
  */
 
 import { loadView } from "../global/view-loader.js";
@@ -65,12 +65,16 @@ export class Router {
 
             const module = await import(modulePath);
 
-            if (module && typeof module.init === "function") {
-                module.init();
-                console.info(`[OWF:${viewName}] Initialised.`);
+            // OWF 4.0 uses render(), not init()
+            if (module && typeof module.render === "function") {
+                module.render();
+                console.info(`[OWF:${viewName}] Rendered.`);
+            } else {
+                console.warn(`[OWF:${viewName}] No render() function found.`);
             }
+
         } catch (err) {
-            console.warn(`[OWF:${viewName}] No JS module found or failed to load.`, err);
+            console.warn(`[OWF:${viewName}] Failed to load module.`, err);
         }
     }
 }
