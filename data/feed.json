@@ -1,69 +1,62 @@
-{
-  "feed": [
-    {
-      "id": "feed-001",
-      "type": "news",
-      "title": "Global Climate Summit Reaches Historic Carbon Agreement",
-      "source": "Reuters",
-      "timestamp": "2025-01-15T09:30:00Z",
-      "tags": ["tag-breaking", "tag-climate", "tag-politics"],
-      "mood": "mood-hopeful",
-      "region": "global",
-      "thumbnail": "https://picsum.photos/seed/climate-summit/640/360",
-      "summary": "World leaders gathered in Geneva have signed a landmark accord pledging to cut carbon emissions by 60% before 2040, with binding enforcement mechanisms for the first time in international climate law.",
-      "url": "https://reuters.com/climate-summit-2025"
-    },
-    {
-      "id": "feed-002",
-      "type": "music",
-      "title": "Afrobeats Artist Burna Boy Drops Surprise Album 'Infinite Horizons'",
-      "source": "Pitchfork",
-      "timestamp": "2025-01-15T07:00:00Z",
-      "tags": ["tag-new", "tag-music", "tag-africa"],
-      "mood": "mood-energetic",
-      "region": "africa",
-      "thumbnail": "https://picsum.photos/seed/burna-boy/640/360",
-      "summary": "The Grammy-winning artist released a 16-track surprise album at midnight, featuring collaborations with artists from Lagos, London, and Kingston. Streaming numbers broke records within hours of release.",
-      "url": "https://pitchfork.com/burna-boy-infinite-horizons"
-    },
-    {
-      "id": "feed-003",
-      "type": "social",
-      "title": "Tokyo Cherry Blossom Festival 2025: The Best Photos from Around the City",
-      "source": "Instagram / Trending",
-      "timestamp": "2025-01-14T14:15:00Z",
-      "tags": ["tag-trending", "tag-culture", "tag-japan"],
-      "mood": "mood-nostalgic",
-      "region": "asia-pacific",
-      "thumbnail": "https://picsum.photos/seed/tokyo-sakura/640/360",
-      "summary": "Thousands of photos flooded social media as Tokyo's Ueno Park erupted in full bloom two weeks ahead of schedule. Scientists attribute the early bloom to record winter temperatures across Honshu.",
-      "url": "https://owf.app/trending/tokyo-sakura-2025"
-    },
-    {
-      "id": "feed-004",
-      "type": "ai",
-      "title": "AI Weekly Digest: Breakthroughs in Protein Folding and Medical Imaging",
-      "source": "OWF AI Curator",
-      "timestamp": "2025-01-15T06:00:00Z",
-      "tags": ["tag-ai", "tag-science", "tag-health"],
-      "mood": "mood-curious",
-      "region": "global",
-      "thumbnail": "https://picsum.photos/seed/ai-science/640/360",
-      "summary": "This week's AI-curated science digest covers DeepMind's new AlphaFold 3 update that models RNA interactions, a new radiology AI outperforming human specialists at early cancer detection, and open-source releases from Meta's FAIR lab.",
-      "url": "https://owf.app/ai-digest/week-3-2025"
-    },
-    {
-      "id": "feed-005",
-      "type": "podcast",
-      "title": "The Indicator: Why Central Banks Are Buying Gold at Record Rates",
-      "source": "NPR / Planet Money",
-      "timestamp": "2025-01-14T18:00:00Z",
-      "tags": ["tag-economics", "tag-finance", "tag-trending"],
-      "mood": "mood-curious",
-      "region": "global",
-      "thumbnail": "https://picsum.photos/seed/gold-podcast/640/360",
-      "summary": "Central banks worldwide purchased over 1,000 tonnes of gold in 2024 — the highest in five decades. In this episode, economists break down what's driving the shift away from dollar reserves and what it means for everyday savers.",
-      "url": "https://npr.org/planet-money/gold-central-banks-2025"
-    }
-  ]
-}
+[
+  {
+    "id": "001",
+    "type": "news",
+    "title": "Global communities unite for a shared climate initiative",
+    "summary": "Cities across the world launch synchronized efforts to reduce emissions and support sustainable living.",
+    "source": "World News Network",
+    "avatar": "/assets/icons/news.svg",
+    "image": "/assets/img/sample/climate.jpg",
+    "time": "2h ago"
+  },
+  {
+    "id": "002",
+    "type": "social",
+    "title": "A photographer captures the quiet beauty of early morning streets",
+    "summary": "A viral post highlights the serenity of dawn in urban spaces, inspiring thousands to share their own moments.",
+    "source": "Social Pulse",
+    "avatar": "/assets/icons/social.svg",
+    "image": "/assets/img/sample/street.jpg",
+    "time": "4h ago"
+  },
+  {
+    "id": "003",
+    "type": "music",
+    "title": "Rising artist blends global rhythms into a new sound",
+    "summary": "A breakout musician fuses Afrobeat, electronic, and folk influences to create a genre-defying debut.",
+    "source": "Music Daily",
+    "avatar": "/assets/icons/music.svg",
+    "image": "/assets/img/sample/music.jpg",
+    "time": "6h ago"
+  },
+  {
+    "id": "004",
+    "type": "podcast",
+    "title": "Exploring the psychology of connection in a digital age",
+    "summary": "A new podcast episode dives into how technology shapes relationships, identity, and community.",
+    "source": "Voices Podcast",
+    "avatar": "/assets/icons/podcasts.svg",
+    "image": "/assets/img/sample/podcast.jpg",
+    "time": "8h ago"
+  },
+  {
+    "id": "005",
+    "type": "live",
+    "title": "Live: Aurora lights up the northern skies tonight",
+    "summary": "A rare geomagnetic event brings vivid auroras visible across multiple continents.",
+    "source": "Live Earth",
+    "avatar": "/assets/icons/live.svg",
+    "image": "/assets/img/sample/aurora.jpg",
+    "time": "10h ago"
+  },
+  {
+    "id": "006",
+    "type": "ai",
+    "title": "AI researchers unveil a breakthrough in multilingual models",
+    "summary": "A new architecture enables real-time translation across 50+ languages with unprecedented accuracy.",
+    "source": "AI Research Lab",
+    "avatar": "/assets/icons/ai.svg",
+    "image": "/assets/img/sample/ai.jpg",
+    "time": "12h ago"
+  }
+]
