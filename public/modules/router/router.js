@@ -1,6 +1,6 @@
 /**
  * OWF | One World Feed
- * modules/router/router.js
+ * public/modules/router/router.js
  *
  * SPA Router — loads views + their JS modules.
  */
@@ -58,7 +58,7 @@ export const Router = {
 
   async loadViewModule(viewName) {
     try {
-      // ⭐ Correct Vercel-safe path
+      // ⭐ FINAL, CORRECT, VERCEL-SAFE PATH
       const modulePath = `/modules/${viewName}/${viewName}.js`;
 
       const module = await import(modulePath);
