@@ -1,84 +1,76 @@
 /**
  * OWF | One World Feed
  * modules/router/router.js
- * Canonical SPA Router (Vercel‑safe, render()-based)
+ *
+ * SPA Router — loads views + their JS modules.
  */
 
-import { loadView } from "../global/view-loader.js";
+export const Router = {
+  currentView: null,
 
-export class Router {
-    constructor() {
-        this.currentView = null;
+  init() {
+    console.info("[OWF:router] Initialised.");
 
-        // Handle browser back/forward
-        window.addEventListener("popstate", () => {
-            const view = this.getViewFromURL();
-            this.navigate(view, { push: false });
-        });
+    // Handle back/forward navigation
+    window.addEventListener("popstate", () => {
+      const view = this.getViewFromURL();
+      this.navigate(view, false);
+    });
 
-        console.info("[OWF:router] Initialised.");
+    // Initial load
+    const initialView = this.getViewFromURL();
+    this.navigate(initialView, false);
+  },
+
+  getViewFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("view") || "home";
+  },
+
+  async navigate(viewName, pushState = true) {
+    if (!viewName) return;
+
+    console.info(`[OWF:router] Navigating to: ${viewName}`);
+
+    if (pushState) {
+      history.pushState({}, "", `/?view=${viewName}`);
     }
 
-    // Extract view name from URL (/?view=home)
-    getViewFromURL() {
-        const params = new URLSearchParams(window.location.search);
-        return params.get("view") || "home";
+    await this.loadViewHTML(viewName);
+    await this.loadViewModule(viewName);
+
+    this.currentView = viewName;
+  },
+
+  async loadViewHTML(viewName) {
+    try {
+      const res = await fetch(`/views/${viewName}.html`);
+      const html = await res.text();
+
+      const container = document.getElementById("main-content");
+      container.innerHTML = html;
+
+      console.info(`[OWF] Loaded view: ${viewName}`);
+    } catch (err) {
+      console.warn(`[OWF:router] Failed to load HTML for ${viewName}`, err);
     }
+  },
 
-    // Main navigation method
-    async navigate(viewName, { push = true } = {}) {
-        if (!viewName) viewName = "home";
+  async loadViewModule(viewName) {
+    try {
+      // ⭐ Correct Vercel-safe path
+      const modulePath = `/modules/${viewName}/${viewName}.js`;
 
-        // Prevent redundant reloads
-        if (this.currentView === viewName) return;
+      const module = await import(modulePath);
 
-        this.currentView = viewName;
-
-        if (push) {
-            history.pushState({}, "", `/?view=${viewName}`);
-        }
-
-        console.info(`[OWF:router] Navigating to: ${viewName}`);
-
-        // Load HTML from /public/views/
-        const html = await loadView(viewName);
-
-        if (!html) {
-            console.error(`[OWF:router] Failed to load view: ${viewName}`);
-            return;
-        }
-
-        // Inject into main content area
-        const container = document.getElementById("main-content");
-        if (container) {
-            container.innerHTML = html;
-        }
-
-        // Initialize the view’s JS module
-        this.initViewModule(viewName);
+      if (module && typeof module.render === "function") {
+        module.render();
+        console.info(`[OWF:${viewName}] Rendered.`);
+      }
+    } catch (err) {
+      console.warn(`[OWF:${viewName}] Failed to load module.`, err);
     }
+  }
+};
 
-    // Dynamically import JS module for the view
-    async initViewModule(viewName) {
-        try {
-            const modulePath = `/public/modules/${viewName}/${viewName}.js`;
-
-            const module = await import(modulePath);
-
-            // OWF 4.0 uses render(), not init()
-            if (module && typeof module.render === "function") {
-                module.render();
-                console.info(`[OWF:${viewName}] Rendered.`);
-            } else {
-                console.warn(`[OWF:${viewName}] No render() function found.`);
-            }
-
-        } catch (err) {
-            console.warn(`[OWF:${viewName}] Failed to load module.`, err);
-        }
-    }
-}
-
-// Auto‑boot router
-export const router = new Router();
-router.navigate(router.getViewFromURL());
+Router.init();
