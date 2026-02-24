@@ -1,27 +1,22 @@
 /**
- * OWF | One World Feed
- * modules/nav/nav.js
- * Connects left navigation to the router.
+ * OWF Navigation — Canonical Default Import
+ * Uses the router default export.
  */
 
-import { router } from "../router/router.js";
+import router from "../router/router.js";
 
 export function initNav() {
-    const nav = document.getElementById("left-nav");
-    if (!nav) {
-        console.error("[OWF:nav] Navigation element not found.");
-        return;
-    }
+  const navLinks = document.querySelectorAll("[data-nav]");
 
-    nav.addEventListener("click", (e) => {
-        const btn = e.target.closest("button[data-view]");
-        if (!btn) return;
+  navLinks.forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const target = link.getAttribute("data-nav");
+      const path = router.routes[target];
 
-        const view = btn.getAttribute("data-view");
-        router.navigate(view);
+      if (path) {
+        router.navigate(path);
+      }
     });
-
-    console.info("[OWF:nav] Initialised.");
+  });
 }
-
-initNav();
