@@ -1,36 +1,36 @@
-/**
- * OWF Router — Canonical Default Export
- * Handles page navigation and route initialization.
- */
+import { router } from "../router/router.js";
 
-const routes = {
-  home: "/",
-  profile: "/profile",
-  settings: "/settings",
-  discover: "/discover",
-  podcasts: "/podcasts",
-  live: "/live",
-  ai: "/ai",
-  news: "/news",
-  music: "/music",
-  social: "/social"
-};
+export function initNav() {
+  function attachNavListeners() {
+    const navLinks = document.querySelectorAll("[data-view]");
 
-function navigate(path) {
-  window.history.pushState({}, "", path);
-  window.dispatchEvent(new Event("popstate"));
+    if (!navLinks.length) {
+      console.warn("[OWF:nav] No nav links found.");
+      return;
+    }
+
+    navLinks.forEach(link => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        const target = link.getAttribute("data-view");
+        const path = router.routes[target];
+
+        if (!path) {
+          console.warn(`[OWF:nav] No route found for view: ${target}`);
+          return;
+        }
+
+        router.navigate(path);
+      });
+    });
+
+    console.info("[OWF:nav] Navigation listeners attached.");
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", attachNavListeners);
+  } else {
+    attachNavListeners();
+  }
 }
-
-function initRouter() {
-  window.addEventListener("popstate", () => {
-    // Page-level modules listen for this event
-  });
-}
-
-const router = {
-  routes,
-  navigate,
-  initRouter
-};
-
-export default router;
