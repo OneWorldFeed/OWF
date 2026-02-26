@@ -1,5 +1,5 @@
-app.js
-// Root test to confirm wiring
-document.getElementById("app").innerHTML = `
-    <h1>OneWorldFeed is live</h1>
-`;
+import { initRouter } from "./modules/router/router.js";
+
+document.addEventListener("DOMContentLoaded", () => {
+    initRouter();
+});
