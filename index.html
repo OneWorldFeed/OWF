@@ -8,10 +8,39 @@
 </head>
 <body>
 
-    <!-- Root App Container -->
-    <div id="app"></div>
+    <div id="layout">
 
-    <!-- Main Application Script -->
+        <!-- Left Navigation -->
+        <aside id="left-nav">
+            <nav>
+                <ul>
+                    <li data-nav="home">Home</li>
+                    <li data-nav="discover">Discover</li>
+                    <li data-nav="news">News</li>
+                    <li data-nav="music">Music</li>
+                    <li data-nav="live">Live</li>
+                    <li data-nav="podcasts">Podcasts</li>
+                    <li data-nav="profile">Profile</li>
+                    <li data-nav="badges">Badges</li>
+                    <li data-nav="ai">AI</li>
+                    <li data-nav="dm">DM</li>
+                    <li data-nav="settings">Settings</li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Center Content (Router Injects Views Here) -->
+        <main id="app"></main>
+
+        <!-- Right Panel -->
+        <aside id="right-panel">
+            <div class="placeholder">
+                Right Panel
+            </div>
+        </aside>
+
+    </div>
+
     <script type="module" src="app.js"></script>
 </body>
 </html>
