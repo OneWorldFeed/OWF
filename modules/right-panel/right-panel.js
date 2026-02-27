@@ -1,16 +1,12 @@
 /* ============================================================
    OWF RIGHT PANEL MODULE — PHASE 4.4.4
    Spotlight • Trending • City Rows • Global Moments
-   Auto‑renders into #right-panel or #global-moments
    ============================================================ */
 
 import spotlightData from "../../data/spotlight.json" assert { type: "json" };
 import citiesData from "../../data/cities.json" assert { type: "json" };
 import feedData from "../../data/feed.json" assert { type: "json" };
 
-/* ---------------------------------------------
-   Root mount point
---------------------------------------------- */
 function getMountPoint() {
   return (
     document.querySelector("#right-panel") ||
@@ -18,9 +14,6 @@ function getMountPoint() {
   );
 }
 
-/* ---------------------------------------------
-   Spotlight Card
---------------------------------------------- */
 function renderSpotlight(item) {
   const card = document.createElement("div");
   card.className = "spotlight-card";
@@ -36,9 +29,6 @@ function renderSpotlight(item) {
   return card;
 }
 
-/* ---------------------------------------------
-   Trending List
---------------------------------------------- */
 function renderTrending() {
   const block = document.createElement("div");
   block.className = "trending-block";
@@ -74,9 +64,6 @@ function renderTrending() {
   return block;
 }
 
-/* ---------------------------------------------
-   City Row (Time + Weather)
---------------------------------------------- */
 function renderCityRow(city) {
   const row = document.createElement("div");
   row.className = "city-row";
@@ -99,9 +86,6 @@ function renderCityRow(city) {
   return row;
 }
 
-/* ---------------------------------------------
-   Global Moments Blocks
---------------------------------------------- */
 function renderMoment(moment) {
   const card = document.createElement("div");
   card.className = "moment-card";
@@ -115,9 +99,6 @@ function renderMoment(moment) {
   return card;
 }
 
-/* ---------------------------------------------
-   Main Render Function
---------------------------------------------- */
 export function renderRightPanel() {
   const mount = getMountPoint();
   if (!mount) return;
