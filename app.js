@@ -6,26 +6,31 @@
 /* ---------------------------------------------
    Global modules (always loaded)
 --------------------------------------------- */
-import "./assets/js/modules/global.js";
-import "./assets/js/modules/router.js";
-import "./assets/js/modules/nav.js";
+import "./modules/global/global.js";
+import "./modules/router/router.js";
+import "./modules/nav/nav.js";
+
+/* ---------------------------------------------
+   Layout engine (creates #feed, #right-panel, #mood-bar)
+--------------------------------------------- */
+import "./modules/layout/layout.js";
 
 /* ---------------------------------------------
    UI modules (loaded when their containers exist)
 --------------------------------------------- */
-import { renderRightPanel } from "./assets/js/modules/right-panel.js";
-import { loadInitialFeed } from "./assets/js/modules/feed-loader.js";
+import { renderRightPanel } from "./modules/right-panel/right-panel.js";
+import { loadInitialFeed } from "./modules/feed-loader/feed-loader.js";
 
 /* ---------------------------------------------
    Boot sequence
 --------------------------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
-  // Router loads the correct view into <main id="main">
-  // After the view loads, we hydrate the UI.
 
   const hydrate = () => {
     const feed = document.querySelector("#feed");
-    const rightPanel = document.querySelector("#right-panel") || document.querySelector("#global-moments");
+    const rightPanel =
+      document.querySelector("#right-panel") ||
+      document.querySelector("#global-moments");
 
     if (feed) {
       loadInitialFeed();
