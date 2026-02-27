@@ -38,8 +38,8 @@ export function injectLayout() {
     `
   );
 
-  // Inject left nav content
-  document.querySelector("#left-nav").innerHTML = `
+  // Inject left nav content INTO THE CORRECT GRID
+  viewRoot.querySelector("#left-nav").innerHTML = `
     <nav class="left-nav-inner">
       <a href="#home" data-nav="home">Home</a>
       <a href="#discover" data-nav="discover">Discover</a>
