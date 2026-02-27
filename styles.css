@@ -1,66 +1,27 @@
-/* Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+/* ============================================================
+   OWF GLOBAL STYLE IMPORT HUB — PHASE 4.4.4
+   ============================================================ */
 
-body {
-    background: #000;
-    color: #fff;
-    font-family: system-ui, sans-serif;
-    height: 100vh;
-    overflow: hidden;
-}
+/* Core Tokens */
+@import "./assets/css/global/global.css";
 
-/* Main 3‑Column Layout */
-#layout {
-    display: grid;
-    grid-template-columns: 240px 1fr 300px;
-    height: 100vh;
-}
+/* Layout System */
+@import "./assets/css/global/layout.css";
 
-/* Left Navigation */
-#left-nav {
-    background: #111;
-    border-right: 1px solid #222;
-    padding: 20px;
-    overflow-y: auto;
-}
+/* Components */
+@import "./assets/css/global/feed.css";
+@import "./assets/css/global/right-panel.css";
+@import "./assets/css/global/nav.css";
 
-#left-nav ul {
-    list-style: none;
-}
+/* Accessibility */
+@import "./assets/css/global/high-contrast.css";
+@import "./assets/css/global/reduced-motion.css";
+@import "./assets/css/global/screenreader.css";
 
-#left-nav li {
-    padding: 12px 0;
-    cursor: pointer;
-    font-size: 1rem;
-    color: #ccc;
-    transition: color 0.2s ease;
-}
+/* Themes (optional) */
+@import "./assets/css/themes/dark.css";
+@import "./assets/css/themes/light.css";
 
-#left-nav li:hover {
-    color: #fff;
-}
-
-/* Center Content (Router Injects Views Here) */
-#app {
-    padding: 20px;
-    overflow-y: auto;
-}
-
-/* Right Panel */
-#right-panel {
-    background: #111;
-    border-left: 1px solid #222;
-    padding: 20px;
-    overflow-y: auto;
-}
-
-#right-panel .placeholder {
-    opacity: 0.5;
-    font-size: 0.9rem;
-    text-align: center;
-    margin-top: 20px;
-}
+/* Motion (optional) */
+@import "./assets/css/motion/transitions.css";
+@import "./assets/css/motion/animations.css";
