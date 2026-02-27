@@ -1,3 +1,8 @@
+/* ============================================================
+   OWF LAYOUT ENGINE — PHASE 4.4.4
+   Injects Feed Column • Right Panel • Mood Bar
+   ============================================================ */
+
 const LAYOUT_ROUTES = ["home", "discover", "news", "live"];
 
 export function injectLayout() {
@@ -9,10 +14,13 @@ export function injectLayout() {
 
   if (!LAYOUT_ROUTES.includes(route)) return;
 
+  // Find the view root inside the loaded view
   const viewRoot = main.querySelector(".view-root") || main;
 
+  // Prevent double injection
   if (viewRoot.querySelector("#owf-layout")) return;
 
+  // Inject the grid INSIDE the view, not overwriting it
   viewRoot.insertAdjacentHTML(
     "beforeend",
     `
