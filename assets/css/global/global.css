@@ -1,1 +1,117 @@
+/* ============================================================
+   OWF GLOBAL DESIGN SYSTEM — PHASE 4.4.4
+   Design Tokens, Base Resets, Dark Mode, Accessibility
+   ============================================================ */
 
+/* ------------------------------
+   Root Tokens
+   ------------------------------ */
+:root {
+  /* Surfaces */
+  --owf-surface: #ffffff;
+  --owf-surface-alt: #f8f8f8;
+
+  /* Borders */
+  --owf-border-soft: rgba(0, 0, 0, 0.08);
+  --owf-border-strong: rgba(0, 0, 0, 0.14);
+
+  /* Text */
+  --owf-text-primary: #111111;
+  --owf-text-secondary: rgba(0, 0, 0, 0.55);
+  --owf-text-tertiary: rgba(0, 0, 0, 0.35);
+
+  /* Global Time States */
+  --owf-time-day: #ffe8a3;
+  --owf-time-night: #1a2340;
+  --owf-time-dawn: linear-gradient(135deg, #ffb36b, #ff6f91);
+
+  /* City Accent Colors */
+  --owf-accent-lagos: #f2a93b;
+  --owf-accent-tokyo: #ff4f8b;
+  --owf-accent-saopaulo: #7a4fff;
+  --owf-accent-la: #4fa3ff;
+
+  /* Typography */
+  --owf-font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --owf-font-size-xs: 12px;
+  --owf-font-size-sm: 14px;
+  --owf-font-size-md: 15px;
+  --owf-font-size-lg: 16px;
+  --owf-font-size-xl: 20px;
+  --owf-font-size-xxl: 24px;
+
+  --owf-font-weight-regular: 400;
+  --owf-font-weight-medium: 500;
+  --owf-font-weight-semibold: 600;
+
+  /* Spacing Scale */
+  --owf-space-xxs: 4px;
+  --owf-space-xs: 8px;
+  --owf-space-sm: 12px;
+  --owf-space-md: 16px;
+  --owf-space-lg: 20px;
+  --owf-space-xl: 24px;
+  --owf-space-xxl: 32px;
+
+  /* Elevation */
+  --owf-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --owf-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --owf-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.10);
+
+  /* Motion */
+  --owf-motion-fast: 120ms ease;
+  --owf-motion-medium: 200ms ease;
+  --owf-motion-slow: 320ms ease;
+}
+
+/* ------------------------------
+   Base Reset
+   ------------------------------ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: var(--owf-font-family);
+  background: var(--owf-surface-alt);
+  color: var(--owf-text-primary);
+  height: 100%;
+  width: 100%;
+}
+
+/* Smooth rendering */
+img {
+  max-width: 100%;
+  display: block;
+  border-radius: 8px;
+}
+
+/* Links */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ------------------------------
+   Dark Mode
+   ------------------------------ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --owf-surface: #111111;
+    --owf-surface-alt: #1a1a1a;
+    --owf-text-primary: #ffffff;
+    --owf-text-secondary: rgba(255, 255, 255, 0.55);
+    --owf-border-soft: rgba(255, 255, 255, 0.12);
+  }
+}
+
+/* ------------------------------
+   Accessibility
+   ------------------------------ */
+:root.high-contrast {
+  --owf-border-soft: #000;
+  --owf-text-secondary: #000;
+  --owf-surface-alt: #fff;
+}
