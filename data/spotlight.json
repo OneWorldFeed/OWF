@@ -1,1 +1,12 @@
-
+[
+  {
+    "title": "Sunrise in Tokyo",
+    "subtitle": "A new day begins",
+    "image": "assets/img/spotlight/tokyo.jpg"
+  },
+  {
+    "title": "Voices of Nairobi",
+    "subtitle": "Street stories at golden hour",
+    "image": "assets/img/spotlight/nairobi.jpg"
+  }
+]
