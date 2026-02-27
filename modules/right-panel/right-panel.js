@@ -1,14 +1,29 @@
 /* ============================================================
-   OWF RIGHT PANEL MODULE — PHASE 4.4.4
+   OWF RIGHT PANEL MODULE — PHASE 4.4.4 (Fetch Version)
    Spotlight • Trending • City Rows • Global Moments
    ============================================================ */
 
-import spotlightData from "../../data/spotlight.json" assert { type: "json" };
-import citiesData from "../../data/cities.json" assert { type: "json" };
-import feedData from "../../data/feed.json" assert { type: "json" };
+let spotlightData = [];
+let citiesData = [];
+let feedData = [];
 
 /* ---------------------------------------------
-   Resolve mount point (#right-panel or #global-moments)
+   Load JSON at runtime (no import assertions)
+--------------------------------------------- */
+async function loadData() {
+  const [spotlightRes, citiesRes, feedRes] = await Promise.all([
+    fetch("../../data/spotlight.json"),
+    fetch("../../data/cities.json"),
+    fetch("../../data/feed.json")
+  ]);
+
+  spotlightData = await spotlightRes.json();
+  citiesData = await citiesRes.json();
+  feedData = await feedRes.json();
+}
+
+/* ---------------------------------------------
+   Resolve mount point
 --------------------------------------------- */
 function getMountPoint() {
   return (
@@ -74,7 +89,7 @@ function renderTrending() {
 }
 
 /* ---------------------------------------------
-   City Row (Time + Weather)
+   City Row
 --------------------------------------------- */
 function renderCityRow(city) {
   const row = document.createElement("div");
@@ -117,7 +132,9 @@ function renderMoment(moment) {
 /* ---------------------------------------------
    Main Render Function
 --------------------------------------------- */
-export function renderRightPanel() {
+export async function renderRightPanel() {
+  await loadData();
+
   const mount = getMountPoint();
   if (!mount) return;
 
