@@ -14,13 +14,10 @@ export function injectLayout() {
 
   if (!LAYOUT_ROUTES.includes(route)) return;
 
-  // The view container inside the loaded HTML file
   const viewRoot = main.querySelector(".view-root") || main;
 
-  // Prevent duplicate injection
   if (viewRoot.querySelector("#owf-layout")) return;
 
-  // Inject the full 3‑column grid
   viewRoot.insertAdjacentHTML(
     "beforeend",
     `
@@ -44,11 +41,6 @@ export function injectLayout() {
    Ensure layout injection runs at the correct time
    ============================================================ */
 
-// When the page first loads
 document.addEventListener("DOMContentLoaded", injectLayout);
-
-// When the route changes (#home → #discover → #news → #live)
 window.addEventListener("hashchange", injectLayout);
-
-// When router.js finishes loading a view
 window.addEventListener("owf:view-loaded", injectLayout);
