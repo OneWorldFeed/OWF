@@ -1,12 +1,47 @@
-import { navigate } from "../router/router.js";
+/* ============================================================
+   OWF NAVIGATION — PHASE 4.4.4
+   Handles SPA navigation + active state
+   ============================================================ */
 
-export function initNavigation() {
-    const navItems = document.querySelectorAll("[data-nav]");
+/**
+ * Update active nav item based on current hash.
+ */
+function updateActiveNav() {
+  const hash = location.hash.replace("#/", "") || "home";
 
-    navItems.forEach(item => {
-        item.addEventListener("click", () => {
-            const target = item.getAttribute("data-nav");
-            navigate(target);
-        });
-    });
+  document.querySelectorAll("[data-nav]").forEach(item => {
+    const target = item.dataset.nav;
+    if (target === hash) {
+      item.classList.add("active");
+    } else {
+      item.classList.remove("active");
+    }
+  });
 }
+
+/**
+ * Bind click events to nav items.
+ */
+function bindNavEvents() {
+  document.querySelectorAll("[data-nav]").forEach(item => {
+    item.addEventListener("click", e => {
+      e.preventDefault();
+      const target = item.dataset.nav;
+      location.hash = `/${target}`;
+    });
+  });
+}
+
+/**
+ * Initialize navigation system.
+ */
+function initNav() {
+  bindNavEvents();
+  updateActiveNav();
+}
+
+/* ---------------------------------------------
+   Auto‑mount on load + hash change
+--------------------------------------------- */
+document.addEventListener("DOMContentLoaded", initNav);
+window.addEventListener("hashchange", updateActiveNav);
