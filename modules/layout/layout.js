@@ -23,6 +23,7 @@ export function injectLayout() {
   let route = location.hash.replace("#", "").trim();
   if (route === "") route = "home";
 
+  // Only inject layout for valid routes
   if (!LAYOUT_ROUTES.includes(route)) return;
 
   const viewRoot = main.querySelector(".view-root") || main;
@@ -49,7 +50,7 @@ export function injectLayout() {
     `
   );
 
-  // Inject left nav content INTO THE CORRECT GRID
+  // Inject the canonical OWF navigation
   viewRoot.querySelector("#left-nav").innerHTML = `
     <nav class="left-nav-inner">
       <a href="#home" data-nav="home">Home</a>
