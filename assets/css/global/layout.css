@@ -4,30 +4,101 @@
    ============================================================ */
 
 .owf-grid {
-  display: grid;
+  display: grid !important;
   grid-template-columns: 260px 1fr 320px;
   grid-template-rows: auto;
   gap: 24px;
-  width: 100%;
+  width: 100% !important;
   max-width: 1600px;
   margin: 0 auto;
   padding: 24px;
   box-sizing: border-box;
 }
 
+/* ============================================================
+   Column Assignments
+   ============================================================ */
+
 /* Left nav column */
 #left-nav {
   grid-column: 1;
+  width: auto !important;
+  max-width: none !important;
 }
 
-/* Center feed */
+/* Center feed column */
 #feed {
   grid-column: 2;
+  width: auto !important;
+  max-width: none !important;
 }
 
-/* Right panel */
+/* Right panel column */
 #right-panel {
   grid-column: 3;
+  width: auto !important;
+  max-width: none !important;
   position: sticky;
   top: 24px;
+}
+
+/* ============================================================
+   View Root Normalization
+   Prevents flexbox or centering from breaking the grid
+   ============================================================ */
+
+.view-root {
+  display: block !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   Hardening Against Global Overrides
+   Ensures no theme or global CSS collapses the grid
+   ============================================================ */
+
+#left-nav,
+#feed,
+#right-panel {
+  display: block !important;
+}
+
+/* Prevent accidental full-width children */
+#left-nav > *,
+#feed > *,
+#right-panel > * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* ============================================================
+   Responsive Behavior (Phase 4.4.4)
+   ============================================================ */
+
+@media (max-width: 1200px) {
+  .owf-grid {
+    grid-template-columns: 220px 1fr 280px;
+  }
+}
+
+@media (max-width: 960px) {
+  .owf-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #left-nav {
+    display: none;
+  }
+
+  #right-panel {
+    display: none;
+  }
+
+  #feed {
+    grid-column: 1;
+  }
 }
