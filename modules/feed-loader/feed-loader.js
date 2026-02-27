@@ -1,10 +1,17 @@
 /* ============================================================
-   OWF FEED LOADER — PHASE 4.4.4
+   OWF FEED LOADER — PHASE 4.4.4 (Fetch Version)
    Pagination • Infinite Scroll • Component Hydration
    ============================================================ */
 
-import feedData from "../../data/feed.json" assert { type: "json" };
-import { createFeedCard } from "../../components/feed-card/feed-card.js";
+let feedData = [];
+
+/* ---------------------------------------------
+   Load JSON at runtime (no import assertions)
+--------------------------------------------- */
+async function loadFeedData() {
+  const res = await fetch("../../data/feed.json");
+  feedData = await res.json();
+}
 
 /* ---------------------------------------------
    Internal feed registry
@@ -19,7 +26,9 @@ const feedState = {
 /* ---------------------------------------------
    Load the first batch
 --------------------------------------------- */
-export function loadInitialFeed() {
+export async function loadInitialFeed() {
+  await loadFeedData();
+
   feedState.cursor = 0;
   feedState.hasMore = true;
   feedState.isLoading = false;
@@ -67,14 +76,15 @@ function renderFeedItems(items) {
   if (!mount) return;
 
   items.forEach(card => {
-    mount.appendChild(createFeedCard(card));
+    const el = createFeedCard(card);
+    mount.appendChild(el);
   });
 }
 
 /* ---------------------------------------------
    Infinite scroll sentinel
 --------------------------------------------- */
-function setupInfiniteScroll() {
+export function setupInfiniteScroll() {
   const mount = document.querySelector("#feed");
   if (!mount) return;
 
@@ -98,5 +108,6 @@ function setupInfiniteScroll() {
 }
 
 /* ---------------------------------------------
-   Removed auto-mount — hydration handled by app.js
+   Feed Card Factory (imported via global scope)
 --------------------------------------------- */
+import { createFeedCard } from "../../components/feed-card/feed-card.js";
