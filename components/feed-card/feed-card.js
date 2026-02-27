@@ -1,14 +1,14 @@
 /* ============================================================
    OWF FEED CARD COMPONENT — PHASE 4.4.4
-   Auto‑renders feed cards into #feed using feed.json
+   Pure component factory — no auto‑rendering
    ============================================================ */
 
-import feedData from "../../data/feed.json" assert { type: "json" };
-
-/* ---------------------------------------------
-   Create a single Feed Card DOM element
---------------------------------------------- */
-function createFeedCard(card) {
+/**
+ * Create a single feed card DOM element.
+ * @param {Object} card - Feed item from feed.json
+ * @returns {HTMLElement}
+ */
+export function createFeedCard(card) {
   const el = document.createElement("div");
   el.className = "feed-card";
 
@@ -38,22 +38,3 @@ function createFeedCard(card) {
 
   return el;
 }
-
-/* ---------------------------------------------
-   Render all feed cards into #feed
---------------------------------------------- */
-export function renderFeed() {
-  const mount = document.querySelector("#feed");
-  if (!mount) return;
-
-  mount.innerHTML = ""; // Clear existing content
-
-  feedData.forEach(card => {
-    mount.appendChild(createFeedCard(card));
-  });
-}
-
-/* ---------------------------------------------
-   Auto‑mount on DOM ready
---------------------------------------------- */
-document.addEventListener("DOMContentLoaded", renderFeed);
