@@ -4,7 +4,7 @@
    ============================================================ */
 
 import feedData from "../../data/feed.json" assert { type: "json" };
-import { createFeedCard } from "../../assets/js/components/feed-card.js";
+import { createFeedCard } from "../cards/feed-card.js";
 
 /* ---------------------------------------------
    Internal feed registry
@@ -98,12 +98,5 @@ function setupInfiniteScroll() {
 }
 
 /* ---------------------------------------------
-   Auto‑mount when Home view loads
+   Removed auto-mount — hydration handled by app.js
 --------------------------------------------- */
-document.addEventListener("DOMContentLoaded", () => {
-  const feed = document.querySelector("#feed");
-  if (feed) {
-    loadInitialFeed();
-    setupInfiniteScroll();
-  }
-});
