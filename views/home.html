@@ -1,11 +1,24 @@
-<section class="view home-view">
+<!-- ============================================================
+     OWF HOME VIEW — PHASE 4.4.4
+     Loaded into <main id="main"> by router.js
+     Layout.js will inject:
+       - #mood-bar
+       - #feed
+       - #right-panel
+   ============================================================ -->
 
-    <h1>Home</h1>
+<div class="view-header">
+  <h1>Home</h1>
+</div>
 
-    <p>Welcome to OneWorldFeed.</p>
+<!-- Navigation (optional if included globally) -->
+<nav class="bottom-nav">
+  <a data-nav="home" class="active">Home</a>
+  <a data-nav="discover">Discover</a>
+  <a data-nav="news">News</a>
+  <a data-nav="live">Live</a>
+  <a data-nav="profile">Profile</a>
+</nav>
 
-    <div class="home-placeholder">
-        <p>Your global feed will appear here.</p>
-    </div>
-
-</section>
+<!-- The actual feed + right panel containers
+     will be injected by layout.js -->
