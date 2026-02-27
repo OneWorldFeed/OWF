@@ -1,1 +1,70 @@
-.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Social • OneWorldFeed</title>
+
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="/styles/global.css" />
+  <link rel="stylesheet" href="/styles/layout.css" />
+  <link rel="stylesheet" href="/styles/right-panel.css" />
+  <link rel="stylesheet" href="/styles/feed.css" />
+  <link rel="stylesheet" href="/styles/halos.css" />
+
+  <!-- Right Panel Phase Controller -->
+  <script defer src="/scripts/rightPanelPhases.js"></script>
+
+  <!-- Glow System -->
+  <script defer src="/scripts/glowSystem.js"></script>
+</head>
+
+<body>
+
+  <div class="layout">
+
+    <!-- LEFT NAVIGATION -->
+    <aside class="sidebar">
+      <nav class="nav">
+        <a href="/views/home.html">Home</a>
+        <a href="/views/discover.html">Discover</a>
+        <a href="/views/news.html">News</a>
+        <a href="/views/live.html">Live</a>
+        <a href="/views/social.html" class="active">Social</a>
+        <a href="/views/profile.html">Profile</a>
+        <a href="/views/official.html">Official</a>
+      </nav>
+    </aside>
+
+    <!-- CENTER FEED -->
+    <main class="feed">
+
+      <h1 class="page-title">Social</h1>
+
+      <!-- SOCIAL FEED CONTAINER -->
+      <section id="social-feed" class="feed-stream">
+
+        <!-- Example Social Card (remove once real data loads) -->
+        <article class="feed-card" data-type="social" data-mood="calm">
+          <div class="card-content">
+            <h2>User Post</h2>
+            <p>This is a placeholder social post. Replace with dynamic content.</p>
+          </div>
+        </article>
+
+      </section>
+
+    </main>
+
+    <!-- RIGHT PANEL -->
+    <aside class="right-panel">
+      <div class="rp-inner">
+        <h2>Global Panel</h2>
+        <p>Time‑adaptive tint active.</p>
+      </div>
+    </aside>
+
+  </div>
+
+</body>
+</html>
