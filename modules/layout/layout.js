@@ -14,13 +14,10 @@ export function injectLayout() {
 
   if (!LAYOUT_ROUTES.includes(route)) return;
 
-  // Find the view root inside the loaded view
   const viewRoot = main.querySelector(".view-root") || main;
 
-  // Prevent double injection
   if (viewRoot.querySelector("#owf-layout")) return;
 
-  // Inject the grid INSIDE the view, not overwriting it
   viewRoot.insertAdjacentHTML(
     "beforeend",
     `
@@ -33,4 +30,7 @@ export function injectLayout() {
   );
 }
 
+// Run layout injection on all possible triggers
+document.addEventListener("DOMContentLoaded", injectLayout);
+window.addEventListener("hashchange", injectLayout);
 window.addEventListener("owf:view-loaded", injectLayout);
