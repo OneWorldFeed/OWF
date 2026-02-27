@@ -1,1 +1,4 @@
-
+[
+  { "id": "calm", "label": "Calm", "color": "#88c0d0" },
+  { "id": "energetic", "label": "Energetic", "color": "#ebcb8b" }
+]
