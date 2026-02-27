@@ -1,6 +1,6 @@
 /* ============================================================
    OWF LAYOUT ENGINE — PHASE 4.4.4
-   Injects Left Nav • Feed Column • Right Panel
+   Injects Left Nav • Center Feed • Right Panel
    ============================================================ */
 
 const LAYOUT_ROUTES = ["home", "discover", "news", "live"];
@@ -16,8 +16,10 @@ export function injectLayout() {
 
   const viewRoot = main.querySelector(".view-root") || main;
 
+  // Prevent duplicate injection
   if (viewRoot.querySelector("#owf-layout")) return;
 
+  // Inject the full 3‑column grid
   viewRoot.insertAdjacentHTML(
     "beforeend",
     `
