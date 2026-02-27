@@ -1,1 +1,124 @@
+/* ============================================================
+   OWF FEED CARD SYSTEM — PHASE 4.4.4
+   Card Shell, Header, Media, Caption, Engagement Row
+   ============================================================ */
 
+/* Feed container spacing (works with layout.css) */
+#feed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--owf-space-xxl);
+}
+
+/* ------------------------------
+   Card Shell
+   ------------------------------ */
+.feed-card {
+  background: var(--owf-surface);
+  border: 1px solid var(--owf-border-soft);
+  border-radius: 16px;
+  padding: 20px 20px 24px;
+  box-shadow: var(--owf-shadow-md);
+  transition: box-shadow var(--owf-motion-medium), transform var(--owf-motion-medium);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.feed-card:hover {
+  box-shadow: var(--owf-shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* ------------------------------
+   Header Row
+   ------------------------------ */
+.feed-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.feed-card-header .avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.feed-card-header .meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.feed-card-header .name {
+  font-size: var(--owf-font-size-md);
+  font-weight: var(--owf-font-weight-semibold);
+  color: var(--owf-text-primary);
+}
+
+.feed-card-header .city-time {
+  font-size: var(--owf-font-size-sm);
+  color: var(--owf-text-secondary);
+}
+
+/* ------------------------------
+   Media (Image / Video)
+   ------------------------------ */
+.feed-card-media {
+  width: 100%;
+  border-radius: 12px;
+  object-fit: cover;
+  max-height: 480px;
+}
+
+/* ------------------------------
+   Caption
+   ------------------------------ */
+.feed-card-caption {
+  font-size: var(--owf-font-size-md);
+  color: var(--owf-text-primary);
+  line-height: 1.45;
+}
+
+/* ------------------------------
+   Engagement Row
+   ------------------------------ */
+.feed-card-engagement {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.feed-card-engagement button {
+  background: none;
+  border: none;
+  font-size: var(--owf-font-size-md);
+  color: var(--owf-text-secondary);
+  cursor: pointer;
+  transition: color var(--owf-motion-fast);
+}
+
+.feed-card-engagement button:hover {
+  color: var(--owf-text-primary);
+}
+
+/* ------------------------------
+   Tags Row
+   ------------------------------ */
+.feed-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.feed-card-tag {
+  background: var(--owf-surface-alt);
+  border: 1px solid var(--owf-border-soft);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: var(--owf-font-size-xs);
+  color: var(--owf-text-secondary);
+}
