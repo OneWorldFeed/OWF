@@ -7,12 +7,12 @@
 import { loadHomeFeed } from "../home/home.js";
 
 const routes = {
-  "home": "./views/home.html",
-  "discover": "./views/discover.html",
-  "news": "./views/news.html",
-  "live": "./views/live.html",
-  "profile": "./views/profile.html",
-  "settings": "./views/settings.html"
+  "home": "../../views/home.html",
+  "discover": "../../views/discover.html",
+  "news": "../../views/news.html",
+  "live": "../../views/live.html",
+  "profile": "../../views/profile.html",
+  "settings": "../../views/settings.html"
 };
 
 /* ---------------------------------------------
@@ -48,10 +48,8 @@ async function handleRoute() {
   const route = getRoute();
   await loadView(route);
 
-  // Layout injection (left-nav, feed, right-panel)
   window.dispatchEvent(new Event("owf:view-loaded"));
 
-  // Hydrate Home feed AFTER layout is injected
   if (route === "home") {
     loadHomeFeed();
   }
