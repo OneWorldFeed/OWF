@@ -24,26 +24,18 @@ import { loadInitialFeed } from "./modules/feed-loader/feed-loader.js";
 /* ---------------------------------------------
    Boot sequence
 --------------------------------------------- */
-document.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("owf:view-loaded", () => {
 
-  const hydrate = () => {
-    const feed = document.querySelector("#feed");
-    const rightPanel =
-      document.querySelector("#right-panel") ||
-      document.querySelector("#global-moments");
+  const feed = document.querySelector("#feed");
+  const rightPanel =
+    document.querySelector("#right-panel") ||
+    document.querySelector("#global-moments");
 
-    if (feed) {
-      loadInitialFeed();
-    }
+  if (feed) {
+    loadInitialFeed();
+  }
 
-    if (rightPanel) {
-      renderRightPanel();
-    }
-  };
-
-  // Hydrate immediately on first load
-  hydrate();
-
-  // Hydrate again whenever the router changes views
-  window.addEventListener("hashchange", hydrate);
+  if (rightPanel) {
+    renderRightPanel();
+  }
 });
