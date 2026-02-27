@@ -1,1 +1,78 @@
+/* ============================================
+   OWF GLOBAL LAYOUT GRID — PHASE 4.4.4
+   12‑COLUMN CINEMATIC GRID SYSTEM
+   ============================================ */
 
+/* Root grid container */
+main#main {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 32px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+/* Left column: Feed (8 columns) */
+#feed {
+  grid-column: span 8;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Right column: Global Moments / Right Panel (4 columns) */
+#global-moments,
+#right-panel {
+  grid-column: span 4;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Mood bar (if present) spans full width */
+#mood-bar {
+  grid-column: 1 / -1;
+  margin-bottom: 24px;
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+/* Tablet: collapse to 8-column grid */
+@media (max-width: 1024px) {
+  main#main {
+    grid-template-columns: repeat(8, 1fr);
+    padding: 24px;
+  }
+
+  #feed {
+    grid-column: span 8;
+  }
+
+  #global-moments,
+  #right-panel {
+    grid-column: span 8;
+    order: 3;
+  }
+
+  #mood-bar {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Mobile: single column */
+@media (max-width: 768px) {
+  main#main {
+    grid-template-columns: repeat(4, 1fr);
+    padding: 16px;
+  }
+
+  #feed,
+  #global-moments,
+  #right-panel {
+    grid-column: 1 / -1;
+  }
+}
