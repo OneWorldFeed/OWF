@@ -1,1 +1,5 @@
-
+[
+  { "name": "Tokyo", "timezone": "Asia/Tokyo", "temp": 72 },
+  { "name": "London", "timezone": "Europe/London", "temp": 58 },
+  { "name": "New York", "timezone": "America/New_York", "temp": 65 }
+]
