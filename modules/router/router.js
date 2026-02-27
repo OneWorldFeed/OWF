@@ -5,12 +5,12 @@
    ============================================================ */
 
 const routes = {
-  "home": "views/home.html",
-  "discover": "views/discover.html",
-  "news": "views/news.html",
-  "live": "views/live.html",
-  "profile": "views/profile.html",
-  "settings": "views/settings.html"
+  "home": "./views/home.html",
+  "discover": "./views/discover.html",
+  "news": "./views/news.html",
+  "live": "./views/live.html",
+  "profile": "./views/profile.html",
+  "settings": "./views/settings.html"
 };
 
 /* ---------------------------------------------
@@ -54,3 +54,4 @@ async function handleRoute() {
 --------------------------------------------- */
 document.addEventListener("DOMContentLoaded", handleRoute);
 window.addEventListener("hashchange", handleRoute);
+
