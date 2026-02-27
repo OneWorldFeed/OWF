@@ -1,1 +1,171 @@
+/* ============================================================
+   OWF RIGHT PANEL — PHASE 4.4.4
+   Spotlight, Trending, City Rows, Weather, Global Moments
+   ============================================================ */
 
+/* Container (works with layout.css) */
+#global-moments,
+#right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--owf-space-xl);
+}
+
+/* ------------------------------
+   Spotlight Card
+   ------------------------------ */
+.spotlight-card {
+  background: var(--owf-surface);
+  border: 1px solid var(--owf-border-soft);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--owf-shadow-md);
+  transition: box-shadow var(--owf-motion-medium), transform var(--owf-motion-medium);
+  cursor: pointer;
+}
+
+.spotlight-card:hover {
+  box-shadow: var(--owf-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.spotlight-card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.spotlight-card .content {
+  padding: 16px 20px 20px;
+}
+
+.spotlight-card .title {
+  font-size: var(--owf-font-size-lg);
+  font-weight: var(--owf-font-weight-semibold);
+  color: var(--owf-text-primary);
+  margin-bottom: 8px;
+}
+
+.spotlight-card .subtitle {
+  font-size: var(--owf-font-size-sm);
+  color: var(--owf-text-secondary);
+}
+
+/* ------------------------------
+   Trending List
+   ------------------------------ */
+.trending-block {
+  background: var(--owf-surface);
+  border: 1px solid var(--owf-border-soft);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--owf-shadow-sm);
+}
+
+.trending-block h3 {
+  font-size: var(--owf-font-size-lg);
+  font-weight: var(--owf-font-weight-semibold);
+  margin-bottom: 16px;
+}
+
+.trending-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--owf-border-soft);
+}
+
+.trending-item:last-child {
+  border-bottom: none;
+}
+
+.trending-item .label {
+  font-size: var(--owf-font-size-md);
+  color: var(--owf-text-primary);
+}
+
+.trending-item .count {
+  font-size: var(--owf-font-size-sm);
+  color: var(--owf-text-secondary);
+}
+
+/* ------------------------------
+   City Row (Weather / Time)
+   ------------------------------ */
+.city-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--owf-surface);
+  border: 1px solid var(--owf-border-soft);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: var(--owf-shadow-sm);
+}
+
+.city-row .left {
+  display: flex;
+  flex-direction: column;
+}
+
+.city-row .city-name {
+  font-size: var(--owf-font-size-md);
+  font-weight: var(--owf-font-weight-medium);
+  color: var(--owf-text-primary);
+}
+
+.city-row .city-time {
+  font-size: var(--owf-font-size-sm);
+  color: var(--owf-text-secondary);
+}
+
+.city-row .temp {
+  font-size: var(--owf-font-size-lg);
+  font-weight: var(--owf-font-weight-semibold);
+}
+
+/* ------------------------------
+   Global Moments Blocks
+   ------------------------------ */
+.moment-card {
+  position: relative;
+  height: 140px;
+  border-radius: 16px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--owf-shadow-md);
+  cursor: pointer;
+  transition: transform var(--owf-motion-medium), box-shadow var(--owf-motion-medium);
+}
+
+.moment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--owf-shadow-lg);
+}
+
+.moment-card .overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.0), rgba(0,0,0,0.55));
+}
+
+.moment-card .label {
+  position: absolute;
+  bottom: 12px;
+  left: 16px;
+  color: white;
+  font-size: var(--owf-font-size-lg);
+  font-weight: var(--owf-font-weight-semibold);
+}
+
+/* ------------------------------
+   Section Titles
+   ------------------------------ */
+.right-panel-title {
+  font-size: var(--owf-font-size-xl);
+  font-weight: var(--owf-font-weight-semibold);
+  margin-bottom: 12px;
+  color: var(--owf-text-primary);
+}
