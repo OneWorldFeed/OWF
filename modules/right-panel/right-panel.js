@@ -47,7 +47,6 @@ function renderTrending() {
 
   const list = document.createElement("div");
 
-  // Count tag frequency from feed.json
   const tagCounts = {};
   feedData.forEach(card => {
     card.tags?.forEach(tag => {
@@ -55,7 +54,6 @@ function renderTrending() {
     });
   });
 
-  // Convert to sorted array
   const sorted = Object.entries(tagCounts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
@@ -124,22 +122,18 @@ export function renderRightPanel() {
   const mount = getMountPoint();
   if (!mount) return;
 
-  mount.innerHTML = ""; // Clear existing content
+  mount.innerHTML = "";
 
-  /* Spotlight */
   if (spotlightData[0]) {
     mount.appendChild(renderSpotlight(spotlightData[0]));
   }
 
-  /* Trending */
   mount.appendChild(renderTrending());
 
-  /* City Rows */
   citiesData.slice(0, 3).forEach(city => {
     mount.appendChild(renderCityRow(city));
   });
 
-  /* Global Moments */
   const momentsHeader = document.createElement("div");
   momentsHeader.className = "right-panel-title";
   momentsHeader.textContent = "Global Moments";
@@ -154,8 +148,3 @@ export function renderRightPanel() {
     );
   });
 }
-
-/* ---------------------------------------------
-   Auto‑mount on load
---------------------------------------------- */
-document.addEventListener("DOMContentLoaded", renderRightPanel);
