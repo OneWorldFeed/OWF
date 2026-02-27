@@ -12,7 +12,7 @@ const LAYOUT_ROUTES = [
   "ai",
   "news",
   "music",
-  "podcast",
+  "podcasts",   // <-- corrected to match router
   "settings"
 ];
 
@@ -61,7 +61,7 @@ export function injectLayout() {
       <a href="#ai" data-nav="ai">AI</a>
       <a href="#news" data-nav="news">News</a>
       <a href="#music" data-nav="music">Music</a>
-      <a href="#podcast" data-nav="podcast">Podcast</a>
+      <a href="#podcasts" data-nav="podcasts">Podcasts</a> <!-- corrected -->
       <a href="#settings" data-nav="settings">Settings</a>
     </nav>
   `;
