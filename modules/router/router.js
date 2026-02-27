@@ -1,38 +1,57 @@
-import { routes } from "./routes.js";
+/* ============================================================
+   OWF ROUTER — PHASE 4.4.4
+   Simple hash‑based SPA router for OWF
+   Loads views into <main id="main">
+   ============================================================ */
 
-export async function loadView(viewName) {
-  const path = routes[viewName];
+const routes = {
+  "/home": "views/home.html",
+  "/discover": "views/discover.html",
+  "/news": "views/news.html",
+  "/live": "views/live.html",
+  "/profile": "views/profile.html",
+  "/settings": "views/settings.html"
+};
 
-  if (!path) {
-    console.error("Route not found:", viewName);
-    return;
-  }
+/* ---------------------------------------------
+   Load an HTML view into <main id="main">
+--------------------------------------------- */
+async function loadView(path) {
+  const main = document.querySelector("#main");
+  if (!main) return;
+
+  const file = routes[path] || routes["/home"];
 
   try {
-    const response = await fetch(path);
+    const response = await fetch(file);
     const html = await response.text();
-    document.getElementById("app").innerHTML = html;
+    main.innerHTML = html;
   } catch (err) {
-    console.error("Error loading view:", err);
+    main.innerHTML = `<p style="padding:20px;">Error loading view.</p>`;
   }
 }
 
-export function navigate(viewName) {
-  loadView(viewName);
-  window.history.pushState({ view: viewName }, "", `#${viewName}`);
+/* ---------------------------------------------
+   Determine current route
+--------------------------------------------- */
+function getRoute() {
+  const hash = location.hash.replace("#", "").trim();
+  return hash === "" ? "/home" : hash;
 }
 
-export function initRouter() {
-  const defaultView = "home";
+/* ---------------------------------------------
+   Handle route changes
+--------------------------------------------- */
+async function handleRoute() {
+  const route = getRoute();
+  await loadView(route);
 
-  // Load initial view
-  const hash = window.location.hash.replace("#", "");
-  const initialView = hash || defaultView;
-  loadView(initialView);
-
-  // Handle back/forward navigation
-  window.onpopstate = (event) => {
-    const view = event.state?.view || defaultView;
-    loadView(view);
-  };
+  // Dispatch a custom event so app.js can hydrate modules
+  window.dispatchEvent(new Event("owf:view-loaded"));
 }
+
+/* ---------------------------------------------
+   Boot router
+--------------------------------------------- */
+document.addEventListener("DOMContentLoaded", handleRoute);
+window.addEventListener("hashchange", handleRoute);
