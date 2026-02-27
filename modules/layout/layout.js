@@ -37,6 +37,20 @@ export function injectLayout() {
     </div>
     `
   );
+
+  // Inject left nav content
+  document.querySelector("#left-nav").innerHTML = `
+    <nav class="left-nav-inner">
+      <a href="#home" data-nav="home">Home</a>
+      <a href="#discover" data-nav="discover">Discover</a>
+      <a href="#news" data-nav="news">News</a>
+      <a href="#live" data-nav="live">Live</a>
+      <a href="#profile" data-nav="profile">Profile</a>
+    </nav>
+  `;
+
+  // Signal that layout is ready for hydration
+  window.dispatchEvent(new Event("owf:layout-ready"));
 }
 
 /* ============================================================
