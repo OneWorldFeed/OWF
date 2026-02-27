@@ -5,7 +5,6 @@
    ============================================================ */
 
 import { loadHomeFeed } from "../home/home.js";
-
 const routes = {
   "home": "../../views/home.html",
   "discover": "../../views/discover.html",
@@ -68,3 +67,4 @@ async function handleRoute() {
 --------------------------------------------- */
 document.addEventListener("DOMContentLoaded", handleRoute);
 window.addEventListener("hashchange", handleRoute);
+
