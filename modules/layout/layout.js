@@ -12,15 +12,22 @@ export function injectLayout() {
   const route = location.hash.replace("#", "") || "home";
   if (!LAYOUT_ROUTES.includes(route)) return;
 
-  if (document.querySelector("#owf-layout")) return;
+  // Do NOT overwrite the view — inject INTO it
+  const viewRoot = main.querySelector(".view-root") || main;
 
-  main.innerHTML = `
+  // Prevent double injection
+  if (viewRoot.querySelector("#owf-layout")) return;
+
+  viewRoot.insertAdjacentHTML(
+    "beforeend",
+    `
     <div id="owf-layout" class="owf-grid">
       <div id="mood-bar"></div>
       <div id="feed"></div>
       <div id="right-panel"></div>
     </div>
-  `;
+    `
+  );
 }
 
 window.addEventListener("owf:view-loaded", injectLayout);
