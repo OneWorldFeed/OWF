@@ -1,8 +1,3 @@
-/* ============================================================
-   OWF LAYOUT ENGINE — PHASE 4.4.4
-   Injects Feed Column • Right Panel • Mood Bar
-   ============================================================ */
-
 const LAYOUT_ROUTES = ["home", "discover", "news", "live"];
 
 export function injectLayout() {
