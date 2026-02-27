@@ -4,7 +4,7 @@
    Loads views into <main id="main">
    ============================================================ */
 
-import { loadHomeFeed } from "./modules/home/home.js";
+import { loadHomeFeed } from "../home/home.js";
 
 const routes = {
   "home": "./views/home.html",
