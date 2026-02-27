@@ -1,47 +1,15 @@
 /* ============================================================
    OWF NAVIGATION — PHASE 4.4.4
-   Handles SPA navigation + active state
+   Hash Routing • Active State • SPA Safe
    ============================================================ */
 
-/**
- * Update active nav item based on current hash.
- */
-function updateActiveNav() {
-  const hash = location.hash.replace("#/", "") || "home";
+export function setActiveNav() {
+  const route = location.hash.replace("#", "") || "home";
 
-  document.querySelectorAll("[data-nav]").forEach(item => {
-    const target = item.dataset.nav;
-    if (target === hash) {
-      item.classList.add("active");
-    } else {
-      item.classList.remove("active");
-    }
+  document.querySelectorAll("[data-nav]").forEach(el => {
+    el.classList.toggle("active", el.dataset.nav === route);
   });
 }
 
-/**
- * Bind click events to nav items.
- */
-function bindNavEvents() {
-  document.querySelectorAll("[data-nav]").forEach(item => {
-    item.addEventListener("click", e => {
-      e.preventDefault();
-      const target = item.dataset.nav;
-      location.hash = `/${target}`;
-    });
-  });
-}
-
-/**
- * Initialize navigation system.
- */
-function initNav() {
-  bindNavEvents();
-  updateActiveNav();
-}
-
-/* ---------------------------------------------
-   Auto‑mount on load + hash change
---------------------------------------------- */
-document.addEventListener("DOMContentLoaded", initNav);
-window.addEventListener("hashchange", updateActiveNav);
+document.addEventListener("DOMContentLoaded", setActiveNav);
+window.addEventListener("hashchange", setActiveNav);
