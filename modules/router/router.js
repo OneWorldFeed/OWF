@@ -54,4 +54,3 @@ async function handleRoute() {
 --------------------------------------------- */
 document.addEventListener("DOMContentLoaded", handleRoute);
 window.addEventListener("hashchange", handleRoute);
-
