@@ -1,1 +1,33 @@
+/* ============================================================
+   OWF 3‑Column Cinematic Grid
+   Left Nav • Center Feed • Right Panel
+   ============================================================ */
 
+.owf-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr 320px;
+  grid-template-rows: auto;
+  gap: 24px;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+/* Left nav column */
+#left-nav {
+  grid-column: 1;
+}
+
+/* Center feed */
+#feed {
+  grid-column: 2;
+}
+
+/* Right panel */
+#right-panel {
+  grid-column: 3;
+  position: sticky;
+  top: 24px;
+}
