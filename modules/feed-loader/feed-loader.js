@@ -1,113 +1,102 @@
 /* ============================================================
-   OWF FEED LOADER — PHASE 4.4.4 (Fetch Version)
-   Pagination • Infinite Scroll • Component Hydration
+   OWF FEED LOADER — PHASE 4.4.4
+   Centralized feed loading + hydration engine
    ============================================================ */
 
-let feedData = [];
+let registry = {}; // Stores feed instances by name
 
-/* ---------------------------------------------
-   Load JSON at runtime (no import assertions)
---------------------------------------------- */
-async function loadFeedData() {
-  const res = await fetch("../../data/feed.json");
-  feedData = await res.json();
+/* ------------------------------------------------------------
+   Register a feed with a loader function
+   Example: registerFeed('home', loadHomeFeed)
+   ------------------------------------------------------------ */
+export function registerFeed(name, loaderFn) {
+  registry[name] = {
+    loader: loaderFn,
+    cursor: null,
+    items: [],
+    isLoading: false,
+    hasMore: true
+  };
 }
 
-/* ---------------------------------------------
-   Internal feed registry
---------------------------------------------- */
-const feedState = {
-  cursor: 0,
-  limit: 5,
-  hasMore: true,
-  isLoading: false
-};
-
-/* ---------------------------------------------
-   Load the first batch
---------------------------------------------- */
+/* ------------------------------------------------------------
+   Load the first page of a feed
+   ------------------------------------------------------------ */
 export async function loadInitialFeed() {
-  await loadFeedData();
+  const route = location.hash.replace("#", "") || "home";
+  const feed = registry[route];
+  if (!feed) return;
 
-  feedState.cursor = 0;
-  feedState.hasMore = true;
-  feedState.isLoading = false;
+  feed.cursor = null;
+  feed.items = [];
+  feed.hasMore = true;
 
-  const mount = document.querySelector("#feed");
-  if (mount) mount.innerHTML = "";
-
-  loadMoreFeed();
+  const items = await loadMore(route);
+  renderFeed(items);
 }
 
-/* ---------------------------------------------
-   Load next batch
---------------------------------------------- */
-export function loadMoreFeed() {
-  if (feedState.isLoading || !feedState.hasMore) return;
+/* ------------------------------------------------------------
+   Load the next page of a feed
+   ------------------------------------------------------------ */
+export async function loadMore(name) {
+  const feed = registry[name];
+  if (!feed || feed.isLoading || !feed.hasMore) return;
 
-  feedState.isLoading = true;
+  feed.isLoading = true;
 
-  const start = feedState.cursor;
-  const end = start + feedState.limit;
+  const result = await feed.loader(feed.cursor);
 
-  const slice = feedData.slice(start, end);
+  // Expected result shape:
+  // { items: [...], nextCursor: <string|null>, hasMore: boolean }
+  feed.items.push(...result.items);
+  feed.cursor = result.nextCursor;
+  feed.hasMore = result.hasMore;
 
-  if (slice.length === 0) {
-    feedState.hasMore = false;
-    feedState.isLoading = false;
-    return;
-  }
+  feed.isLoading = false;
 
-  renderFeedItems(slice);
-
-  feedState.cursor = end;
-  feedState.isLoading = false;
-
-  if (end >= feedData.length) {
-    feedState.hasMore = false;
-  }
+  return result.items;
 }
 
-/* ---------------------------------------------
-   Render items into #feed
---------------------------------------------- */
-function renderFeedItems(items) {
-  const mount = document.querySelector("#feed");
-  if (!mount) return;
+/* ------------------------------------------------------------
+   Render feed items into #feed
+   ------------------------------------------------------------ */
+function renderFeed(items) {
+  const container = document.querySelector("#feed");
+  if (!container) return;
 
-  items.forEach(card => {
-    const el = createFeedCard(card);
-    mount.appendChild(el);
+  container.innerHTML = ""; // Clear existing items
+
+  items.forEach(item => {
+    const card = createFeedCard(item);
+    container.appendChild(card);
   });
 }
 
-/* ---------------------------------------------
-   Infinite scroll sentinel
---------------------------------------------- */
-export function setupInfiniteScroll() {
-  const mount = document.querySelector("#feed");
-  if (!mount) return;
+/* ------------------------------------------------------------
+   Infinite scroll
+   ------------------------------------------------------------ */
+window.addEventListener("scroll", async () => {
+  const route = location.hash.replace("#", "") || "home";
+  const feed = registry[route];
+  if (!feed || feed.isLoading || !feed.hasMore) return;
 
-  const sentinel = document.createElement("div");
-  sentinel.id = "feed-sentinel";
-  sentinel.style.height = "1px";
-  sentinel.style.width = "100%";
-  sentinel.style.marginTop = "40px";
+  if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 300) {
+    const newItems = await loadMore(route);
+    appendFeedItems(newItems);
+  }
+});
 
-  mount.appendChild(sentinel);
+function appendFeedItems(items) {
+  const container = document.querySelector("#feed");
+  if (!container) return;
 
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        loadMoreFeed();
-      }
-    });
+  items.forEach(item => {
+    const card = createFeedCard(item);
+    container.appendChild(card);
   });
-
-  observer.observe(sentinel);
 }
 
-/* ---------------------------------------------
-   Feed Card Factory (imported via global scope)
---------------------------------------------- */
-import { createFeedCard } from "../../components/feed-card/feed-card.js";
+/* ------------------------------------------------------------
+   Hydrate feed AFTER layout is ready
+   ------------------------------------------------------------ */
+window.addEventListener("owf:layout-ready", loadInitialFeed);
