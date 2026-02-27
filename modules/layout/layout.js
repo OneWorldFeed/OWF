@@ -3,7 +3,18 @@
    Injects Left Nav • Center Feed • Right Panel
    ============================================================ */
 
-const LAYOUT_ROUTES = ["home", "discover", "news", "live"];
+const LAYOUT_ROUTES = [
+  "home",
+  "profile",
+  "social",
+  "dm",
+  "live",
+  "ai",
+  "news",
+  "music",
+  "podcast",
+  "settings"
+];
 
 export function injectLayout() {
   const main = document.querySelector("#main");
@@ -42,10 +53,15 @@ export function injectLayout() {
   viewRoot.querySelector("#left-nav").innerHTML = `
     <nav class="left-nav-inner">
       <a href="#home" data-nav="home">Home</a>
-      <a href="#discover" data-nav="discover">Discover</a>
-      <a href="#news" data-nav="news">News</a>
-      <a href="#live" data-nav="live">Live</a>
       <a href="#profile" data-nav="profile">Profile</a>
+      <a href="#social" data-nav="social">Social</a>
+      <a href="#dm" data-nav="dm">DM</a>
+      <a href="#live" data-nav="live">Live</a>
+      <a href="#ai" data-nav="ai">AI</a>
+      <a href="#news" data-nav="news">News</a>
+      <a href="#music" data-nav="music">Music</a>
+      <a href="#podcast" data-nav="podcast">Podcast</a>
+      <a href="#settings" data-nav="settings">Settings</a>
     </nav>
   `;
 
