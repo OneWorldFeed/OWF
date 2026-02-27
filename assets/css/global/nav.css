@@ -1,1 +1,51 @@
+/* ============================================================
+   OWF NAVIGATION STYLES — PHASE 4.4.4
+   Styles the left navigation rail injected by layout.js
+   ============================================================ */
 
+#left-nav {
+  width: 220px;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+  height: 100%;
+}
+
+.left-nav-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.left-nav-inner a {
+  display: block;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* Hover state */
+.left-nav-inner a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+/* Active state (controlled by nav.js) */
+.left-nav-inner a.active {
+  background: linear-gradient(90deg, #00c6ff, #0072ff);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 900px) {
+  #left-nav {
+    display: none;
+  }
+}
