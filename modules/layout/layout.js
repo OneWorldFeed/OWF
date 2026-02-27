@@ -9,13 +9,13 @@ export function injectLayout() {
   const main = document.querySelector("#main");
   if (!main) return;
 
-  const route = location.hash.replace("#", "") || "home";
+  let route = location.hash.replace("#", "").trim();
+  if (route === "") route = "home";
+
   if (!LAYOUT_ROUTES.includes(route)) return;
 
-  // Do NOT overwrite the view — inject INTO it
   const viewRoot = main.querySelector(".view-root") || main;
 
-  // Prevent double injection
   if (viewRoot.querySelector("#owf-layout")) return;
 
   viewRoot.insertAdjacentHTML(
