@@ -4,7 +4,7 @@
    ============================================================ */
 
 import feedData from "../../data/feed.json" assert { type: "json" };
-import { createFeedCard } from "../cards/feed-card.js";
+import { createFeedCard } from "../../components/feed-card/feed-card.js";
 
 /* ---------------------------------------------
    Internal feed registry
