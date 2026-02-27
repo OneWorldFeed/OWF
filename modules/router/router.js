@@ -5,12 +5,12 @@
    ============================================================ */
 
 const routes = {
-  "/home": "views/home.html",
-  "/discover": "views/discover.html",
-  "/news": "views/news.html",
-  "/live": "views/live.html",
-  "/profile": "views/profile.html",
-  "/settings": "views/settings.html"
+  "home": "views/home.html",
+  "discover": "views/discover.html",
+  "news": "views/news.html",
+  "live": "views/live.html",
+  "profile": "views/profile.html",
+  "settings": "views/settings.html"
 };
 
 /* ---------------------------------------------
@@ -20,7 +20,7 @@ async function loadView(path) {
   const main = document.querySelector("#main");
   if (!main) return;
 
-  const file = routes[path] || routes["/home"];
+  const file = routes[path] || routes["home"];
 
   try {
     const response = await fetch(file);
@@ -36,7 +36,7 @@ async function loadView(path) {
 --------------------------------------------- */
 function getRoute() {
   const hash = location.hash.replace("#", "").trim();
-  return hash === "" ? "/home" : hash;
+  return hash === "" ? "home" : hash;
 }
 
 /* ---------------------------------------------
@@ -46,7 +46,6 @@ async function handleRoute() {
   const route = getRoute();
   await loadView(route);
 
-  // Dispatch a custom event so app.js can hydrate modules
   window.dispatchEvent(new Event("owf:view-loaded"));
 }
 
