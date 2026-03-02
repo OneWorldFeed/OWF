@@ -11,15 +11,42 @@
 /* ------------------------------------------------------------
    Layout System (3-column grid, global header, containers)
 ------------------------------------------------------------ */
-@import "./layout/layout.css";
+@import "./assets/css/global/layout.css";
+@import "./assets/css/global/nav.css";
+@import "./assets/css/global/feed.css";
+@import "./assets/css/global/right-panel.css";
+@import "./assets/css/global/style.css";
 
 /* ------------------------------------------------------------
    Components (feed cards, nav, right panel, radio)
 ------------------------------------------------------------ */
 @import "./components/feed-card/feed-cards.css";
-@import "./modules/nav/nav.css";
-@import "./modules/right-panel/right-panel.css";
 @import "./components/radio/radio-player.css";
+
+/* Feed Card Tokens */
+@import "./components/feed-card/tokens/colors.css";
+@import "./components/feed-card/tokens/shadows.css";
+@import "./components/feed-card/tokens/spacing.css";
+@import "./components/feed-card/tokens/typography.css";
+
+/* Feed Card Animations */
+@import "./components/feed-card/animations/entry.css";
+@import "./components/feed-card/animations/hover.css";
+@import "./components/feed-card/animations/lift.css";
+@import "./components/feed-card/animations/pulse.css";
+@import "./components/feed-card/animations/shimmer.css";
+
+/* Feed Card Themes */
+@import "./components/feed-card/themes/regions/africa.css";
+@import "./components/feed-card/themes/regions/americas.css";
+@import "./components/feed-card/themes/regions/asia.css";
+@import "./components/feed-card/themes/regions/europe.css";
+@import "./components/feed-card/themes/regions/oceania.css";
+
+@import "./components/feed-card/themes/tags/breaking.css";
+@import "./components/feed-card/themes/tags/celebratory.css";
+@import "./components/feed-card/themes/tags/new.css";
+@import "./components/feed-card/themes/tags/urgent.css";
 
 /* ------------------------------------------------------------
    Accessibility
@@ -33,9 +60,17 @@
 ------------------------------------------------------------ */
 @import "./assets/css/themes/light.css";
 @import "./assets/css/themes/dark.css";
+@import "./assets/css/themes/autumn.css";
+@import "./assets/css/themes/spring.css";
+@import "./assets/css/themes/summer.css";
+@import "./assets/css/themes/winter.css";
 
 /* ------------------------------------------------------------
    Motion (cinematic transitions + animations)
 ------------------------------------------------------------ */
+@import "./assets/css/motion/hover.css";
+@import "./assets/css/motion/lift.css";
+@import "./assets/css/motion/page-entrance.css";
+@import "./assets/css/motion/pulse.css";
+@import "./assets/css/motion/shimmer.css";
 @import "./assets/css/motion/transitions.css";
-@import "./assets/css/motion/animations.css";
