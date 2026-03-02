@@ -1,79 +1,14 @@
 /* ============================================================
-   OWF LAYOUT ENGINE — PHASE 4.4.4
-   Injects Left Nav • Center Feed • Right Panel
+   OWF LAYOUT ENGINE — PHASE 4.4.4 (STATIC LAYOUT VERSION)
+   Layout is now fully defined in index.html.
+   This file remains only for future global layout behaviors.
    ============================================================ */
 
-const LAYOUT_ROUTES = [
-  "home",
-  "profile",
-  "social",
-  "dm",
-  "live",
-  "ai",
-  "news",
-  "music",
-  "podcasts",   // <-- corrected to match router
-  "settings"
-];
-
-export function injectLayout() {
-  const main = document.querySelector("#main");
-  if (!main) return;
-
-  let route = location.hash.replace("#", "").trim();
-  if (route === "") route = "home";
-
-  // Only inject layout for valid routes
-  if (!LAYOUT_ROUTES.includes(route)) return;
-
-  const viewRoot = main.querySelector(".view-root") || main;
-
-  // Prevent duplicate injection
-  if (viewRoot.querySelector("#owf-layout")) return;
-
-  // Inject the full 3‑column grid
-  viewRoot.insertAdjacentHTML(
-    "beforeend",
-    `
-    <div id="owf-layout" class="owf-grid">
-
-      <!-- LEFT NAV COLUMN -->
-      <div id="left-nav"></div>
-
-      <!-- CENTER FEED COLUMN -->
-      <div id="feed"></div>
-
-      <!-- RIGHT PANEL COLUMN -->
-      <div id="right-panel"></div>
-
-    </div>
-    `
-  );
-
-  // Inject the canonical OWF navigation
-  viewRoot.querySelector("#left-nav").innerHTML = `
-    <nav class="left-nav-inner">
-      <a href="#home" data-nav="home">Home</a>
-      <a href="#profile" data-nav="profile">Profile</a>
-      <a href="#social" data-nav="social">Social</a>
-      <a href="#dm" data-nav="dm">DM</a>
-      <a href="#live" data-nav="live">Live</a>
-      <a href="#ai" data-nav="ai">AI</a>
-      <a href="#news" data-nav="news">News</a>
-      <a href="#music" data-nav="music">Music</a>
-      <a href="#podcasts" data-nav="podcasts">Podcasts</a> <!-- corrected -->
-      <a href="#settings" data-nav="settings">Settings</a>
-    </nav>
-  `;
-
-  // Signal that layout is ready for hydration
+export function initLayout() {
+  // Reserved for future global layout behaviors (theme switching, resizing, etc.)
+  // No dynamic DOM injection is needed anymore.
   window.dispatchEvent(new Event("owf:layout-ready"));
 }
 
-/* ============================================================
-   Ensure layout injection runs at the correct time
-   ============================================================ */
-
-document.addEventListener("DOMContentLoaded", injectLayout);
-window.addEventListener("hashchange", injectLayout);
-window.addEventListener("owf:view-loaded", injectLayout);
+// Run once on startup
+document.addEventListener("DOMContentLoaded", initLayout);
