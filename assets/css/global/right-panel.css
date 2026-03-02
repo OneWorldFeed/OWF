@@ -1,171 +1,148 @@
 /* ============================================================
-   OWF RIGHT PANEL — PHASE 4.4.4
-   Spotlight, Trending, City Rows, Weather, Global Moments
+   OWF RIGHT PANEL — PHASE 4.4.4 (CINEMATIC + EXPRESSIVE)
+   Global signals • Glow accents • Elevated cards
    ============================================================ */
 
-/* Container (works with layout.css) */
-#global-moments,
-#right-panel {
+/* ------------------------------------------------------------
+   PANEL CONTAINER
+------------------------------------------------------------ */
+.owf-right-panel {
+  background: var(--owf-surface);
+  border-left: 1px solid var(--owf-border-soft);
+  padding: var(--owf-space-xl) var(--owf-space-lg);
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: var(--owf-space-xl);
 }
 
-/* ------------------------------
-   Spotlight Card
-   ------------------------------ */
-.spotlight-card {
-  background: var(--owf-surface);
-  border: 1px solid var(--owf-border-soft);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: var(--owf-shadow-md);
-  transition: box-shadow var(--owf-motion-medium), transform var(--owf-motion-medium);
-  cursor: pointer;
-}
-
-.spotlight-card:hover {
-  box-shadow: var(--owf-shadow-lg);
-  transform: translateY(-2px);
-}
-
-.spotlight-card img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-}
-
-.spotlight-card .content {
-  padding: 16px 20px 20px;
-}
-
-.spotlight-card .title {
+/* ------------------------------------------------------------
+   SECTION TITLES
+------------------------------------------------------------ */
+.right-section-title {
   font-size: var(--owf-font-size-lg);
   font-weight: var(--owf-font-weight-semibold);
+  margin-bottom: var(--owf-space-sm);
   color: var(--owf-text-primary);
-  margin-bottom: 8px;
 }
 
-.spotlight-card .subtitle {
-  font-size: var(--owf-font-size-sm);
+/* ------------------------------------------------------------
+   CARD BASE (EXPRESSIVE)
+------------------------------------------------------------ */
+.right-card {
+  background: var(--owf-surface);
+  padding: var(--owf-space-lg);
+  border-radius: var(--owf-radius-xl);
+  box-shadow: var(--owf-shadow-card);
+  transition: var(--owf-fade);
+}
+
+.right-card:hover {
+  transform: var(--owf-hover-lift);
+}
+
+/* Glow variants for expressive mood */
+.right-card.glow-warm { box-shadow: 0 0 28px var(--owf-glow-warm); }
+.right-card.glow-neutral { box-shadow: 0 0 28px var(--owf-glow-neutral); }
+.right-card.glow-cool { box-shadow: 0 0 28px var(--owf-glow-cool); }
+
+/* ------------------------------------------------------------
+   TIME + WEATHER BLOCK (EXPRESSIVE)
+------------------------------------------------------------ */
+.time-weather-block {
+  background: linear-gradient(
+    135deg,
+    var(--owf-time-day),
+    var(--owf-surface)
+  );
+  padding: var(--owf-space-lg);
+  border-radius: var(--owf-radius-xl);
+  box-shadow: 0 0 32px var(--owf-glow-warm);
+  color: var(--owf-text-primary);
+  transition: var(--owf-fade-slow);
+}
+
+.time-weather-block:hover {
+  transform: var(--owf-hover-lift);
+}
+
+.time-display {
+  font-size: var(--owf-font-size-xxl);
+  font-weight: var(--owf-font-weight-semibold);
+  margin-bottom: var(--owf-space-xs);
+}
+
+.weather-display {
+  font-size: var(--owf-font-size-md);
   color: var(--owf-text-secondary);
 }
 
-/* ------------------------------
-   Trending List
-   ------------------------------ */
-.trending-block {
-  background: var(--owf-surface);
-  border: 1px solid var(--owf-border-soft);
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: var(--owf-shadow-sm);
-}
-
-.trending-block h3 {
-  font-size: var(--owf-font-size-lg);
-  font-weight: var(--owf-font-weight-semibold);
-  margin-bottom: 16px;
+/* ------------------------------------------------------------
+   TRENDING LIST (EXPRESSIVE)
+------------------------------------------------------------ */
+.trending-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--owf-space-md);
 }
 
 .trending-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--owf-border-soft);
-}
-
-.trending-item:last-child {
-  border-bottom: none;
-}
-
-.trending-item .label {
-  font-size: var(--owf-font-size-md);
-  color: var(--owf-text-primary);
-}
-
-.trending-item .count {
-  font-size: var(--owf-font-size-sm);
-  color: var(--owf-text-secondary);
-}
-
-/* ------------------------------
-   City Row (Weather / Time)
-   ------------------------------ */
-.city-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--owf-surface);
+  padding: var(--owf-space-sm) var(--owf-space-md);
+  border-radius: var(--owf-radius-lg);
+  background: var(--owf-surface-alt);
   border: 1px solid var(--owf-border-soft);
-  border-radius: 12px;
-  padding: 14px 16px;
-  box-shadow: var(--owf-shadow-sm);
+  transition: var(--owf-fade);
+  cursor: pointer;
 }
 
-.city-row .left {
-  display: flex;
-  flex-direction: column;
+.trending-item:hover {
+  background: var(--owf-surface);
+  transform: var(--owf-hover-lift);
+  box-shadow: 0 0 18px var(--owf-glow-neutral);
 }
 
-.city-row .city-name {
+.trending-rank {
+  font-size: var(--owf-font-size-xs);
+  color: var(--owf-text-tertiary);
+}
+
+.trending-title {
   font-size: var(--owf-font-size-md);
   font-weight: var(--owf-font-weight-medium);
-  color: var(--owf-text-primary);
 }
 
-.city-row .city-time {
+/* ------------------------------------------------------------
+   AI PANEL (EXPRESSIVE)
+------------------------------------------------------------ */
+.ai-panel {
+  background: var(--owf-surface);
+  padding: var(--owf-space-lg);
+  border-radius: var(--owf-radius-xl);
+  box-shadow: 0 0 32px var(--owf-glow-cool);
+  transition: var(--owf-fade);
+}
+
+.ai-panel:hover {
+  transform: var(--owf-hover-lift);
+}
+
+.ai-title {
+  font-size: var(--owf-font-size-lg);
+  font-weight: var(--owf-font-weight-semibold);
+  margin-bottom: var(--owf-space-sm);
+}
+
+.ai-description {
   font-size: var(--owf-font-size-sm);
   color: var(--owf-text-secondary);
+  line-height: 1.5;
 }
 
-.city-row .temp {
-  font-size: var(--owf-font-size-lg);
-  font-weight: var(--owf-font-weight-semibold);
-}
-
-/* ------------------------------
-   Global Moments Blocks
-   ------------------------------ */
-.moment-card {
-  position: relative;
-  height: 140px;
-  border-radius: 16px;
-  overflow: hidden;
-  background-size: cover;
-  background-position: center;
-  box-shadow: var(--owf-shadow-md);
-  cursor: pointer;
-  transition: transform var(--owf-motion-medium), box-shadow var(--owf-motion-medium);
-}
-
-.moment-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--owf-shadow-lg);
-}
-
-.moment-card .overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.0), rgba(0,0,0,0.55));
-}
-
-.moment-card .label {
-  position: absolute;
-  bottom: 12px;
-  left: 16px;
-  color: white;
-  font-size: var(--owf-font-size-lg);
-  font-weight: var(--owf-font-weight-semibold);
-}
-
-/* ------------------------------
-   Section Titles
-   ------------------------------ */
-.right-panel-title {
-  font-size: var(--owf-font-size-xl);
-  font-weight: var(--owf-font-weight-semibold);
-  margin-bottom: 12px;
-  color: var(--owf-text-primary);
+/* ------------------------------------------------------------
+   DIVIDERS (SOFT + CINEMATIC)
+------------------------------------------------------------ */
+.right-divider {
+  height: 1px;
+  background: var(--owf-border-soft);
+  margin: var(--owf-space-lg) 0;
 }
