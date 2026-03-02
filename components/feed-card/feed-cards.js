@@ -1,5 +1,5 @@
 /* ============================================================
-   FEED CARD COMPONENT — PHASE 4.4.4 (CINEMATIC)
+   FEED CARD COMPONENT — PHASE 4.4.4 (CINEMATIC FINAL)
    Creates a DOM element for any card type
    ============================================================ */
 
@@ -11,9 +11,30 @@ export function createFeedCard(card) {
   if (card.glow) el.classList.add(`glow-${card.glow}`);
 
   // Card type
-  el.classList.add(`${card.type}-card`);
+  if (card.type) el.classList.add(`${card.type}-card`);
 
-  // Header (optional)
+  /* ------------------------------------------------------------
+     HERO CARD (hero image first, no header required)
+  ------------------------------------------------------------ */
+  if (card.type === "hero" && card.hero) {
+    const img = document.createElement("img");
+    img.classList.add("hero-image");
+    img.src = card.hero;
+    el.appendChild(img);
+
+    if (card.text) {
+      const p = document.createElement("p");
+      p.classList.add("card-text");
+      p.textContent = card.text;
+      el.appendChild(p);
+    }
+
+    return el;
+  }
+
+  /* ------------------------------------------------------------
+     HEADER (author + time)
+  ------------------------------------------------------------ */
   if (card.author) {
     const header = document.createElement("div");
     header.classList.add("card-header");
@@ -29,7 +50,9 @@ export function createFeedCard(card) {
     el.appendChild(header);
   }
 
-  // Text content
+  /* ------------------------------------------------------------
+     TEXT CONTENT
+  ------------------------------------------------------------ */
   if (card.text) {
     const p = document.createElement("p");
     p.classList.add("card-text");
@@ -37,7 +60,9 @@ export function createFeedCard(card) {
     el.appendChild(p);
   }
 
-  // Image content
+  /* ------------------------------------------------------------
+     IMAGE CONTENT (image, mixed)
+  ------------------------------------------------------------ */
   if (card.image) {
     const img = document.createElement("img");
     img.classList.add("card-image");
@@ -45,15 +70,9 @@ export function createFeedCard(card) {
     el.appendChild(img);
   }
 
-  // Hero image
-  if (card.hero) {
-    const img = document.createElement("img");
-    img.classList.add("hero-image");
-    img.src = card.hero;
-    el.appendChild(img);
-  }
-
-  // News title + summary
+  /* ------------------------------------------------------------
+     NEWS CARD
+  ------------------------------------------------------------ */
   if (card.newsTitle) {
     const title = document.createElement("h2");
     title.classList.add("news-title");
@@ -68,7 +87,9 @@ export function createFeedCard(card) {
     el.appendChild(summary);
   }
 
-  // Music card
+  /* ------------------------------------------------------------
+     MUSIC CARD
+  ------------------------------------------------------------ */
   if (card.type === "music") {
     const player = document.createElement("div");
     player.classList.add("music-player");
