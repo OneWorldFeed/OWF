@@ -1,43 +1,48 @@
 /* ============================================================
-   OWF NAVIGATION ENGINE — PHASE 4.4.4
-   Handles route changes + active link highlighting
+   OWF NAVIGATION ENGINE — PHASE 4.4.4 (FINAL)
+   Highlights active nav item based on hash route
    ============================================================ */
 
+/* ---------------------------------------------
+   Highlight active nav item
+--------------------------------------------- */
 function updateActiveNav() {
-  const route = location.hash.replace("#", "") || "home";
+  const route = location.hash.replace("#/", "") || "home";
 
-  document.querySelectorAll("[data-nav]").forEach(link => {
-    link.classList.toggle("active", link.dataset.nav === route);
+  document.querySelectorAll(".nav-item").forEach(link => {
+    const href = link.getAttribute("href").replace("#/", "");
+    link.classList.toggle("active", href === route);
   });
 }
 
+/* ---------------------------------------------
+   Handle nav clicks (SPA routing)
+--------------------------------------------- */
 function handleNavClick(event) {
-  const link = event.target.closest("[data-nav]");
+  const link = event.target.closest(".nav-item");
   if (!link) return;
 
-  const route = link.dataset.nav;
+  event.preventDefault();
+
+  const route = link.getAttribute("href");
   location.hash = route;
 }
 
-/* ============================================================
+/* ---------------------------------------------
    Event Listeners
-   ============================================================ */
+--------------------------------------------- */
 
-// Highlight nav when route changes
+// Highlight when route changes
 window.addEventListener("hashchange", updateActiveNav);
 
-// Highlight nav after router loads a view
+// Highlight after router loads a view
 window.addEventListener("owf:view-loaded", updateActiveNav);
 
-// Highlight nav after layout injects left-nav
-window.addEventListener("owf:layout-ready", updateActiveNav);
-
-// Bind click handlers after layout is ready
-window.addEventListener("owf:layout-ready", () => {
-  document.querySelectorAll("[data-nav]").forEach(link => {
+// Bind click handlers once DOM is ready
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".nav-item").forEach(link => {
     link.addEventListener("click", handleNavClick);
   });
-});
 
-// Initial highlight on first load
-document.addEventListener("DOMContentLoaded", updateActiveNav);
+  updateActiveNav();
+});
