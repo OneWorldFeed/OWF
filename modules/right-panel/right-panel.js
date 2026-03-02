@@ -1,32 +1,166 @@
-export function renderRightPanel() {
-  const container = document.querySelector("#right-global");
-  if (!container) return;
+/* ============================================================
+   OWF RIGHT PANEL MODULE — PHASE 4.4.4 (Fetch Version)
+   Spotlight • Trending • City Rows • Global Moments
+   ============================================================ */
 
-  container.innerHTML = `
-    <div class="right-card glow-warm time-weather-block">
-      <div class="time-display">4:32 PM</div>
-      <div class="weather-display">Los Angeles · 72°F · Clear</div>
-    </div>
+let spotlightData = [];
+let citiesData = [];
+let feedData = [];
 
-    <h3 class="right-section-title">Trending</h3>
-    <div class="trending-list">
-      <div class="trending-item">
-        <div class="trending-rank">#1</div>
-        <div class="trending-title">Global Climate Summit</div>
-      </div>
-      <div class="trending-item">
-        <div class="trending-rank">#2</div>
-        <div class="trending-title">New Music from Tokyo</div>
-      </div>
-    </div>
+/* ---------------------------------------------
+   Load JSON at runtime
+--------------------------------------------- */
+async function loadData() {
+  const [spotlightRes, citiesRes, feedRes] = await Promise.all([
+    fetch("../../data/spotlight.json"),
+    fetch("../../data/cities.json"),
+    fetch("../../data/feed.json")
+  ]);
 
-    <div class="right-divider"></div>
+  spotlightData = await spotlightRes.json();
+  citiesData = await citiesRes.json();
+  feedData = await feedRes.json();
+}
 
-    <div class="ai-panel glow-cool">
-      <div class="ai-title">OWF AI</div>
-      <div class="ai-description">
-        Ask anything, explore global insights, or generate ideas.
-      </div>
+/* ---------------------------------------------
+   Correct mount point for your real layout
+--------------------------------------------- */
+function getMountPoint() {
+  return document.querySelector("#right-global");
+}
+
+/* ---------------------------------------------
+   Spotlight Card
+--------------------------------------------- */
+function renderSpotlight(item) {
+  const card = document.createElement("div");
+  card.className = "spotlight-card";
+
+  card.innerHTML = `
+    <img src="${item.image}" alt="${item.title}">
+    <div class="content">
+      <div class="title">${item.title}</div>
+      <div class="subtitle">${item.subtitle}</div>
     </div>
   `;
+
+  return card;
+}
+
+/* ---------------------------------------------
+   Trending Tags
+--------------------------------------------- */
+function renderTrending() {
+  const block = document.createElement("div");
+  block.className = "trending-block";
+
+  block.innerHTML = `<h3>Trending</h3>`;
+
+  const list = document.createElement("div");
+
+  const tagCounts = {};
+  feedData.forEach(card => {
+    card.tags?.forEach(tag => {
+      tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+    });
+  });
+
+  const sorted = Object.entries(tagCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+
+  sorted.forEach(([tag, count]) => {
+    const item = document.createElement("div");
+    item.className = "trending-item";
+
+    item.innerHTML = `
+      <span class="label">#${tag}</span>
+      <span class="count">${count}</span>
+    `;
+
+    list.appendChild(item);
+  });
+
+  block.appendChild(list);
+  return block;
+}
+
+/* ---------------------------------------------
+   City Row
+--------------------------------------------- */
+function renderCityRow(city) {
+  const row = document.createElement("div");
+  row.className = "city-row";
+
+  const now = new Date();
+  const localTime = now.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: city.timezone
+  });
+
+  row.innerHTML = `
+    <div class="left">
+      <div class="city-name">${city.name}</div>
+      <div class="city-time">${localTime}</div>
+    </div>
+    <div class="temp">${city.temp ?? "--"}°</div>
+  `;
+
+  return row;
+}
+
+/* ---------------------------------------------
+   Global Moments Card
+--------------------------------------------- */
+function renderMoment(moment) {
+  const card = document.createElement("div");
+  card.className = "moment-card";
+  card.style.backgroundImage = `url(${moment.image})`;
+
+  card.innerHTML = `
+    <div class="overlay"></div>
+    <div class="label">${moment.label}</div>
+  `;
+
+  return card;
+}
+
+/* ---------------------------------------------
+   Main Render Function
+--------------------------------------------- */
+export async function renderRightPanel() {
+  await loadData();
+
+  const mount = getMountPoint();
+  if (!mount) {
+    console.warn("Right panel mount point not found.");
+    return;
+  }
+
+  mount.innerHTML = "";
+
+  if (spotlightData[0]) {
+    mount.appendChild(renderSpotlight(spotlightData[0]));
+  }
+
+  mount.appendChild(renderTrending());
+
+  citiesData.slice(0, 3).forEach(city => {
+    mount.appendChild(renderCityRow(city));
+  });
+
+  const header = document.createElement("div");
+  header.className = "right-panel-title";
+  header.textContent = "Global Moments";
+  mount.appendChild(header);
+
+  feedData.slice(0, 3).forEach(card => {
+    mount.appendChild(
+      renderMoment({
+        image: card.image,
+        label: card.city
+      })
+    );
+  });
 }
