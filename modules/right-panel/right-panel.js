@@ -1,5 +1,5 @@
 /* ============================================================
-   OWF RIGHT PANEL MODULE — PHASE 4.4.4 (Fetch Version)
+   OWF RIGHT PANEL MODULE — PHASE 4.4.4 (Static Layout Version)
    Spotlight • Trending • City Rows • Global Moments
    ============================================================ */
 
@@ -12,9 +12,9 @@ let feedData = [];
 --------------------------------------------- */
 async function loadData() {
   const [spotlightRes, citiesRes, feedRes] = await Promise.all([
-    fetch("../../data/spotlight.json"),
-    fetch("../../data/cities.json"),
-    fetch("../../data/feed.json")
+    fetch("../data/spotlight.json"),
+    fetch("../data/cities.json"),
+    fetch("../data/feed.json")
   ]);
 
   spotlightData = await spotlightRes.json();
@@ -23,7 +23,7 @@ async function loadData() {
 }
 
 /* ---------------------------------------------
-   Correct mount point for your real layout
+   Correct mount point for static layout
 --------------------------------------------- */
 function getMountPoint() {
   return document.querySelector("#right-global");
@@ -127,16 +127,35 @@ function renderMoment(moment) {
 }
 
 /* ---------------------------------------------
+   Routes that should show the right panel
+--------------------------------------------- */
+const RIGHT_PANEL_ROUTES = [
+  "home",
+  "social",
+  "news",
+  "discover",
+  "music",
+  "podcasts",
+  "live",
+  "ai"
+];
+
+/* ---------------------------------------------
    Main Render Function
 --------------------------------------------- */
 export async function renderRightPanel() {
+  const route = location.hash.replace("#/", "") || "home";
+
+  if (!RIGHT_PANEL_ROUTES.includes(route)) {
+    const mount = getMountPoint();
+    if (mount) mount.innerHTML = "";
+    return;
+  }
+
   await loadData();
 
   const mount = getMountPoint();
-  if (!mount) {
-    console.warn("Right panel mount point not found.");
-    return;
-  }
+  if (!mount) return;
 
   mount.innerHTML = "";
 
@@ -164,3 +183,10 @@ export async function renderRightPanel() {
     );
   });
 }
+
+/* ---------------------------------------------
+   Auto-render on route changes
+--------------------------------------------- */
+window.addEventListener("hashchange", renderRightPanel);
+window.addEventListener("owf:view-loaded", renderRightPanel);
+document.addEventListener("DOMContentLoaded", renderRightPanel);
