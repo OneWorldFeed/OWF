@@ -1,152 +1,85 @@
 /* ============================================================
-   OWF FEED CARD ENGINE — PHASE 4.4.4
-   Cinematic Hybrid • Deep Rounded • Adaptive Themes
-   Generates all card types for the Home feed.
+   FEED CARD COMPONENT — PHASE 4.4.4 (CINEMATIC)
+   Creates a DOM element for any card type
    ============================================================ */
 
-/* ------------------------------------------------------------
-   Base card wrapper
-   ------------------------------------------------------------ */
-function createBaseCard(className = "") {
-  const card = document.createElement("div");
-  card.className = `feed-card ${className}`;
-  return card;
-}
+export function createFeedCard(card) {
+  const el = document.createElement("article");
+  el.classList.add("feed-card");
 
-/* ------------------------------------------------------------
-   HERO MOMENT CARD
-   ------------------------------------------------------------ */
-export function createHeroCard({ image, title, subtitle }) {
-  const card = createBaseCard("hero-card");
+  // Glow variant
+  if (card.glow) el.classList.add(`glow-${card.glow}`);
 
-  card.innerHTML = `
-    <img class="hero-image" src="${image}" alt="">
-    <div class="hero-content">
-      <h1>${title}</h1>
-      <p>${subtitle}</p>
-    </div>
-  `;
+  // Card type
+  el.classList.add(`${card.type}-card`);
 
-  return card;
-}
+  // Header (optional)
+  if (card.author) {
+    const header = document.createElement("div");
+    header.classList.add("card-header");
 
-/* ------------------------------------------------------------
-   GLOBAL MOMENT CARD
-   ------------------------------------------------------------ */
-export function createMomentCard({ image, caption }) {
-  const card = createBaseCard("moment-card");
+    header.innerHTML = `
+      <div class="avatar"></div>
+      <div class="meta">
+        <h3>${card.author}</h3>
+        <span>${card.time || ""}</span>
+      </div>
+    `;
 
-  card.innerHTML = `
-    <img class="moment-image" src="${image}" alt="">
-    <div class="moment-caption">${caption}</div>
-  `;
+    el.appendChild(header);
+  }
 
-  return card;
-}
+  // Text content
+  if (card.text) {
+    const p = document.createElement("p");
+    p.classList.add("card-text");
+    p.textContent = card.text;
+    el.appendChild(p);
+  }
 
-/* ------------------------------------------------------------
-   TEXT EDITORIAL CARD
-   ------------------------------------------------------------ */
-export function createTextCard({ title, body }) {
-  const card = createBaseCard("text-card");
+  // Image content
+  if (card.image) {
+    const img = document.createElement("img");
+    img.classList.add("card-image");
+    img.src = card.image;
+    el.appendChild(img);
+  }
 
-  card.innerHTML = `
-    <h2>${title}</h2>
-    <p>${body}</p>
-  `;
+  // Hero image
+  if (card.hero) {
+    const img = document.createElement("img");
+    img.classList.add("hero-image");
+    img.src = card.hero;
+    el.appendChild(img);
+  }
 
-  return card;
-}
+  // News title + summary
+  if (card.newsTitle) {
+    const title = document.createElement("h2");
+    title.classList.add("news-title");
+    title.textContent = card.newsTitle;
+    el.appendChild(title);
+  }
 
-/* ------------------------------------------------------------
-   IMAGE + TEXT HYBRID CARD
-   ------------------------------------------------------------ */
-export function createImageTextCard({ image, title, body }) {
-  const card = createBaseCard("image-text-card");
+  if (card.newsSummary) {
+    const summary = document.createElement("p");
+    summary.classList.add("news-summary");
+    summary.textContent = card.newsSummary;
+    el.appendChild(summary);
+  }
 
-  card.innerHTML = `
-    <img class="card-image" src="${image}" alt="">
-    <h2>${title}</h2>
-    <p>${body}</p>
-  `;
+  // Music card
+  if (card.type === "music") {
+    const player = document.createElement("div");
+    player.classList.add("music-player");
 
-  return card;
-}
+    player.innerHTML = `
+      <button class="play-btn">▶</button>
+      <div class="progress-bar"></div>
+    `;
 
-/* ------------------------------------------------------------
-   NEWS CARD
-   ------------------------------------------------------------ */
-export function createNewsCard({ headline, source }) {
-  const card = createBaseCard("news-card");
+    el.appendChild(player);
+  }
 
-  card.innerHTML = `
-    <h3>${headline}</h3>
-    <div class="source">${source}</div>
-  `;
-
-  return card;
-}
-
-/* ------------------------------------------------------------
-   MUSIC CARD
-   ------------------------------------------------------------ */
-export function createMusicCard({ image, track, artist }) {
-  const card = createBaseCard("music-card");
-
-  card.innerHTML = `
-    <img src="${image}" alt="">
-    <div>
-      <div class="track-title">${track}</div>
-      <div class="artist">${artist}</div>
-    </div>
-  `;
-
-  return card;
-}
-
-/* ------------------------------------------------------------
-   WEATHER CARD
-   ------------------------------------------------------------ */
-export function createWeatherCard({ city, temp }) {
-  const card = createBaseCard("weather-card");
-
-  card.innerHTML = `
-    <div class="temp">${temp}°</div>
-    <div class="city">${city}</div>
-  `;
-
-  return card;
-}
-
-/* ------------------------------------------------------------
-   LIVE TILE
-   ------------------------------------------------------------ */
-export function createLiveCard({ title, description }) {
-  const card = createBaseCard("live-card");
-
-  card.innerHTML = `
-    <div class="live-label">LIVE</div>
-    <h2>${title}</h2>
-    <p>${description}</p>
-  `;
-
-  return card;
-}
-
-/* ------------------------------------------------------------
-   TRENDING CARD
-   ------------------------------------------------------------ */
-export function createTrendingCard({ items }) {
-  const card = createBaseCard("trending-card");
-
-  const list = items
-    .map(item => `<li>#${item.tag} (${item.count})</li>`)
-    .join("");
-
-  card.innerHTML = `
-    <h2>Trending</h2>
-    <ul>${list}</ul>
-  `;
-
-  return card;
+  return el;
 }
