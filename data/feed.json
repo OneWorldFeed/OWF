@@ -1,13 +1,46 @@
 [
   {
-    "name": "Aiko Tanaka",
-    "city": "Tokyo",
+    "type": "hero",
+    "hero": "./assets/img/hero/earthrise.jpg",
+    "glow": "warm",
+    "text": "A global space for stories, music, news, and human connection."
+  },
+  {
+    "type": "text",
+    "author": "Global Voices",
     "time": "2h ago",
-    "avatar": "assets/img/avatars/aiko.jpg",
-    "image": "assets/img/feed/tokyo.jpg",
-    "caption": "Morning light over Shibuya.",
-    "tags": ["tokyo", "sunrise"],
-    "likes": 120,
-    "comments": 14
+    "text": "Every sunrise is a reminder that the world is still full of possibility.",
+    "glow": "neutral"
+  },
+  {
+    "type": "image",
+    "author": "Travel Journal",
+    "time": "5h ago",
+    "text": "Sunset over the Pacific tonight.",
+    "image": "./assets/img/posts/sunset.jpg",
+    "glow": "cool"
+  },
+  {
+    "type": "mixed",
+    "author": "Culture Stream",
+    "time": "1d ago",
+    "text": "Street art from downtown LA this morning.",
+    "image": "./assets/img/posts/streetart.jpg",
+    "glow": "warm"
+  },
+  {
+    "type": "news",
+    "author": "World News",
+    "time": "3h ago",
+    "newsTitle": "Global Climate Summit Opens Today",
+    "newsSummary": "Leaders from 80+ nations gather to discuss climate resilience and global cooperation.",
+    "glow": "neutral"
+  },
+  {
+    "type": "music",
+    "author": "Now Playing",
+    "time": "Live",
+    "text": "Ocean Breathes Salty — Modest Mouse",
+    "glow": "cool"
   }
 ]
