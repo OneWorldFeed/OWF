@@ -38,9 +38,9 @@
 }
 
 /* Glow variants */
-.right-card.glow-warm { box-shadow: 0 0 28px var(--owf-glow-warm); }
+.right-card.glow-warm    { box-shadow: 0 0 28px var(--owf-glow-warm); }
 .right-card.glow-neutral { box-shadow: 0 0 28px var(--owf-glow-neutral); }
-.right-card.glow-cool { box-shadow: 0 0 28px var(--owf-glow-cool); }
+.right-card.glow-cool    { box-shadow: 0 0 28px var(--owf-glow-cool); }
 
 /* ------------------------------------------------------------
    SPOTLIGHT CARD
@@ -104,23 +104,30 @@
 .ai-input-row {
   display: flex;
   gap: var(--owf-space-sm);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .ai-input {
   flex: 1;
+  min-width: 0; /* allows input to shrink below content size */
   padding: var(--owf-space-sm) var(--owf-space-md);
   border-radius: var(--owf-radius-md);
   border: 1px solid var(--owf-border-soft);
   background: var(--owf-surface-alt);
+  box-sizing: border-box;
 }
 
 .ai-send-btn {
+  flex-shrink: 0;
   padding: var(--owf-space-sm) var(--owf-space-md);
   border-radius: var(--owf-radius-md);
   background: var(--owf-surface);
   border: 1px solid var(--owf-border-soft);
   cursor: pointer;
   transition: var(--owf-fade);
+  white-space: nowrap;
 }
 
 .ai-send-btn:hover {
@@ -180,7 +187,7 @@
 }
 
 /* ------------------------------------------------------------
-   THEME SELECTOR (OPTION C)
+   THEME SELECTOR
 ------------------------------------------------------------ */
 .theme-card {
   display: flex;
@@ -212,7 +219,6 @@
   box-shadow: var(--owf-shadow-md);
 }
 
-/* Gradients */
 .theme-swatch[data-theme="dawn"] {
   background: linear-gradient(135deg, #ffb36b, #ff6f91);
 }
