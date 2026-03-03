@@ -13,11 +13,9 @@
   display: flex;
   flex-direction: column;
   gap: var(--owf-space-xl);
-  width: 280px;
-  min-width: 280px;
+  /* width is controlled by the grid in layout.css — do not set fixed width here */
   height: 100vh;
-  position: fixed;
-  left: 0;
+  position: sticky;  /* stays pinned while grid handles column sizing */
   top: 0;
   overflow-y: auto;
 }
