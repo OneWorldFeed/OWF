@@ -12,9 +12,9 @@ let feedData = [];
 --------------------------------------------- */
 async function loadData() {
   const [spotlightRes, citiesRes, feedRes] = await Promise.all([
-    fetch("../data/spotlight.json"),
-    fetch("../data/cities.json"),
-    fetch("../data/feed.json")
+    fetch("/data/spotlight.json"),
+    fetch("/data/cities.json"),
+    fetch("/data/feed.json")
   ]);
 
   spotlightData = await spotlightRes.json();
