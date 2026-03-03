@@ -1,265 +1,179 @@
 /* ============================================================
-   OWF LEFT PANEL — MOCKUP ALIGNED
+   OWF LEFT PANEL — CINEMATIC HYBRID (FINAL)
+   Navigation • Radio Player • Glow Selector • Global Signals
    ============================================================ */
 
+/* ------------------------------------------------------------
+   LEFT PANEL CONTAINER
+------------------------------------------------------------ */
 .owf-left-panel {
-  background: #111111;
-  border-right: 1px solid rgba(255,255,255,0.08);
-  padding: var(--owf-space-xl) var(--owf-space-md);
+  background: var(--owf-surface);
+  border-right: 1px solid var(--owf-border-soft);
+  padding: var(--owf-space-xl) var(--owf-space-lg);
   display: flex;
   flex-direction: column;
-  gap: var(--owf-space-lg);
+  gap: var(--owf-space-xl);
+  width: 280px;
+  min-width: 280px;
   height: 100vh;
-  position: sticky;
+  position: fixed;
+  left: 0;
   top: 0;
   overflow-y: auto;
-  color: white;
 }
 
-/* Brand */
+/* ------------------------------------------------------------
+   HEADER (LOGO + BRAND)
+------------------------------------------------------------ */
 .left-header {
   display: flex;
   align-items: center;
   gap: var(--owf-space-md);
-  padding-bottom: var(--owf-space-lg);
-  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
 .owf-logo {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--owf-radius-sm);
+  width: 48px;
+  height: 48px;
+  border-radius: var(--owf-radius-lg);
 }
 
 .brand-title {
-  font-size: var(--owf-font-size-lg);
+  font-size: var(--owf-font-size-xl);
   font-weight: var(--owf-font-weight-semibold);
-  color: white;
-  letter-spacing: -0.01em;
+  color: var(--owf-text-primary);
 }
 
-/* User Profile Block */
-.left-profile {
-  display: flex;
-  align-items: center;
-  gap: var(--owf-space-sm);
-  padding: var(--owf-space-sm);
-  border-radius: var(--owf-radius-lg);
-  transition: background 0.15s;
-  cursor: pointer;
-}
-
-.left-profile:hover { background: rgba(255,255,255,0.06); }
-
-.left-profile-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3a4a6a, #2a3a5a);
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 1rem;
-  color: white;
-  overflow: hidden;
-}
-
-.left-profile-info { flex: 1; min-width: 0; }
-
-.left-profile-name {
-  font-size: var(--owf-font-size-sm);
-  font-weight: var(--owf-font-weight-semibold);
-  color: white;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.left-profile-role {
-  font-size: var(--owf-font-size-xs);
-  color: rgba(255,255,255,0.4);
-}
-
-/* Nav */
-.left-nav {
+/* ------------------------------------------------------------
+   NAVIGATION (TEXT-ONLY CINEMATIC PILLS)
+------------------------------------------------------------ */
+#left-nav {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  flex: 1;
+  gap: var(--owf-space-xs);
 }
 
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: var(--owf-space-sm);
+.left-nav-item {
   padding: var(--owf-space-sm) var(--owf-space-md);
-  border-radius: var(--owf-radius-md);
-  font-size: var(--owf-font-size-sm);
-  font-weight: var(--owf-font-weight-medium);
-  color: rgba(255,255,255,0.55);
-  background: transparent;
-  transition: background 0.15s, color 0.15s;
-}
-
-.nav-item:hover {
-  background: rgba(255,255,255,0.07);
-  color: white;
-}
-
-.nav-item.active {
-  background: rgba(255,255,255,0.1);
-  color: white;
-  font-weight: var(--owf-font-weight-semibold);
-}
-
-.nav-icon {
-  width: 18px;
-  height: 18px;
-  flex-shrink: 0;
-  opacity: 0.7;
-}
-
-.nav-item.active .nav-icon,
-.nav-item:hover .nav-icon { opacity: 1; }
-
-/* Section divider */
-.nav-section-label {
-  font-size: var(--owf-font-size-xs);
-  color: rgba(255,255,255,0.25);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: var(--owf-space-sm) var(--owf-space-md) 4px;
-  margin-top: var(--owf-space-xs);
-}
-
-/* Radio / Music player card */
-.left-radio-card {
-  background: rgba(255,255,255,0.05);
-  border-radius: var(--owf-radius-lg);
-  padding: var(--owf-space-md);
-  border: 1px solid rgba(255,255,255,0.08);
-}
-
-.left-radio-player { color: white; }
-
-.radio-ui { color: white; }
-
-.radio-header {
-  font-size: var(--owf-font-size-sm);
-  font-weight: var(--owf-font-weight-semibold);
-  color: white;
-  margin-bottom: var(--owf-space-sm);
-}
-
-.radio-select {
-  width: 100%;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: white;
-  padding: var(--owf-space-xs) var(--owf-space-sm);
-  border-radius: var(--owf-radius-sm);
-  font-family: var(--owf-font-family);
-  font-size: var(--owf-font-size-xs);
-  margin-bottom: var(--owf-space-sm);
-}
-
-.radio-play {
-  width: 100%;
-  padding: var(--owf-space-xs);
-  border-radius: var(--owf-radius-sm);
-  background: white;
-  color: #111;
-  border: none;
+  border-radius: var(--owf-radius-pill);
   cursor: pointer;
-  font-family: var(--owf-font-family);
-  font-size: var(--owf-font-size-xs);
+  transition: var(--owf-fade);
+  color: var(--owf-text-primary);
+  font-size: var(--owf-font-size-md);
+}
+
+.left-nav-item:hover {
+  background: var(--owf-surface-alt);
+  transform: var(--owf-hover-lift);
+  box-shadow: 0 0 12px var(--owf-glow-neutral);
+}
+
+.left-nav-item.active {
+  background: var(--owf-surface-alt);
   font-weight: var(--owf-font-weight-semibold);
-  margin-bottom: var(--owf-space-xs);
-  transition: opacity 0.15s;
+  box-shadow: 0 0 18px var(--owf-glow-neutral);
 }
 
-.radio-play:hover { opacity: 0.85; }
-
-.radio-status {
-  font-size: var(--owf-font-size-xs);
-  color: rgba(255,255,255,0.4);
+/* ------------------------------------------------------------
+   RADIO PLAYER CARD (GLOBAL MINI PLAYER)
+------------------------------------------------------------ */
+.left-radio-card {
+  background: var(--owf-surface);
+  padding: var(--owf-space-lg);
+  border-radius: var(--owf-radius-xl);
+  box-shadow: var(--owf-shadow-card);
+  transition: var(--owf-fade);
 }
 
-/* Glow selector */
+/* Glow applied dynamically */
+.left-radio-card.glow-warm {
+  box-shadow: 0 0 28px var(--owf-glow-warm);
+}
+
+.left-radio-card.glow-neutral {
+  box-shadow: 0 0 28px var(--owf-glow-neutral);
+}
+
+.left-radio-card.glow-cool {
+  box-shadow: 0 0 28px var(--owf-glow-cool);
+}
+
+/* ------------------------------------------------------------
+   GLOW SELECTOR CARD (NEUTRAL GLOW)
+------------------------------------------------------------ */
 .glow-card {
-  background: rgba(255,255,255,0.04);
-  border-radius: var(--owf-radius-lg);
-  padding: var(--owf-space-md);
-  border: 1px solid rgba(255,255,255,0.07);
+  background: var(--owf-surface);
+  padding: var(--owf-space-lg);
+  border-radius: var(--owf-radius-xl);
+  box-shadow: 0 0 28px var(--owf-glow-neutral);
+  transition: var(--owf-fade);
 }
 
 .glow-title {
-  font-size: var(--owf-font-size-xs);
-  color: rgba(255,255,255,0.35);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: var(--owf-space-sm);
+  font-size: var(--owf-font-size-md);
+  font-weight: var(--owf-font-weight-semibold);
+  margin-bottom: var(--owf-space-md);
+  color: var(--owf-text-primary);
 }
 
-.glow-swatches { display: flex; gap: var(--owf-space-sm); }
+.glow-swatches {
+  display: flex;
+  gap: var(--owf-space-md);
+}
 
 .glow-swatch {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--owf-radius-md);
   cursor: pointer;
-  transition: transform 0.15s;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--owf-shadow-sm);
 }
 
-.glow-swatch:hover { transform: scale(1.15); }
-.glow-swatch[data-glow="warm"]    { background: linear-gradient(135deg,#ffb36b,#ff6f91); }
-.glow-swatch[data-glow="neutral"] { background: linear-gradient(135deg,#d9d9d9,#bfbfbf); }
-.glow-swatch[data-glow="cool"]    { background: linear-gradient(135deg,#6ecbff,#4fa3ff); }
+.glow-swatch:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--owf-shadow-md);
+}
 
-/* Global signals */
+/* Swatch colors */
+.glow-swatch[data-glow="warm"] {
+  background: linear-gradient(135deg, #ffb36b, #ff6f91);
+}
+
+.glow-swatch[data-glow="neutral"] {
+  background: linear-gradient(135deg, #d9d9d9, #bfbfbf);
+}
+
+.glow-swatch[data-glow="cool"] {
+  background: linear-gradient(135deg, #6ecbff, #4fa3ff);
+}
+
+/* ------------------------------------------------------------
+   GLOBAL SIGNALS CARD
+------------------------------------------------------------ */
 .left-global-signals {
-  background: rgba(255,255,255,0.04);
-  border-radius: var(--owf-radius-lg);
-  padding: var(--owf-space-md);
-  border: 1px solid rgba(255,255,255,0.07);
+  background: var(--owf-surface);
+  padding: var(--owf-space-lg);
+  border-radius: var(--owf-radius-xl);
+  box-shadow: var(--owf-shadow-card);
+  transition: var(--owf-fade);
+}
+
+.left-global-signals:hover {
+  transform: var(--owf-hover-lift);
 }
 
 .left-global-title {
-  font-size: var(--owf-font-size-xs);
-  color: rgba(255,255,255,0.35);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  font-size: var(--owf-font-size-md);
+  font-weight: var(--owf-font-weight-semibold);
   margin-bottom: var(--owf-space-sm);
+  color: var(--owf-text-primary);
 }
 
 .left-global-item {
-  font-size: var(--owf-font-size-xs);
-  color: rgba(255,255,255,0.45);
-  margin-bottom: 4px;
+  font-size: var(--owf-font-size-sm);
+  color: var(--owf-text-secondary);
+  margin-bottom: var(--owf-space-xs);
 }
-
-/* Footer links */
-.left-footer {
-  display: flex;
-  gap: var(--owf-space-md);
-  padding-top: var(--owf-space-sm);
-  border-top: 1px solid rgba(255,255,255,0.07);
-  margin-top: auto;
-}
-
-.left-footer a {
-  font-size: var(--owf-font-size-xs);
-  color: rgba(255,255,255,0.3);
-  transition: color 0.15s;
-}
-
-.left-footer a:hover { color: rgba(255,255,255,0.6); }
-
-/* Scrollbar */
-.owf-left-panel::-webkit-scrollbar { width: 4px; }
-.owf-left-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
 
 /* ------------------------------------------------------------
    USER PROFILE BLOCK (added from mockup)
