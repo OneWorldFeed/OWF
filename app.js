@@ -19,11 +19,16 @@ import "/modules/layout/layout.js";
    UI modules (hydrated only when containers exist)
 --------------------------------------------- */
 import { renderRightPanel } from "/modules/right-panel/right-panel.js";
-import { loadInitialFeed } from "/modules/feed-loader/feed-loader.js";
+import { loadInitialFeed }  from "/modules/feed-loader/feed-loader.js";
+import { initLeftPanel }    from "/components/left-panel/left-panel.js";
 
 /* ---------------------------------------------
    Boot sequence
 --------------------------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  initLeftPanel(); // mount radio, glow, signals into static HTML
+});
+
 window.addEventListener("owf:view-loaded", () => {
 
   const feed = document.querySelector("#feed");
