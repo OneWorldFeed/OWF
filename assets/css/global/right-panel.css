@@ -17,17 +17,7 @@
 }
 
 /* ------------------------------------------------------------
-   SECTION TITLES
------------------------------------------------------------- */
-.right-section-title {
-  font-size: var(--owf-font-size-lg);
-  font-weight: var(--owf-font-weight-semibold);
-  margin-bottom: var(--owf-space-sm);
-  color: var(--owf-text-primary);
-}
-
-/* ------------------------------------------------------------
-   CARD BASE (EXPRESSIVE)
+   CARD BASE (CINEMATIC)
 ------------------------------------------------------------ */
 .right-card {
   background: var(--owf-surface);
@@ -41,49 +31,37 @@
   transform: var(--owf-hover-lift);
 }
 
-/* Glow variants for expressive mood */
+/* Glow variants */
 .right-card.glow-warm { box-shadow: 0 0 28px var(--owf-glow-warm); }
 .right-card.glow-neutral { box-shadow: 0 0 28px var(--owf-glow-neutral); }
 .right-card.glow-cool { box-shadow: 0 0 28px var(--owf-glow-cool); }
 
 /* ------------------------------------------------------------
-   TIME + WEATHER BLOCK (EXPRESSIVE)
+   SPOTLIGHT CARD
 ------------------------------------------------------------ */
-.time-weather-block {
-  background: linear-gradient(
-    135deg,
-    var(--owf-time-day),
-    var(--owf-surface)
-  );
-  padding: var(--owf-space-lg);
-  border-radius: var(--owf-radius-xl);
-  box-shadow: 0 0 32px var(--owf-glow-warm);
-  color: var(--owf-text-primary);
-  transition: var(--owf-fade-slow);
+.spotlight-card img {
+  width: 100%;
+  border-radius: var(--owf-radius-lg);
+  margin-bottom: var(--owf-space-md);
 }
 
-.time-weather-block:hover {
-  transform: var(--owf-hover-lift);
-}
-
-.time-display {
-  font-size: var(--owf-font-size-xxl);
+.spotlight-card .title {
+  font-size: var(--owf-font-size-lg);
   font-weight: var(--owf-font-weight-semibold);
-  margin-bottom: var(--owf-space-xs);
 }
 
-.weather-display {
-  font-size: var(--owf-font-size-md);
+.spotlight-card .subtitle {
+  font-size: var(--owf-font-size-sm);
   color: var(--owf-text-secondary);
 }
 
 /* ------------------------------------------------------------
-   TRENDING LIST (EXPRESSIVE)
+   TRENDING BLOCK
 ------------------------------------------------------------ */
-.trending-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--owf-space-md);
+.trending-block h3 {
+  font-size: var(--owf-font-size-md);
+  font-weight: var(--owf-font-weight-semibold);
+  margin-bottom: var(--owf-space-md);
 }
 
 .trending-item {
@@ -93,6 +71,8 @@
   border: 1px solid var(--owf-border-soft);
   transition: var(--owf-fade);
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
 }
 
 .trending-item:hover {
@@ -101,48 +81,144 @@
   box-shadow: 0 0 18px var(--owf-glow-neutral);
 }
 
-.trending-rank {
-  font-size: var(--owf-font-size-xs);
-  color: var(--owf-text-tertiary);
+/* ------------------------------------------------------------
+   AI MINI ASSISTANT
+------------------------------------------------------------ */
+.ai-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--owf-space-md);
 }
 
-.trending-title {
+.ai-title {
+  font-size: var(--owf-font-size-md);
+  font-weight: var(--owf-font-weight-semibold);
+}
+
+.ai-input-row {
+  display: flex;
+  gap: var(--owf-space-sm);
+}
+
+.ai-input {
+  flex: 1;
+  padding: var(--owf-space-sm) var(--owf-space-md);
+  border-radius: var(--owf-radius-md);
+  border: 1px solid var(--owf-border-soft);
+  background: var(--owf-surface-alt);
+}
+
+.ai-send-btn {
+  padding: var(--owf-space-sm) var(--owf-space-md);
+  border-radius: var(--owf-radius-md);
+  background: var(--owf-surface);
+  border: 1px solid var(--owf-border-soft);
+  cursor: pointer;
+  transition: var(--owf-fade);
+}
+
+.ai-send-btn:hover {
+  background: var(--owf-surface-alt);
+}
+
+/* ------------------------------------------------------------
+   CITY ROWS
+------------------------------------------------------------ */
+.city-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--owf-space-sm) 0;
+}
+
+.city-name {
   font-size: var(--owf-font-size-md);
   font-weight: var(--owf-font-weight-medium);
 }
 
-/* ------------------------------------------------------------
-   AI PANEL (EXPRESSIVE)
------------------------------------------------------------- */
-.ai-panel {
-  background: var(--owf-surface);
-  padding: var(--owf-space-lg);
-  border-radius: var(--owf-radius-xl);
-  box-shadow: 0 0 32px var(--owf-glow-cool);
-  transition: var(--owf-fade);
-}
-
-.ai-panel:hover {
-  transform: var(--owf-hover-lift);
-}
-
-.ai-title {
-  font-size: var(--owf-font-size-lg);
-  font-weight: var(--owf-font-weight-semibold);
-  margin-bottom: var(--owf-space-sm);
-}
-
-.ai-description {
+.city-time {
   font-size: var(--owf-font-size-sm);
   color: var(--owf-text-secondary);
-  line-height: 1.5;
+}
+
+.temp {
+  font-size: var(--owf-font-size-lg);
+  font-weight: var(--owf-font-weight-semibold);
 }
 
 /* ------------------------------------------------------------
-   DIVIDERS (SOFT + CINEMATIC)
+   GLOBAL MOMENTS
 ------------------------------------------------------------ */
-.right-divider {
-  height: 1px;
-  background: var(--owf-border-soft);
-  margin: var(--owf-space-lg) 0;
+.moment-card {
+  position: relative;
+  height: 140px;
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--owf-radius-lg);
+  overflow: hidden;
+}
+
+.moment-card .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+}
+
+.moment-card .label {
+  position: absolute;
+  bottom: var(--owf-space-md);
+  left: var(--owf-space-md);
+  color: white;
+  font-size: var(--owf-font-size-md);
+  font-weight: var(--owf-font-weight-semibold);
+}
+
+/* ------------------------------------------------------------
+   THEME SELECTOR (OPTION C)
+------------------------------------------------------------ */
+.theme-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--owf-space-md);
+}
+
+.theme-title {
+  font-size: var(--owf-font-size-md);
+  font-weight: var(--owf-font-weight-semibold);
+}
+
+.theme-swatches {
+  display: flex;
+  gap: var(--owf-space-md);
+}
+
+.theme-swatch {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--owf-radius-md);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: var(--owf-shadow-sm);
+}
+
+.theme-swatch:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--owf-shadow-md);
+}
+
+/* Gradients */
+.theme-swatch[data-theme="dawn"] {
+  background: linear-gradient(135deg, #ffb36b, #ff6f91);
+}
+
+.theme-swatch[data-theme="day"] {
+  background: linear-gradient(135deg, #6ecbff, #4fa3ff);
+}
+
+.theme-swatch[data-theme="sunset"] {
+  background: linear-gradient(135deg, #ff8a5c, #ff4f8b);
+}
+
+.theme-swatch[data-theme="midnight"] {
+  background: linear-gradient(135deg, #1a2340, #3a4a6a);
 }
