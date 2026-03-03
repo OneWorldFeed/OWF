@@ -12,9 +12,9 @@ let feedData = [];
 --------------------------------------------- */
 async function loadData() {
   const [spotlightRes, citiesRes, feedRes] = await Promise.all([
-    fetch("/data/spotlight.json"),
-    fetch("/data/cities.json"),
-    fetch("/data/feed.json")
+    fetch("../data/spotlight.json"),
+    fetch("../data/cities.json"),
+    fetch("../data/feed.json")
   ]);
 
   spotlightData = await spotlightRes.json();
@@ -278,3 +278,9 @@ export async function renderRightPanel() {
   mount.appendChild(wrapCard(renderThemeSelector()));
 }
 
+/* ---------------------------------------------
+   Auto-render on route changes
+--------------------------------------------- */
+window.addEventListener("hashchange", renderRightPanel);
+window.addEventListener("owf:view-loaded", renderRightPanel);
+document.addEventListener("DOMContentLoaded", renderRightPanel);
