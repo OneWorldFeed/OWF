@@ -3,8 +3,8 @@
    Radio Player • Glow Selector • Global Signals
    ============================================================ */
 
-import { initRadioPlayer } from "../radio/radio-player.js";
-import { initGlobalSignals } from "../../modules/right-panel/global-signals.js";
+import { initRadioPlayer } from "/components/radio/radio-player.js";
+import { initGlobalSignals } from "/modules/right-panel/global-signals.js";
 
 /* ------------------------------------------------------------
    Initialize Left Panel
