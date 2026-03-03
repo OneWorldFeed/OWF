@@ -283,4 +283,3 @@ export async function renderRightPanel() {
 --------------------------------------------- */
 window.addEventListener("hashchange", renderRightPanel);
 window.addEventListener("owf:view-loaded", renderRightPanel);
-document.addEventListener("DOMContentLoaded", renderRightPanel);
