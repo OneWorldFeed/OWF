@@ -18,19 +18,46 @@ function getTimeOfDay() {
 }
 
 /**
- * Create an <img> with an onerror fallback.
+ * Generate a self-contained SVG placeholder as a data URI.
+ * Used when the real image is missing — no network call needed.
  */
-function makeImg(src, fallback, alt = "", className = "") {
+function makePlaceholderSrc(label = "", color = "#d0d8e4") {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400">
+    <rect width="800" height="400" fill="${color}"/>
+    <circle cx="370" cy="175" r="36" fill="none" stroke="#aab4c0" stroke-width="3"/>
+    <line x1="356" y1="175" x2="384" y2="175" stroke="#aab4c0" stroke-width="3" stroke-linecap="round"/>
+    <line x1="370" y1="161" x2="370" y2="189" stroke="#aab4c0" stroke-width="3" stroke-linecap="round"/>
+    <text x="400" y="255" font-family="system-ui,sans-serif" font-size="18" fill="#8a96a3" text-anchor="middle">${label}</text>
+  </svg>`;
+  return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+}
+
+/**
+ * Placeholder colors per glow variant.
+ */
+const PLACEHOLDER_COLORS = {
+  warm:    "#f0e6dc",
+  neutral: "#e8eaed",
+  cool:    "#d8e6f0"
+};
+
+/**
+ * Create an <img> with an onerror SVG placeholder fallback.
+ * Never makes external network requests.
+ */
+function makeImg(src, alt = "", className = "", glowVariant = "neutral") {
   const img = document.createElement("img");
-  img.src = src || fallback || "";
   img.alt = alt;
   if (className) img.className = className;
   img.loading = "lazy";
 
-  if (fallback && src !== fallback) {
-    img.onerror = () => {
-      if (img.src !== fallback) img.src = fallback;
-    };
+  const placeholder = makePlaceholderSrc(alt, PLACEHOLDER_COLORS[glowVariant] || "#e8eaed");
+
+  if (src) {
+    img.src = src;
+    img.onerror = () => { img.src = placeholder; };
+  } else {
+    img.src = placeholder;
   }
 
   return img;
@@ -50,14 +77,12 @@ function makeCard(type, { glow = "neutral", mood, live, active } = {}) {
 /* ------------------------------------------------------------
    HERO CARD
    ------------------------------------------------------------ */
-export function createHeroCard({ image, imageFallback, title, subtitle, glow = "warm", mood } = {}) {
+export function createHeroCard({ image, title, subtitle, glow = "warm", mood } = {}) {
   const card = makeCard("hero", { glow, mood });
   const wrap = document.createElement("div");
   wrap.className = "hero-image-wrap";
 
-  if (image || imageFallback) {
-    wrap.appendChild(makeImg(image, imageFallback, title || "Hero image", "hero-image"));
-  }
+  wrap.appendChild(makeImg(image, title || "Hero image", "hero-image", glow));
 
   const overlay = document.createElement("div");
   overlay.className = "hero-overlay";
@@ -76,11 +101,9 @@ export function createHeroCard({ image, imageFallback, title, subtitle, glow = "
 /* ------------------------------------------------------------
    MOMENT CARD
    ------------------------------------------------------------ */
-export function createMomentCard({ image, imageFallback, caption, glow = "neutral", mood } = {}) {
+export function createMomentCard({ image, caption, glow = "neutral", mood } = {}) {
   const card = makeCard("moment", { glow, mood });
-  if (image || imageFallback) {
-    card.appendChild(makeImg(image, imageFallback, caption || "Global moment", "moment-image"));
-  }
+  card.appendChild(makeImg(image, caption || "Global moment", "moment-image", glow));
   if (caption) {
     const p = document.createElement("p");
     p.className = "moment-caption";
@@ -109,7 +132,7 @@ export function createTextCard({ title, body, author, time, glow = "neutral", mo
 /* ------------------------------------------------------------
    IMAGE + TEXT CARD
    ------------------------------------------------------------ */
-export function createImageTextCard({ image, imageFallback, title, body, author, time, glow = "cool", mood } = {}) {
+export function createImageTextCard({ image, title, body, author, time, glow = "cool", mood } = {}) {
   const card = makeCard("image-text", { glow, mood });
 
   if (author || time) {
@@ -127,9 +150,7 @@ export function createImageTextCard({ image, imageFallback, title, body, author,
     card.appendChild(h);
   }
 
-  if (image || imageFallback) {
-    card.appendChild(makeImg(image, imageFallback, title || "Post image", "card-image"));
-  }
+  card.appendChild(makeImg(image, title || "Post image", "card-image", glow));
 
   if (body) {
     const p = document.createElement("p");
@@ -155,11 +176,11 @@ export function createNewsCard({ headline, source, summary, glow = "neutral", mo
 /* ------------------------------------------------------------
    MUSIC CARD
    ------------------------------------------------------------ */
-export function createMusicCard({ image, imageFallback, track, artist, author, time, glow = "cool", mood } = {}) {
+export function createMusicCard({ image, track, artist, author, time, glow = "cool", mood } = {}) {
   const card = makeCard("music", { glow, mood });
 
-  if (image || imageFallback) {
-    card.appendChild(makeImg(image, imageFallback, track || "Album art", "music-art"));
+  if (image) {
+    card.appendChild(makeImg(image, track || "Album art", "music-art", glow));
   }
 
   const info = document.createElement("div");
@@ -224,17 +245,15 @@ export function createFeedCard(item) {
   switch (item.type) {
     case "hero":
       return createHeroCard({
-        image:         item.hero          || item.image,
-        imageFallback: item.heroFallback  || item.imageFallback,
-        title:         item.title,
-        subtitle:      item.subtitle      || item.text,
+        image:    item.hero || item.image,
+        title:    item.title,
+        subtitle: item.subtitle || item.text,
         glow, mood
       });
     case "moment":
       return createMomentCard({
-        image:         item.image,
-        imageFallback: item.imageFallback,
-        caption:       item.caption || item.text,
+        image:   item.image,
+        caption: item.caption || item.text,
         glow, mood
       });
     case "text":
@@ -246,12 +265,11 @@ export function createFeedCard(item) {
     case "image":
     case "mixed":
       return createImageTextCard({
-        image:         item.image,
-        imageFallback: item.imageFallback,
-        title:         item.title,
-        body:          item.text,
-        author:        item.author,
-        time:          item.time,
+        image:  item.image,
+        title:  item.title,
+        body:   item.text,
+        author: item.author,
+        time:   item.time,
         glow, mood
       });
     case "news":
@@ -263,12 +281,11 @@ export function createFeedCard(item) {
       });
     case "music":
       return createMusicCard({
-        image:         item.image,
-        imageFallback: item.imageFallback,
-        track:         item.track  || item.text,
-        artist:        item.artist,
-        author:        item.author,
-        time:          item.time,
+        image:  item.image,
+        track:  item.track  || item.text,
+        artist: item.artist,
+        author: item.author,
+        time:   item.time,
         glow, mood
       });
     case "weather":
