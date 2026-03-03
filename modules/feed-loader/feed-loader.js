@@ -3,14 +3,14 @@
    Loads feed.json and renders cards into #feed
    ============================================================ */
 
-import { createFeedCard } from "../../components/feed-card/feed-cards.js";
+import { createFeedCard } from "/components/feed-card/feed-cards.js";
 
 export async function loadInitialFeed() {
-  const feedEl = document.querySelector("#feed");
+  const feedEl = document.querySelector("#owf-page");
   if (!feedEl) return;
 
   try {
-    const res = await fetch("../../data/feed.json");
+    const res = await fetch("/data/feed.json");
     const cards = await res.json();
 
     feedEl.innerHTML = "";
