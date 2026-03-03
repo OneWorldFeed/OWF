@@ -16,17 +16,23 @@ import "/modules/nav/nav.js";
 import "/modules/layout/layout.js";
 
 /* ---------------------------------------------
-   UI modules (hydrated only when containers exist)
+   UI modules
 --------------------------------------------- */
 import { renderRightPanel } from "/modules/right-panel/right-panel.js";
 import { loadInitialFeed } from "/modules/feed-loader/feed-loader.js";
+import { initLeftPanel } from "/components/left-panel/left-panel.js";  // fix: was never imported
 
 /* ---------------------------------------------
    Boot sequence
 --------------------------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  initLeftPanel();  // fix: boot the left panel on load
+});
+
 window.addEventListener("owf:view-loaded", () => {
 
-  const feed = document.querySelector("#feed");
+  // fix: correct selector — the feed container is #owf-page, not #feed
+  const feed = document.querySelector("#owf-page");
   if (feed) {
     loadInitialFeed();
   }
