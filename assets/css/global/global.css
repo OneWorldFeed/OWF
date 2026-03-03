@@ -196,9 +196,7 @@ a {
   padding: var(--owf-space-md) var(--owf-space-lg);
   background: var(--owf-surface);
   border-bottom: 1px solid var(--owf-border-soft);
-  position: sticky;
-  top: 0;
-  z-index: 50;
+  position: static;
 }
 
 .owf-global-header input {
