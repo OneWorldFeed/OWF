@@ -1,5 +1,5 @@
 /* ============================================================
-   OWF LEFT NAVIGATION — PHASE 4.4.4 (PILL-SHAPED)
+   OWF LEFT NAVIGATION — PHASE 4.4.4 (PILL-SHAPED, TEXT-ONLY)
    280px panel • cinematic glow • Inter/SF
    ============================================================ */
 
@@ -7,7 +7,7 @@
 .left-nav {
   display: flex;
   flex-direction: column;
-  gap: var(--owf-space-sm);
+  gap: var(--owf-space-xs);
   margin-top: var(--owf-space-md);
 }
 
@@ -20,31 +20,25 @@
   font-weight: var(--owf-font-weight-medium);
   color: var(--owf-text-primary);
   background: transparent;
-  transition: background var(--owf-fade), transform var(--owf-fade);
+  transition: background var(--owf-fade), transform var(--owf-fade), box-shadow var(--owf-fade);
+  margin-left: 4px; /* subtle rhythm */
 }
 
 /* Hover */
 .nav-item:hover {
   background: var(--owf-surface-alt);
   transform: var(--owf-hover-lift);
+  box-shadow: 0 0 12px var(--owf-glow-neutral);
 }
 
-/* Active state (router should add .active) */
+/* Active state (router adds .active) */
 .nav-item.active {
-  background: var(--owf-surface);
-  box-shadow: 0 0 18px var(--owf-glow-neutral);
+  background: var(--owf-surface-alt);
   font-weight: var(--owf-font-weight-semibold);
+  box-shadow: 0 0 18px var(--owf-glow-neutral);
 }
 
-/* Optional: subtle left indent for visual rhythm */
-.nav-item {
-  margin-left: 4px;
-}
-
-/* Optional: icon support (future-proofing) */
+/* No icons — future-proofing removed */
 .nav-item .icon {
-  width: 20px;
-  height: 20px;
-  margin-right: var(--owf-space-sm);
-  opacity: 0.85;
+  display: none;
 }
