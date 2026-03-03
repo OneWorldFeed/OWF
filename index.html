@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="./assets/css/motion/shimmer.css">
   <link rel="stylesheet" href="./assets/css/motion/transitions.css">
 
-  <!-- THEMES (LIGHT DEFAULT) -->
+  <!-- THEMES -->
   <link rel="stylesheet" href="./assets/css/themes/light.css">
   <link rel="stylesheet" href="./assets/css/themes/dark.css">
   <link rel="stylesheet" href="./assets/css/themes/autumn.css">
@@ -72,38 +72,48 @@
   <!-- GLOBAL APP SHELL -->
   <div id="owf-app">
 
-    <!-- LEFT PANEL (STATIC, EDITORIALLY LOCKED) -->
+    <!-- LEFT PANEL -->
     <aside class="owf-left-panel">
+
+      <!-- Header -->
       <div class="left-header">
         <img src="./assets/img/logo/owf-logo.png" alt="OWF Logo" class="owf-logo">
         <h1 class="brand-title">OneWorldFeed</h1>
       </div>
 
+      <!-- Navigation -->
       <nav class="left-nav">
-        <a href="#/home" class="nav-item">Home</a>
-        <a href="#/profile" class="nav-item">Profile</a>
-        <a href="#/social" class="nav-item">Social</a>
-        <a href="#/music" class="nav-item">Music</a>
-        <a href="#/podcasts" class="nav-item">Podcasts</a>
-        <a href="#/live" class="nav-item">Live</a>
-        <a href="#/discover" class="nav-item">Discover</a>
-        <a href="#/news" class="nav-item">News</a>
-        <a href="#/ai" class="nav-item">AI</a>
-        <a href="#/saved" class="nav-item">Saved</a>
-        <a href="#/dm" class="nav-item">DM</a>
-        <a href="#/badges" class="nav-item">Badges</a>
-        <a href="#/settings" class="nav-item">Settings</a>
+        <div class="nav-item" data-route="home">Home</div>
+        <div class="nav-item" data-route="profile">Profile</div>
+        <div class="nav-item" data-route="social">Social</div>
+        <div class="nav-item" data-route="music">Music</div>
+        <div class="nav-item" data-route="podcasts">Podcasts</div>
+        <div class="nav-item" data-route="live">Live</div>
+        <div class="nav-item" data-route="discover">Discover</div>
+        <div class="nav-item" data-route="news">News</div>
+        <div class="nav-item" data-route="ai">AI</div>
+        <div class="nav-item" data-route="saved">Saved</div>
+        <div class="nav-item" data-route="dm">DM</div>
+        <div class="nav-item" data-route="badges">Badges</div>
+        <div class="nav-item" data-route="settings">Settings</div>
       </nav>
 
-      <div class="left-radio-player">
-        <!-- Radio Player Mount -->
+      <!-- Radio Player Card -->
+      <div class="left-radio-card">
+        <div class="left-radio-player"></div>
       </div>
+
+      <!-- Glow Selector -->
+      <div id="left-glow-selector"></div>
+
+      <!-- Global Signals -->
+      <div class="left-global-signals"></div>
+
     </aside>
 
     <!-- CENTER COLUMN -->
     <main class="owf-center">
 
-      <!-- GLOBAL HEADER -->
       <header class="owf-global-header">
         <div class="post-bar">
           <input type="text" placeholder="Share something with the world..." class="post-input">
@@ -114,7 +124,6 @@
         </div>
       </header>
 
-      <!-- SPA VIEW MOUNT -->
       <section id="owf-page"></section>
 
     </main>
@@ -126,8 +135,10 @@
 
   </div>
 
-  <!-- SPA ENTRY -->
-  <script type="module" src="./app.js"></script>
+  <!-- SCRIPTS (FOUC FIX: defer) -->
+  <script type="module" src="./modules/nav/nav.js" defer></script>
+  <script type="module" src="./components/left-panel/left-panel.js" defer></script>
+  <script type="module" src="./app.js" defer></script>
 
 </body>
 </html>
