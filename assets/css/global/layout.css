@@ -27,9 +27,9 @@
 .owf-center {
   padding: var(--owf-space-xl) var(--owf-space-xxl);
   overflow-y: auto;
+  overflow-x: hidden;
   background: var(--owf-surface-alt);
   min-width: 0;
-  width: 100%;
 }
 
 /* ------------------------------------------------------------
@@ -80,12 +80,14 @@
   border-left: 1px solid var(--owf-border-soft);
   padding: var(--owf-space-xl) var(--owf-space-lg);
   overflow-y: auto;
-  width: 320px;
-  min-width: 320px;
-  flex-shrink: 0;
+  overflow-x: hidden;
   height: 100vh;
   position: sticky;
   top: 0;
+  min-width: 0;
+  width: 320px;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 /* ------------------------------------------------------------
@@ -108,4 +110,32 @@
 .owf-center::-webkit-scrollbar-thumb:hover,
 .owf-right-panel::-webkit-scrollbar-thumb:hover {
   background: #aaa;
+}
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS
+   Right panel collapses at tablet, left panel collapses at mobile
+   ============================================================ */
+
+/* Tablet (< 1024px): hide right panel, center takes remaining space */
+@media (max-width: 1023px) {
+  #owf-app {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+  .owf-right-panel {
+    display: none;
+  }
+}
+
+/* Mobile (< 768px): hide left panel too, show only center feed */
+@media (max-width: 767px) {
+  #owf-app {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .owf-left-panel {
+    display: none;
+  }
+  .owf-center {
+    padding: var(--owf-space-md);
+  }
 }
