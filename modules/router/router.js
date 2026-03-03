@@ -4,18 +4,18 @@
    ============================================================ */
 
 const routes = {
-  home: "./views/home.html",
-  discover: "./views/discover.html",
-  news: "./views/news.html",
-  live: "./views/live.html",
-  music: "./views/music.html",
-  podcasts: "./views/podcasts.html",
-  social: "./views/social.html",
-  dm: "./views/dm.html",
-  ai: "./views/ai.html",
-  profile: "./views/profile.html",
-  settings: "./views/settings.html",
-  auth: "./views/auth.html"
+  home: "/views/home.html",
+  discover: "/views/discover.html",
+  news: "/views/news.html",
+  live: "/views/live.html",
+  music: "/views/music.html",
+  podcasts: "/views/podcasts.html",
+  social: "/views/social.html",
+  dm: "/views/dm.html",
+  ai: "/views/ai.html",
+  profile: "/views/profile.html",
+  settings: "/views/settings.html",
+  auth: "/views/auth.html"
 };
 
 /* ------------------------------------------------------------
