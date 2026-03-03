@@ -16,33 +16,9 @@
 
 /* ------------------------------------------------------------
    LEFT PANEL (STATIC, PINNED)
+   Styles live in assets/css/global/left-panel.css
+   Only grid column sizing is controlled here.
 ------------------------------------------------------------ */
-.owf-left-panel {
-  background: var(--owf-surface);
-  border-right: 1px solid var(--owf-border-soft);
-  padding: var(--owf-space-xl) var(--owf-space-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--owf-space-xl);
-  overflow-y: auto;
-}
-
-.left-header {
-  display: flex;
-  align-items: center;
-  gap: var(--owf-space-md);
-}
-
-.owf-logo {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--owf-radius-lg);
-}
-
-.brand-title {
-  font-size: var(--owf-font-size-xl);
-  font-weight: var(--owf-font-weight-semibold);
-}
 
 /* ------------------------------------------------------------
    CENTER COLUMN (FEED AREA)
