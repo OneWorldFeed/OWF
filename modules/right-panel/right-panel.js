@@ -278,9 +278,3 @@ export async function renderRightPanel() {
   mount.appendChild(wrapCard(renderThemeSelector()));
 }
 
-/* ---------------------------------------------
-   Auto-render on route changes
---------------------------------------------- */
-window.addEventListener("hashchange", renderRightPanel);
-window.addEventListener("owf:view-loaded", renderRightPanel);
-document.addEventListener("DOMContentLoaded", renderRightPanel);
