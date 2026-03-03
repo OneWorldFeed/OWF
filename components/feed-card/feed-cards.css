@@ -1,240 +1,43 @@
-/* ============================================================
-   OWF FEED CARDS — PHASE 4.4.4
-   Cinematic Hybrid • Deep Rounded • Adaptive Themes
-   ============================================================ */
-
-/* ------------------------------------------------------------
-   THEME VARIABLES
-   Light mode is default. Dark mode overrides below.
-   ------------------------------------------------------------ */
+/* -------------------------------------------------------
+   OneWorldFeed — Feed Card Glow Tokens
+   File: components/feed-card/tokens/glow.css
+   ------------------------------------------------------- */
 
 :root {
-  --card-bg: #ffffff;
-  --card-bg-alt: #f7f7f7;
-  --card-text: #222;
-  --card-subtext: #555;
-  --card-border: rgba(0,0,0,0.08);
-  --card-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  --card-radius: 20px; /* deep rounded */
-  --card-hover: rgba(0,0,0,0.04);
-}
+  /* Warm Glow */
+  --owf-glow-warm-100: #F4D9C8;
+  --owf-glow-warm-150: #EEC2A8;
+  --owf-glow-warm-200: #E7A98A;
 
-[data-theme="dark"] {
-  --card-bg: #1a1a1a;
-  --card-bg-alt: #222;
-  --card-text: #f2f2f2;
-  --card-subtext: #aaa;
-  --card-border: rgba(255,255,255,0.08);
-  --card-shadow: 0 4px 20px rgba(0,0,0,0.4);
-  --card-hover: rgba(255,255,255,0.06);
-}
+  /* Neutral Glow */
+  --owf-glow-neutral-100: #E8E8E8;
+  --owf-glow-neutral-150: #DCDCDC;
+  --owf-glow-neutral-200: #CFCFCF;
 
-/* ------------------------------------------------------------
-   FEED CONTAINER
-   ------------------------------------------------------------ */
+  /* Cool Glow */
+  --owf-glow-cool-100: #C9D8E8;
+  --owf-glow-cool-150: #B4C9DD;
+  --owf-glow-cool-200: #9EB9D2;
 
-#feed {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 24px;
-  box-sizing: border-box;
-}
+  /* Intensities */
+  --owf-glow-intensity-100: 0 0 32px;
+  --owf-glow-intensity-150: 0 0 40px;
+  --owf-glow-intensity-200: 0 0 52px;
 
-/* ------------------------------------------------------------
-   BASE CARD STYLE
-   ------------------------------------------------------------ */
+  /* Moods */
+  --owf-glow-mood-calm: 1;
+  --owf-glow-mood-hopeful: 1.08;
+  --owf-glow-mood-reflective: 0.94;
+  --owf-glow-mood-urgent: 1.12;
 
-.feed-card {
-  background: var(--card-bg);
-  border-radius: var(--card-radius);
-  box-shadow: var(--card-shadow);
-  border: 1px solid var(--card-border);
-  padding: 20px;
-  transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
-}
+  /* Time-of-Day */
+  --owf-glow-time-morning: 1.06;
+  --owf-glow-time-afternoon: 1;
+  --owf-glow-time-evening: 0.96;
+  --owf-glow-time-night: 0.90;
 
-.feed-card:hover {
-  background: var(--card-hover);
-  transform: translateY(-2px);
-}
-
-/* ------------------------------------------------------------
-   CARD TYPOGRAPHY
-   ------------------------------------------------------------ */
-
-.feed-card h2 {
-  margin: 0 0 8px 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--card-text);
-}
-
-.feed-card p {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--card-subtext);
-}
-
-/* ------------------------------------------------------------
-   IMAGE CARDS
-   ------------------------------------------------------------ */
-
-.feed-card .card-image {
-  width: 100%;
-  height: 220px;
-  border-radius: var(--card-radius);
-  object-fit: cover;
-  margin-bottom: 16px;
-}
-
-/* ------------------------------------------------------------
-   HERO MOMENT CARD
-   ------------------------------------------------------------ */
-
-.hero-card {
-  padding: 0;
-  overflow: hidden;
-}
-
-.hero-card .hero-image {
-  width: 100%;
-  height: 320px;
-  object-fit: cover;
-  border-radius: var(--card-radius) var(--card-radius) 0 0;
-}
-
-.hero-card .hero-content {
-  padding: 20px;
-}
-
-.hero-card h1 {
-  margin: 0 0 8px 0;
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--card-text);
-}
-
-.hero-card p {
-  font-size: 16px;
-  color: var(--card-subtext);
-}
-
-/* ------------------------------------------------------------
-   GLOBAL MOMENT CARD
-   ------------------------------------------------------------ */
-
-.moment-card {
-  display: flex;
-  flex-direction: column;
-}
-
-.moment-card .moment-image {
-  width: 100%;
-  height: 180px;
-  border-radius: var(--card-radius);
-  object-fit: cover;
-  margin-bottom: 12px;
-}
-
-.moment-card .moment-caption {
-  font-size: 15px;
-  color: var(--card-text);
-}
-
-/* ------------------------------------------------------------
-   NEWS CARD
-   ------------------------------------------------------------ */
-
-.news-card h3 {
-  margin: 0 0 6px 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--card-text);
-}
-
-.news-card .source {
-  font-size: 13px;
-  color: var(--card-subtext);
-  margin-bottom: 12px;
-}
-
-/* ------------------------------------------------------------
-   MUSIC CARD
-   ------------------------------------------------------------ */
-
-.music-card {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-}
-
-.music-card img {
-  width: 72px;
-  height: 72px;
-  border-radius: var(--card-radius);
-  object-fit: cover;
-}
-
-.music-card .track-title {
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--card-text);
-}
-
-.music-card .artist {
-  font-size: 14px;
-  color: var(--card-subtext);
-}
-
-/* ------------------------------------------------------------
-   WEATHER CARD
-   ------------------------------------------------------------ */
-
-.weather-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.weather-card .temp {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--card-text);
-}
-
-.weather-card .city {
-  font-size: 16px;
-  color: var(--card-subtext);
-}
-
-/* ------------------------------------------------------------
-   LIVE TILE
-   ------------------------------------------------------------ */
-
-.live-card {
-  border-left: 6px solid #ff3b30;
-}
-
-.live-card .live-label {
-  color: #ff3b30;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
-/* ------------------------------------------------------------
-   TRENDING CARD
-   ------------------------------------------------------------ */
-
-.trending-card ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.trending-card li {
-  padding: 6px 0;
-  font-size: 15px;
-  color: var(--card-text);
+  /* Composite */
+  --owf-glow-warm: var(--owf-glow-intensity-100) rgba(244, 217, 200, 0.55);
+  --owf-glow-neutral: var(--owf-glow-intensity-100) rgba(232, 232, 232, 0.55);
+  --owf-glow-cool: var(--owf-glow-intensity-100) rgba(201, 216, 232, 0.55);
 }
