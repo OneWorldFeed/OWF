@@ -3,17 +3,17 @@
    Radio Player • Glow Selector • Global Signals
    ============================================================ */
 
-import { initRadioPlayer } from "/components/radio/radio-player.js";
+import { renderRadioPlayer } from "/modules/radio/radio-player.js";
 import { initGlobalSignals } from "/modules/right-panel/global-signals.js";
 
 /* ------------------------------------------------------------
    Initialize Left Panel
 ------------------------------------------------------------ */
 export function initLeftPanel() {
-  initRadioPlayer();               // Mounts the radio UI
+  renderRadioPlayer();             // Mounts the radio UI (fix: was initRadioPlayer)
   renderGlowSelector();            // Renders glow card + swatches
   applySavedGlowToLeftPlayer();    // Applies saved glow class
-  initGlobalSignals();             // Mounts time/weather signals
+  initGlobalSignals();             // Mounts time/signals
 }
 
 /* ------------------------------------------------------------
