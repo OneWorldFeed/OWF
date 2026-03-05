@@ -1,1 +1,584 @@
+<!-- ============================================================
+     OWF AI PAGE — Cinematic Emotional Companion
+     Design: Deep navy · Teal atmospheric glow · Frosted glass
+     ============================================================ -->
+
+<div id="owf-ai-page">
+
+  <!-- Atmospheric background layers -->
+  <div class="ai-bg">
+    <div class="ai-bg__deep"></div>
+    <div class="ai-bg__glow"></div>
+    <div class="ai-bg__horizon"></div>
+    <div class="ai-bg__grid"></div>
+  </div>
+
+  <!-- Main AI interface -->
+  <div class="ai-interface">
+
+    <!-- Header -->
+    <div class="ai-header">
+      <div class="ai-avatar">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="8" fill="rgba(0,210,200,0.15)" stroke="rgba(0,210,200,0.4)" stroke-width="1"/>
+          <circle cx="14" cy="11" r="3.5" fill="rgba(0,210,200,0.8)"/>
+          <path d="M7 21c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="rgba(0,210,200,0.8)" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="ai-title">Assistant</span>
+      <div class="ai-status">
+        <span class="ai-status__dot"></span>
+      </div>
+    </div>
+
+    <!-- Prompt area -->
+    <div class="ai-prompt-area">
+      <h2 class="ai-headline">What would you<br>like to explore?</h2>
+
+      <!-- Suggestion chips -->
+      <div class="ai-chips">
+        <button class="ai-chip" data-prompt="Tell me about Global Moments today">Global Moments Today</button>
+        <button class="ai-chip" data-prompt="Show me my ritual pattern">Your Ritual Pattern</button>
+        <button class="ai-chip" data-prompt="I need a moment of quiet reflection">Quiet Reflection</button>
+        <button class="ai-chip" data-prompt="Help me explore a new city">Explore a New City</button>
+      </div>
+    </div>
+
+    <!-- Conversation area -->
+    <div class="ai-conversation" id="ai-conversation">
+      <!-- Initial ambient message -->
+      <div class="ai-message ai-message--ambient" id="ai-ambient">
+        <p id="ai-ambient-text">The world is still. A good moment to listen.</p>
+      </div>
+    </div>
+
+    <!-- Divider glow line -->
+    <div class="ai-divider"></div>
+
+    <!-- Input bar -->
+    <div class="ai-input-bar">
+      <input
+        type="text"
+        id="ai-input"
+        class="ai-input"
+        placeholder="Write something..."
+        autocomplete="off"
+        spellcheck="false"
+      />
+      <button class="ai-send" id="ai-send">Send</button>
+    </div>
+
+  </div>
+</div>
+
+<style>
+/* ============================================================
+   AI PAGE — SCOPED STYLES
+   ============================================================ */
+
+#owf-ai-page {
+  position:    relative;
+  min-height:  100%;
+  display:     flex;
+  flex-direction: column;
+  overflow:    hidden;
+  font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
+}
+
+/* ----------------------------------------------------------
+   ATMOSPHERIC BACKGROUND
+---------------------------------------------------------- */
+.ai-bg {
+  position:   absolute;
+  inset:      0;
+  z-index:    0;
+  overflow:   hidden;
+}
+
+.ai-bg__deep {
+  position:   absolute;
+  inset:      0;
+  background: linear-gradient(
+    180deg,
+    #05111f 0%,
+    #071828 40%,
+    #08202e 70%,
+    #0a2535 100%
+  );
+}
+
+.ai-bg__glow {
+  position:   absolute;
+  bottom:     15%;
+  left:       50%;
+  transform:  translateX(-50%);
+  width:      140%;
+  height:     60%;
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    rgba(0, 180, 170, 0.28) 0%,
+    rgba(0, 140, 160, 0.14) 40%,
+    transparent 70%
+  );
+  filter:     blur(40px);
+  animation:  owf-ai-breathe 8s ease-in-out infinite;
+}
+
+.ai-bg__horizon {
+  position:   absolute;
+  bottom:     28%;
+  left:       0;
+  right:      0;
+  height:     1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 220, 200, 0.15) 20%,
+    rgba(0, 255, 220, 0.55) 50%,
+    rgba(0, 220, 200, 0.15) 80%,
+    transparent 100%
+  );
+  box-shadow: 0 0 24px rgba(0, 220, 200, 0.30);
+}
+
+.ai-bg__grid {
+  position:   absolute;
+  inset:      0;
+  background-image:
+    linear-gradient(rgba(0, 180, 170, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 180, 170, 0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+}
+
+@keyframes owf-ai-breathe {
+  0%, 100% { opacity: 0.8; transform: translateX(-50%) scaleY(1); }
+  50%       { opacity: 1.0; transform: translateX(-50%) scaleY(1.08); }
+}
+
+/* ----------------------------------------------------------
+   INTERFACE WRAPPER
+---------------------------------------------------------- */
+.ai-interface {
+  position:       relative;
+  z-index:        1;
+  display:        flex;
+  flex-direction: column;
+  height:         100%;
+  min-height:     calc(100vh - 80px);
+  padding:        28px 24px 24px;
+  gap:            0;
+}
+
+/* ----------------------------------------------------------
+   HEADER
+---------------------------------------------------------- */
+.ai-header {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+  margin-bottom: 40px;
+}
+
+.ai-avatar {
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  flex-shrink:     0;
+}
+
+.ai-title {
+  font-size:   18px;
+  font-weight: 600;
+  color:       #e8f4f0;
+  letter-spacing: -0.01em;
+}
+
+.ai-status {
+  margin-left: auto;
+}
+
+.ai-status__dot {
+  display:      block;
+  width:        8px;
+  height:       8px;
+  border-radius: 50%;
+  background:   #00d4c0;
+  box-shadow:   0 0 8px rgba(0, 212, 192, 0.8);
+  animation:    owf-ai-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes owf-ai-pulse {
+  0%, 100% { opacity: 1;   box-shadow: 0 0 8px rgba(0, 212, 192, 0.8); }
+  50%       { opacity: 0.5; box-shadow: 0 0 16px rgba(0, 212, 192, 0.4); }
+}
+
+/* ----------------------------------------------------------
+   PROMPT AREA
+---------------------------------------------------------- */
+.ai-prompt-area {
+  text-align:  center;
+  flex:        1;
+  display:     flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 20px;
+}
+
+.ai-headline {
+  font-size:      clamp(26px, 5vw, 34px);
+  font-weight:    400;
+  color:          #dff0ec;
+  line-height:    1.3;
+  letter-spacing: -0.02em;
+  margin-bottom:  32px;
+}
+
+/* ----------------------------------------------------------
+   CHIPS
+---------------------------------------------------------- */
+.ai-chips {
+  display:         flex;
+  flex-wrap:       wrap;
+  gap:             10px;
+  justify-content: center;
+  max-width:       460px;
+}
+
+.ai-chip {
+  background:    rgba(255, 255, 255, 0.06);
+  border:        1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 100px;
+  color:         rgba(220, 240, 235, 0.90);
+  font-size:     14px;
+  font-weight:   400;
+  padding:       9px 18px;
+  cursor:        pointer;
+  transition:
+    background  220ms ease,
+    border-color 220ms ease,
+    transform   200ms ease,
+    box-shadow  220ms ease;
+  white-space:   nowrap;
+  backdrop-filter: blur(8px);
+}
+
+.ai-chip:hover {
+  background:    rgba(0, 212, 192, 0.12);
+  border-color:  rgba(0, 212, 192, 0.40);
+  color:         #a0f0e8;
+  transform:     translateY(-1px);
+  box-shadow:    0 0 20px rgba(0, 212, 192, 0.20);
+}
+
+.ai-chip:active {
+  transform: translateY(0);
+}
+
+/* ----------------------------------------------------------
+   CONVERSATION AREA
+---------------------------------------------------------- */
+.ai-conversation {
+  display:        flex;
+  flex-direction: column;
+  gap:            12px;
+  margin-bottom:  20px;
+  max-height:     280px;
+  overflow-y:     auto;
+  scrollbar-width: none;
+}
+
+.ai-conversation::-webkit-scrollbar { display: none; }
+
+/* Ambient message (frosted glass card) */
+.ai-message--ambient {
+  background:     rgba(255, 255, 255, 0.05);
+  border:         1px solid rgba(255, 255, 255, 0.10);
+  border-radius:  16px;
+  padding:        20px 22px;
+  backdrop-filter: blur(12px);
+}
+
+.ai-message--ambient p {
+  font-size:   16px;
+  line-height: 1.6;
+  color:       rgba(210, 235, 230, 0.85);
+  margin:      0;
+}
+
+/* User message */
+.ai-message--user {
+  align-self:    flex-end;
+  background:    rgba(0, 180, 170, 0.15);
+  border:        1px solid rgba(0, 180, 170, 0.25);
+  border-radius: 16px 16px 4px 16px;
+  padding:       12px 18px;
+  max-width:     80%;
+}
+
+.ai-message--user p {
+  font-size: 15px;
+  color:     rgba(200, 240, 235, 0.90);
+  margin:    0;
+}
+
+/* Assistant response */
+.ai-message--response {
+  background:     rgba(255, 255, 255, 0.05);
+  border:         1px solid rgba(255, 255, 255, 0.10);
+  border-radius:  16px 16px 16px 4px;
+  padding:        16px 20px;
+  backdrop-filter: blur(12px);
+  max-width:      90%;
+  animation:      owf-ai-fade-in 300ms ease both;
+}
+
+.ai-message--response p {
+  font-size:   15px;
+  line-height: 1.65;
+  color:       rgba(210, 235, 230, 0.88);
+  margin:      0;
+}
+
+/* Thinking dots */
+.ai-thinking {
+  display:     flex;
+  gap:         5px;
+  padding:     14px 18px;
+  background:  rgba(255, 255, 255, 0.04);
+  border:      1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  width:       fit-content;
+}
+
+.ai-thinking__dot {
+  width:         7px;
+  height:        7px;
+  border-radius: 50%;
+  background:    rgba(0, 212, 192, 0.70);
+  animation:     owf-ai-dot 1.4s ease-in-out infinite;
+}
+
+.ai-thinking__dot:nth-child(2) { animation-delay: 0.18s; }
+.ai-thinking__dot:nth-child(3) { animation-delay: 0.36s; }
+
+@keyframes owf-ai-dot {
+  0%, 80%, 100% { transform: scale(0.8); opacity: 0.4; }
+  40%           { transform: scale(1.2); opacity: 1.0; }
+}
+
+@keyframes owf-ai-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ----------------------------------------------------------
+   DIVIDER GLOW LINE
+---------------------------------------------------------- */
+.ai-divider {
+  height:      1px;
+  background:  linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 220, 200, 0.20) 30%,
+    rgba(0, 255, 220, 0.45) 50%,
+    rgba(0, 220, 200, 0.20) 70%,
+    transparent 100%
+  );
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+/* ----------------------------------------------------------
+   INPUT BAR
+---------------------------------------------------------- */
+.ai-input-bar {
+  display:     flex;
+  gap:         0;
+  background:  rgba(255, 255, 255, 0.06);
+  border:      1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 100px;
+  padding:     6px 6px 6px 20px;
+  backdrop-filter: blur(12px);
+  align-items: center;
+  flex-shrink: 0;
+  transition:  border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.ai-input-bar:focus-within {
+  border-color: rgba(0, 212, 192, 0.35);
+  box-shadow:   0 0 0 3px rgba(0, 212, 192, 0.08);
+}
+
+.ai-input {
+  flex:        1;
+  min-width:   0;
+  background:  transparent;
+  border:      none;
+  outline:     none;
+  font-size:   15px;
+  color:       rgba(220, 240, 235, 0.85);
+  font-family: inherit;
+}
+
+.ai-input::placeholder {
+  color: rgba(180, 210, 205, 0.40);
+}
+
+.ai-send {
+  flex-shrink:   0;
+  background:    transparent;
+  border:        none;
+  color:         rgba(180, 210, 205, 0.70);
+  font-size:     15px;
+  font-weight:   500;
+  font-family:   inherit;
+  padding:       8px 16px;
+  cursor:        pointer;
+  border-radius: 100px;
+  transition:    color 200ms ease, background 200ms ease;
+}
+
+.ai-send:hover {
+  color:       #00d4c0;
+  background:  rgba(0, 212, 192, 0.10);
+}
+
+/* ----------------------------------------------------------
+   HIDDEN STATE — when conversation is active
+---------------------------------------------------------- */
+.ai-prompt-area.ai-active {
+  flex:        0;
+  min-height:  0;
+  margin-bottom: 16px;
+}
+
+.ai-prompt-area.ai-active .ai-headline {
+  font-size:     20px;
+  margin-bottom: 12px;
+}
+
+.ai-prompt-area.ai-active .ai-chips {
+  gap: 6px;
+}
+
+.ai-prompt-area.ai-active .ai-chip {
+  font-size: 12px;
+  padding:   6px 12px;
+}
+</style>
+
+<script>
+/* ============================================================
+   OWF AI PAGE — Interaction Logic
+   ============================================================ */
+(function() {
+
+  const input        = document.getElementById('ai-input');
+  const sendBtn      = document.getElementById('ai-send');
+  const conversation = document.getElementById('ai-conversation');
+  const ambientMsg   = document.getElementById('ai-ambient');
+  const ambientText  = document.getElementById('ai-ambient-text');
+  const promptArea   = document.querySelector('.ai-prompt-area');
+  const chips        = document.querySelectorAll('.ai-chip');
+
+  /* Ambient messages — rotate on load */
+  const ambientMessages = [
+    "The world is moving with a rising horizon today. Here's something unfolding across cities.",
+    "A quiet morning across the Pacific. Good time to reflect.",
+    "Evening light is settling over three continents. What do you want to know?",
+    "Something significant is being felt globally right now.",
+    "The world is still. A good moment to listen."
+  ];
+
+  ambientText.textContent = ambientMessages[
+    Math.floor(Math.random() * ambientMessages.length)
+  ];
+
+  /* Chip clicks */
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const prompt = chip.dataset.prompt;
+      sendMessage(prompt);
+    });
+  });
+
+  /* Send button */
+  sendBtn.addEventListener('click', () => {
+    const text = input.value.trim();
+    if (text) sendMessage(text);
+  });
+
+  /* Enter key */
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (text) sendMessage(text);
+    }
+  });
+
+  function sendMessage(text) {
+    /* Collapse prompt area */
+    promptArea.classList.add('ai-active');
+
+    /* Hide ambient on first message */
+    if (ambientMsg) ambientMsg.style.display = 'none';
+
+    /* Add user message */
+    addMessage(text, 'user');
+    input.value = '';
+
+    /* Show thinking */
+    const thinking = addThinking();
+
+    /* Simulate response — replace with real AI call */
+    setTimeout(() => {
+      thinking.remove();
+      addMessage(generateResponse(text), 'response');
+      conversation.scrollTop = conversation.scrollHeight;
+    }, 1400 + Math.random() * 800);
+
+    conversation.scrollTop = conversation.scrollHeight;
+  }
+
+  function addMessage(text, type) {
+    const div = document.createElement('div');
+    div.className = `ai-message ai-message--${type}`;
+    const p = document.createElement('p');
+    p.textContent = text;
+    div.appendChild(p);
+    conversation.appendChild(div);
+    return div;
+  }
+
+  function addThinking() {
+    const div = document.createElement('div');
+    div.className = 'ai-thinking';
+    div.innerHTML = `
+      <span class="ai-thinking__dot"></span>
+      <span class="ai-thinking__dot"></span>
+      <span class="ai-thinking__dot"></span>
+    `;
+    conversation.appendChild(div);
+    conversation.scrollTop = conversation.scrollHeight;
+    return div;
+  }
+
+  function generateResponse(text) {
+    const t = text.toLowerCase();
+    if (t.includes('global moment') || t.includes('today'))
+      return "Three significant moments are unfolding today — a cultural celebration in West Africa, a climate summit opening in Geneva, and a sunrise festival across coastal Japan. Would you like to explore any of these?";
+    if (t.includes('ritual') || t.includes('pattern'))
+      return "Your ritual pattern shows consistency in the mornings. You tend to engage most deeply between 7 and 9 AM. Your kindness streak is at 4 days. A reflective mood has been consistent this week.";
+    if (t.includes('reflect') || t.includes('quiet'))
+      return "Take a breath. The world can wait. Here is a quiet fact: right now, across every timezone, someone is watching a sunrise. You share this planet with 8 billion quiet moments happening simultaneously.";
+    if (t.includes('city') || t.includes('explore'))
+      return "Where would you like to go? I can take you to Accra at dawn, Kyoto in autumn, São Paulo on a Saturday evening, or anywhere the world is most alive right now.";
+    return "I hear you. Let me think about that across the context of what's happening in the world today and what I know about your presence here.";
+  }
+
+})();
+</script>
 
