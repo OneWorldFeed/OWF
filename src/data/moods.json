@@ -1,4 +1,290 @@
 [
-  { "id": "calm", "label": "Calm", "color": "#88c0d0" },
-  { "id": "energetic", "label": "Energetic", "color": "#ebcb8b" }
+  {
+    "id": "electric",
+    "label": "Electric",
+    "color": "#FBBF24",
+    "glowRgb": "251,191,36",
+    "glowMode": "gold",
+    "timeOfDay": {
+      "dawn": {
+        "intensity": 0.6
+      },
+      "morning": {
+        "intensity": 0.8
+      },
+      "afternoon": {
+        "intensity": 1
+      },
+      "dusk": {
+        "intensity": 0.9
+      },
+      "night": {
+        "intensity": 0.7
+      }
+    }
+  },
+  {
+    "id": "calm",
+    "label": "Calm",
+    "color": "#7DD3FC",
+    "glowRgb": "125,211,252",
+    "glowMode": "blue",
+    "timeOfDay": {
+      "dawn": {
+        "intensity": 0.8
+      },
+      "morning": {
+        "intensity": 0.7
+      },
+      "afternoon": {
+        "intensity": 0.5
+      },
+      "dusk": {
+        "intensity": 0.7
+      },
+      "night": {
+        "intensity": 0.9
+      }
+    }
+  },
+  {
+    "id": "joyful",
+    "label": "Joyful",
+    "color": "#22C55E",
+    "glowRgb": "34,197,94",
+    "glowMode": "turquoise",
+    "timeOfDay": {
+      "dawn": {
+        "intensity": 0.7
+      },
+      "morning": {
+        "intensity": 1
+      },
+      "afternoon": {
+        "intensity": 0.9
+      },
+      "dusk": {
+        "intensity": 0.7
+      },
+      "night": {
+        "intensity": 0.5
+      }
+    }
+  },
+  {
+    "id": "reflective",
+    "label": "Reflective",
+    "color": "#60A5FA",
+    "glowRgb": "96,165,250",
+    "glowMode": "blue",
+    "timeOfDay": {
+      "dawn": {
+        "intensity": 0.9
+      },
+      "morning": {
+        "intensity": 0.6
+      },
+      "afternoon": {
+        "intensity": 0.5
+      },
+      "dusk": {
+        "intensity": 0.8
+      },
+      "night": {
+        "intensity": 1
+      }
+    }
+  },
+  {
+    "id": "curious",
+    "label": "Curious",
+    "color": "#2DD4BF",
+    "glowRgb": "45,212,191",
+    "glowMode": "turquoise",
+    "timeOfDay": {
+      "dawn": {
+        "intensity": 0.7
+      },
+      "morning": {
+        "intensity": 0.9
+      },
+      "afternoon": {
+        "intensity": 1
+      },
+      "dusk": {
+        "intensity": 0.8
+      },
+      "night": {
+        "intensity": 0.6
+      }
+    }
+  },
+  {
+    "id": "ambitious",
+    "label": "Ambitious",
+    "color": "#F97316",
+    "glowRgb": "249,115,22",
+    "glowMode": "amber",
+    "timeOfDay": {
+      "dawn": {
+        "intensity": 0.8
+      },
+      "morning": {
+        "intensity": 1
+      },
+      "afternoon": {
+        "intensity": 0.9
+      },
+      "dusk": {
+        "intensity": 0.7
+      },
+      "night": {
+        "intensity": 0.5
+      }
+    }
+  },
+  {
+    "id": "resilient",
+    "label": "Resilient",
+    "color": "#D97706",
+    "glowRgb": "217,119,6",
+    "glowMode": "gold",
+    "timeOfDay": {
+      "dawn": {
+        "intensity": 0.7
+      },
+      "morning": {
+        "intensity": 0.8
+      },
+      "afternoon": {
+        "intensity": 0.9
+      },
+      "dusk": {
+        "intensity": 1
+      },
+      "night": {
+        "intensity": 0.8
+      }
+    }
+  },
+  {
+    "id": "hopeful",
+    "label": "Hopeful",
+    "color": "#86EFAC",
+    "glowRgb": "134,239,172",
+    "glowMode": "turquoise",
+    "timeOfDay": {
+      "dawn": {
+        "intensity": 1
+      },
+      "morning": {
+        "intensity": 0.9
+      },
+      "afternoon": {
+        "intensity": 0.7
+      },
+      "dusk": {
+        "intensity": 0.8
+      },
+      "night": {
+        "intensity": 0.6
+      }
+    }
+  },
+  {
+    "id": "melancholic",
+    "label": "Melancholic",
+    "color": "#818CF8",
+    "glowRgb": "129,140,248",
+    "glowMode": "purple",
+    "timeOfDay": {
+      "dawn": {
+        "intensity": 0.6
+      },
+      "morning": {
+        "intensity": 0.5
+      },
+      "afternoon": {
+        "intensity": 0.4
+      },
+      "dusk": {
+        "intensity": 0.8
+      },
+      "night": {
+        "intensity": 1
+      }
+    }
+  },
+  {
+    "id": "fragile",
+    "label": "Fragile",
+    "color": "#FDA4AF",
+    "glowRgb": "253,164,175",
+    "glowMode": "rose",
+    "timeOfDay": {
+      "dawn": {
+        "intensity": 0.8
+      },
+      "morning": {
+        "intensity": 0.6
+      },
+      "afternoon": {
+        "intensity": 0.4
+      },
+      "dusk": {
+        "intensity": 0.7
+      },
+      "night": {
+        "intensity": 0.9
+      }
+    }
+  },
+  {
+    "id": "ancient",
+    "label": "Ancient",
+    "color": "#A78BFA",
+    "glowRgb": "167,139,250",
+    "glowMode": "purple",
+    "timeOfDay": {
+      "dawn": {
+        "intensity": 0.9
+      },
+      "morning": {
+        "intensity": 0.5
+      },
+      "afternoon": {
+        "intensity": 0.4
+      },
+      "dusk": {
+        "intensity": 0.7
+      },
+      "night": {
+        "intensity": 1
+      }
+    }
+  },
+  {
+    "id": "silent",
+    "label": "Silent",
+    "color": "#94A3B8",
+    "glowRgb": "148,163,184",
+    "glowMode": "slate",
+    "timeOfDay": {
+      "dawn": {
+        "intensity": 0.7
+      },
+      "morning": {
+        "intensity": 0.4
+      },
+      "afternoon": {
+        "intensity": 0.3
+      },
+      "dusk": {
+        "intensity": 0.6
+      },
+      "night": {
+        "intensity": 0.9
+      }
+    }
+  }
 ]
