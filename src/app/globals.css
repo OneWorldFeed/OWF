@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --owf-navy: #0D1F35;
+  --owf-gold: #D97706;
+  --owf-teal: #007A6E;
+  --owf-purple: #5B54D6;
+  --owf-blue: #1D4ED8;
+  --owf-bg: #060E1A;
+  --owf-surface: #0D1F35;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: var(--owf-bg);
+  color: #F9FAFB;
+  font-family: Inter, system-ui, sans-serif;
+}
+EOFEOF
+cat > src/app/layout.tsx << 'EOF'
+import type { Metadata } from 'next'
+import './globals.css'
+
+export const metadata: Metadata = {
+  title: 'OneWorldFeed',
+  description: 'A cinematic, emotionally intelligent global platform',
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  )
+}
+EOFEOF
+cat > src/app/page.tsx << 'EOF'
+export default function Home() {
+  return (
+    <main style={{ padding: '2rem' }}>
+      <h1 style={{ color: '#D97706', fontSize: '2rem', fontWeight: 'bold' }}>
+        OneWorldFeed
+      </h1>
+      <p style={{ color: '#9CA3AF', marginTop: '0.5rem' }}>
+        Foundation is live. Building begins.
+      </p>
+    </main>
+  )
+}
+EOFEOF
+git add . && git commit -m "feat: app shell — layout, page, globals" && git push
