@@ -15,6 +15,8 @@ export interface FeedCardProps {
   safetyBadge?: 'clear' | 'notice' | 'rights';
   likeCount?: number;
   commentCount?: number;
+  featured?: boolean;
+  compact?: boolean;
 }
 
 export default function FeedCard({
@@ -28,6 +30,8 @@ export default function FeedCard({
   safetyBadge,
   likeCount = 0,
   commentCount = 0,
+  featured = false,
+  compact = false,
 }: FeedCardProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -38,121 +42,106 @@ export default function FeedCard({
   const moodRgb = moodData?.glowRgb ?? '217,119,6';
   const moodLabel = moodData?.label ?? mood;
 
+  const avatarSize = featured ? 'w-13 h-13' : compact ? 'w-9 h-9' : 'w-11 h-11';
+  const nameSize = featured ? 'text-base' : compact ? 'text-xs' : 'text-sm';
+  const contentSize = featured ? 'text-base' : compact ? 'text-xs' : 'text-sm';
+  const padding = featured ? 'p-6' : compact ? 'p-3' : 'p-5';
+
   return (
     <article
-      className="relative rounded-2xl overflow-hidden mb-4 cursor-pointer transition-all duration-300"
+      className={`relative rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-[1.01] ${featured ? 'mb-0' : 'mb-0'}`}
       style={{
         backgroundColor: 'var(--owf-surface)',
-        border: '1px solid var(--owf-border)',
+        border: `1px solid ${moodColor}44`,
         boxShadow: mounted
-          ? `0 2px 12px rgba(${moodRgb}, ${intensity * 0.12})`
+          ? `0 2px 16px rgba(${moodRgb}, ${intensity * 0.15})`
           : '0 1px 3px rgba(0,0,0,0.06)',
+        ...(featured && {
+          background: `linear-gradient(135deg, var(--owf-surface) 0%, ${moodColor}08 100%)`,
+        }),
       }}
     >
       {/* Mood top bar */}
       <div
-        className="absolute top-0 left-0 right-0 h-[3px]"
+        className={`absolute top-0 left-0 right-0 ${featured ? 'h-[4px]' : 'h-[3px]'}`}
         style={{
           background: `linear-gradient(90deg, ${moodColor}, ${moodColor}00)`,
           opacity: intensity,
         }}
       />
 
-      <div className="p-5">
+      <div className={padding}>
 
-        {/* Row 1 — Author */}
-        <div className="flex items-center gap-3 mb-4">
-
-          {/* Avatar with mood glow */}
+        {/* Author row */}
+        <div className={`flex items-center gap-3 ${featured ? 'mb-5' : compact ? 'mb-2' : 'mb-4'}`}>
           <div
             className="relative flex-shrink-0"
-            style={{
-              filter: mounted ? `drop-shadow(0 0 6px ${moodColor}66)` : 'none',
-            }}
+            style={{ filter: mounted ? `drop-shadow(0 0 6px ${moodColor}66)` : 'none' }}
           >
             <div
-              className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-black text-white"
+              className={`${featured ? 'w-12 h-12' : compact ? 'w-9 h-9' : 'w-11 h-11'} rounded-full flex items-center justify-center font-black text-white`}
               style={{
+                fontSize: featured ? '1rem' : compact ? '0.7rem' : '0.875rem',
                 background: `linear-gradient(135deg, ${moodColor}, ${moodColor}99)`,
               }}
             >
               {authorName.charAt(0).toUpperCase()}
             </div>
-            {/* Mood pulse dot */}
             <div
-              className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2"
-              style={{
-                backgroundColor: moodColor,
-                borderColor: 'var(--owf-surface)',
-              }}
+              className={`absolute -bottom-0.5 -right-0.5 ${compact ? 'w-2 h-2' : 'w-3 h-3'} rounded-full border-2`}
+              style={{ backgroundColor: moodColor, borderColor: 'var(--owf-surface)' }}
             />
           </div>
 
-          {/* Name + meta */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span
-                className="font-bold text-sm"
-                style={{ color: 'var(--owf-text-primary)' }}
-              >
+              <span className={`font-bold ${nameSize}`} style={{ color: 'var(--owf-text-primary)' }}>
                 {authorName}
               </span>
-              <span
-                className="text-xs font-semibold px-1.5 py-0.5 rounded-full"
-                style={{
-                  color: moodColor,
-                  backgroundColor: `${moodColor}18`,
-                }}
-              >
-                {moodLabel}
-              </span>
+              {!compact && (
+                <span
+                  className="text-xs font-semibold px-1.5 py-0.5 rounded-full"
+                  style={{ color: moodColor, backgroundColor: `${moodColor}18` }}
+                >
+                  {moodLabel}
+                </span>
+              )}
             </div>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span style={{ color: 'var(--owf-text-secondary)', fontSize: '0.72rem' }}>
-                {authorHandle}
-              </span>
-              <span style={{ color: 'var(--owf-border)', fontSize: '0.72rem' }}>·</span>
-              <span style={{ color: 'var(--owf-text-secondary)', fontSize: '0.72rem' }}>
-                {city}
-              </span>
-              <span style={{ color: 'var(--owf-border)', fontSize: '0.72rem' }}>·</span>
-              <span style={{ color: 'var(--owf-text-secondary)', fontSize: '0.72rem' }}>
-                {timeAgo}
-              </span>
+            <div className="flex items-center gap-1 mt-0.5 flex-wrap">
+              <span style={{ color: 'var(--owf-text-secondary)', fontSize: '0.68rem' }}>{authorHandle}</span>
+              <span style={{ color: 'var(--owf-border)', fontSize: '0.68rem' }}>·</span>
+              <span style={{ color: 'var(--owf-text-secondary)', fontSize: '0.68rem' }}>{city}</span>
+              <span style={{ color: 'var(--owf-border)', fontSize: '0.68rem' }}>·</span>
+              <span style={{ color: 'var(--owf-text-secondary)', fontSize: '0.68rem' }}>{timeAgo}</span>
             </div>
           </div>
 
-          {/* Safety badge */}
-          {safetyBadge === 'clear' && (
-            <span className="text-xs px-2.5 py-1 rounded-full flex-shrink-0 font-medium"
+          {safetyBadge === 'clear' && !compact && (
+            <span className="text-xs px-2 py-0.5 rounded-full flex-shrink-0 font-medium"
               style={{ backgroundColor: '#F0FDF4', color: '#166534', border: '1px solid #BBF7D0' }}>
               ✦ Clear
             </span>
           )}
-          {safetyBadge === 'notice' && (
-            <span className="text-xs px-2.5 py-1 rounded-full flex-shrink-0 font-medium"
+          {safetyBadge === 'notice' && !compact && (
+            <span className="text-xs px-2 py-0.5 rounded-full flex-shrink-0 font-medium"
               style={{ backgroundColor: '#FFFBEB', color: '#92400E', border: '1px solid #FDE68A' }}>
               ⚠ Notice
             </span>
           )}
         </div>
 
-        {/* Row 2 — Content */}
+        {/* Content */}
         <p
-          className="leading-relaxed mb-4"
+          className={`leading-relaxed ${compact ? 'mb-2 line-clamp-3' : 'mb-4'}`}
           style={{
-            fontSize: '0.975rem',
+            fontSize: featured ? '1rem' : compact ? '0.78rem' : '0.95rem',
             color: 'var(--owf-text-primary)',
             letterSpacing: '0.01em',
           }}
         >
           {content.split(' ').map((word, i) =>
             word.startsWith('+') ? (
-              <span
-                key={i}
-                className="font-semibold hover:underline cursor-pointer"
-                style={{ color: moodColor }}
-              >
+              <span key={i} className="font-semibold hover:underline cursor-pointer" style={{ color: moodColor }}>
                 {word}{' '}
               </span>
             ) : (
@@ -161,40 +150,28 @@ export default function FeedCard({
           )}
         </p>
 
-        {/* Row 3 — Image */}
         {imageUrl && (
-          <div className="rounded-xl overflow-hidden mb-4 aspect-video"
-            style={{ backgroundColor: 'var(--owf-bg)' }}>
+          <div className="rounded-xl overflow-hidden mb-4 aspect-video" style={{ backgroundColor: 'var(--owf-bg)' }}>
             <img src={imageUrl} alt="" className="w-full h-full object-cover" />
           </div>
         )}
 
-        {/* Row 4 — Engagement */}
+        {/* Engagement */}
         <div
-          className="flex items-center gap-6 pt-3"
+          className={`flex items-center gap-4 ${compact ? 'pt-2' : 'pt-3'}`}
           style={{ borderTop: '1px solid var(--owf-border)' }}
         >
-          <button
-            className="flex items-center gap-2 text-xs transition-colors group/btn"
-            style={{ color: 'var(--owf-text-secondary)' }}
-          >
-            <span className="text-base">♡</span>
-            <span>{likeCount}</span>
+          <button className="flex items-center gap-1.5 text-xs transition-colors" style={{ color: 'var(--owf-text-secondary)' }}>
+            <span>♡</span><span>{likeCount}</span>
           </button>
-          <button
-            className="flex items-center gap-2 text-xs transition-colors group/btn"
-            style={{ color: 'var(--owf-text-secondary)' }}
-          >
-            <span className="text-base">◇</span>
-            <span>{commentCount}</span>
+          <button className="flex items-center gap-1.5 text-xs transition-colors" style={{ color: 'var(--owf-text-secondary)' }}>
+            <span>◇</span><span>{commentCount}</span>
           </button>
-          <button
-            className="flex items-center gap-2 text-xs transition-colors ml-auto"
-            style={{ color: 'var(--owf-text-secondary)' }}
-          >
-            <span className="text-base">↗</span>
-            <span>Share</span>
-          </button>
+          {!compact && (
+            <button className="flex items-center gap-1.5 text-xs ml-auto" style={{ color: 'var(--owf-text-secondary)' }}>
+              <span>↗</span><span>Share</span>
+            </button>
+          )}
         </div>
 
       </div>
@@ -202,9 +179,7 @@ export default function FeedCard({
       {/* Bottom mood line */}
       <div
         className="absolute bottom-0 left-0 right-0 h-[1px]"
-        style={{
-          background: `linear-gradient(90deg, transparent, ${moodColor}33, transparent)`,
-        }}
+        style={{ background: `linear-gradient(90deg, transparent, ${moodColor}44, transparent)` }}
       />
     </article>
   );
