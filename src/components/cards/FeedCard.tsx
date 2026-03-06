@@ -48,7 +48,7 @@ export default function FeedCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-semibold text-white text-sm">{authorName}</span>
-              <span className="text-[#6B7280] text-xs">@{authorHandle}</span>
+              <span className="text-[#6B7280] text-xs">{authorHandle}</span>
               <span className="text-[#6B7280] text-xs">·</span>
               <span className="text-[#6B7280] text-xs">{city}</span>
               <span className="text-[#6B7280] text-xs">·</span>
