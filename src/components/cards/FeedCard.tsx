@@ -243,9 +243,18 @@ export default function FeedCard({
         </p>
 
         {imageUrl && (
-          <div className="rounded-xl overflow-hidden mb-4 aspect-video"
-            style={{ backgroundColor: 'var(--owf-bg)' }}>
-            <img src={imageUrl} alt="" className="w-full h-full object-cover" />
+          <div
+            className="rounded-xl overflow-hidden mb-3"
+            style={{
+              backgroundColor: 'var(--owf-bg)',
+              height: featured ? '200px' : '160px',
+            }}
+          >
+            <img
+              src={imageUrl}
+              alt=""
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            />
           </div>
         )}
 
