@@ -2,7 +2,7 @@ import FeedCard from '@/components/cards/FeedCard';
 
 const posts = [
   {
-    id: '1', authorName: 'Amara Diallo', authorHandle: 'amaradiallo.feed',
+    id: '1', authorName: 'Amara Diallo', accolade: 'Community Favorite',, authorHandle: 'amaradiallo.feed',
     city: 'Lagos', timeAgo: '2m ago', mood: 'electric' as const,
     safetyBadge: 'clear' as const, likeCount: 24, commentCount: 7,
     content: 'The energy in Lagos tonight is something else. The music never stops and neither do we. +lagos +nightlife',
@@ -38,7 +38,7 @@ const posts = [
     content: 'Tango in the street at midnight. A stranger asked me to dance and now we are friends. +buenosaires +tango',
   },
   {
-    id: '7', authorName: 'Kenji Mori', authorHandle: 'kenjimori.feed',
+    id: '7', authorName: 'Kenji Mori', trophy: true,, authorHandle: 'kenjimori.feed',
     city: 'Osaka', timeAgo: '55m ago', mood: 'curious' as const,
     likeCount: 29, commentCount: 11,
     content: 'Found a 100 year old ramen shop hidden in an alley. The owner is 87. Still cooking every day. +osaka +japan +food',
