@@ -1,10 +1,13 @@
-import moods from '@/data/moods.json';
+import type { CSSProperties } from 'react';
+import moodsData from '@/data/moods.json';
 
 export type MoodId = 'electric' | 'reflective' | 'joyful' | 'melancholic' |
   'curious' | 'ambitious' | 'calm' | 'resilient' | 'ancient' | 'hopeful' |
   'fragile' | 'silent';
 
 export type TimeOfDay = 'dawn' | 'morning' | 'afternoon' | 'dusk' | 'night';
+
+const moods = moodsData as any[];
 
 export function getTimeOfDay(): TimeOfDay {
   const hour = new Date().getHours();
@@ -16,7 +19,7 @@ export function getTimeOfDay(): TimeOfDay {
 }
 
 export function getMood(moodId: MoodId) {
-  return moods.find((m: any) => m.id === moodId) ?? moods[0];
+  return moods.find((m) => m.id === moodId) ?? moods[0];
 }
 
 export function getMoodIntensity(moodId: MoodId): number {
@@ -25,7 +28,7 @@ export function getMoodIntensity(moodId: MoodId): number {
   return mood?.timeOfDay?.[time]?.intensity ?? 0.7;
 }
 
-export function getHaloStyle(moodId: MoodId): React.CSSProperties {
+export function getHaloStyle(moodId: MoodId): CSSProperties {
   const mood = getMood(moodId);
   const intensity = getMoodIntensity(moodId);
   const alpha = Math.round(intensity * 255).toString(16).padStart(2, '0');
@@ -34,7 +37,7 @@ export function getHaloStyle(moodId: MoodId): React.CSSProperties {
   };
 }
 
-export function getGlowStyle(moodId: MoodId): React.CSSProperties {
+export function getGlowStyle(moodId: MoodId): CSSProperties {
   const mood = getMood(moodId);
   const intensity = getMoodIntensity(moodId);
   return {
