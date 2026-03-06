@@ -15,10 +15,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-[#060E1A]">
+      <body style={{ backgroundColor: 'var(--owf-bg)', color: 'var(--owf-text-primary)' }}>
         <GlobalHeader />
         <LeftNav />
-        <main className="ml-56 mt-14 min-h-screen">
+        <main className="ml-56 mt-14 min-h-screen" style={{ backgroundColor: 'var(--owf-bg)' }}>
           {children}
         </main>
       </body>

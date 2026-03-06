@@ -3,13 +3,24 @@
 @tailwind utilities;
 
 :root {
+  --owf-bg: #F9FAFB;
+  --owf-surface: #FFFFFF;
+  --owf-border: #E5E7EB;
+  --owf-text-primary: #111827;
+  --owf-text-secondary: #6B7280;
   --owf-navy: #0D1F35;
   --owf-gold: #D97706;
   --owf-teal: #007A6E;
   --owf-purple: #5B54D6;
-  --owf-blue: #1D4ED8;
+  --owf-orange: #F97316;
+}
+
+[data-theme="dark"] {
   --owf-bg: #060E1A;
   --owf-surface: #0D1F35;
+  --owf-border: #1E3A5F;
+  --owf-text-primary: #F9FAFB;
+  --owf-text-secondary: #6B7280;
 }
 
 * {
@@ -20,6 +31,7 @@
 
 body {
   background-color: var(--owf-bg);
-  color: #F9FAFB;
+  color: var(--owf-text-primary);
   font-family: Inter, system-ui, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }

@@ -40,18 +40,16 @@ export default function FeedCard({
 
   return (
     <article
-      className="relative rounded-2xl overflow-hidden mb-4 group cursor-pointer"
+      className="relative rounded-2xl overflow-hidden mb-4 cursor-pointer transition-all duration-300"
       style={{
-        background: mounted
-          ? `linear-gradient(135deg, #0D1F35 0%, #060E1A 100%)`
-          : '#0D1F35',
+        backgroundColor: 'var(--owf-surface)',
+        border: '1px solid var(--owf-border)',
         boxShadow: mounted
-          ? `0 0 0 1px ${moodColor}33, 0 4px 24px rgba(${moodRgb}, ${intensity * 0.25})`
-          : '0 0 0 1px #1E3A5F',
-        transition: 'box-shadow 0.3s ease',
+          ? `0 2px 12px rgba(${moodRgb}, ${intensity * 0.12})`
+          : '0 1px 3px rgba(0,0,0,0.06)',
       }}
     >
-      {/* Bold mood bar — top edge */}
+      {/* Mood top bar */}
       <div
         className="absolute top-0 left-0 right-0 h-[3px]"
         style={{
@@ -62,70 +60,99 @@ export default function FeedCard({
 
       <div className="p-5">
 
-        {/* Row 1 — Author + mood pulse */}
+        {/* Row 1 — Author */}
         <div className="flex items-center gap-3 mb-4">
 
           {/* Avatar with mood glow */}
           <div
             className="relative flex-shrink-0"
             style={{
-              filter: mounted ? `drop-shadow(0 0 8px ${moodColor}88)` : 'none',
+              filter: mounted ? `drop-shadow(0 0 6px ${moodColor}66)` : 'none',
             }}
           >
             <div
               className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-black text-white"
-              style={{ background: `linear-gradient(135deg, ${moodColor}44, ${moodColor}22)`, border: `1.5px solid ${moodColor}66` }}
+              style={{
+                background: `linear-gradient(135deg, ${moodColor}, ${moodColor}99)`,
+              }}
             >
               {authorName.charAt(0).toUpperCase()}
             </div>
             {/* Mood pulse dot */}
             <div
-              className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-[#060E1A]"
-              style={{ background: moodColor }}
+              className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2"
+              style={{
+                backgroundColor: moodColor,
+                borderColor: 'var(--owf-surface)',
+              }}
             />
           </div>
 
-          {/* Name + handle + meta */}
+          {/* Name + meta */}
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="font-bold text-white text-sm">{authorName}</span>
               <span
-                className="text-xs font-medium"
-                style={{ color: moodColor }}
+                className="font-bold text-sm"
+                style={{ color: 'var(--owf-text-primary)' }}
+              >
+                {authorName}
+              </span>
+              <span
+                className="text-xs font-semibold px-1.5 py-0.5 rounded-full"
+                style={{
+                  color: moodColor,
+                  backgroundColor: `${moodColor}18`,
+                }}
               >
                 {moodLabel}
               </span>
             </div>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="text-[#4B5563] text-xs">{authorHandle}</span>
-              <span className="text-[#2D3748] text-xs">·</span>
-              <span className="text-[#4B5563] text-xs">{city}</span>
-              <span className="text-[#2D3748] text-xs">·</span>
-              <span className="text-[#4B5563] text-xs">{timeAgo}</span>
+              <span style={{ color: 'var(--owf-text-secondary)', fontSize: '0.72rem' }}>
+                {authorHandle}
+              </span>
+              <span style={{ color: 'var(--owf-border)', fontSize: '0.72rem' }}>·</span>
+              <span style={{ color: 'var(--owf-text-secondary)', fontSize: '0.72rem' }}>
+                {city}
+              </span>
+              <span style={{ color: 'var(--owf-border)', fontSize: '0.72rem' }}>·</span>
+              <span style={{ color: 'var(--owf-text-secondary)', fontSize: '0.72rem' }}>
+                {timeAgo}
+              </span>
             </div>
           </div>
 
           {/* Safety badge */}
           {safetyBadge === 'clear' && (
-            <span className="text-xs bg-[#14532D]/60 text-[#86EFAC] px-2.5 py-1 rounded-full border border-[#166534]/40 flex-shrink-0">
+            <span className="text-xs px-2.5 py-1 rounded-full flex-shrink-0 font-medium"
+              style={{ backgroundColor: '#F0FDF4', color: '#166534', border: '1px solid #BBF7D0' }}>
               ✦ Clear
             </span>
           )}
           {safetyBadge === 'notice' && (
-            <span className="text-xs bg-[#92400E]/60 text-[#FCD34D] px-2.5 py-1 rounded-full border border-[#B45309]/40 flex-shrink-0">
+            <span className="text-xs px-2.5 py-1 rounded-full flex-shrink-0 font-medium"
+              style={{ backgroundColor: '#FFFBEB', color: '#92400E', border: '1px solid #FDE68A' }}>
               ⚠ Notice
             </span>
           )}
         </div>
 
-        {/* Row 2 — Content (hero) */}
+        {/* Row 2 — Content */}
         <p
-          className="text-[#E5E7EB] leading-relaxed mb-4"
-          style={{ fontSize: '0.975rem', letterSpacing: '0.01em' }}
+          className="leading-relaxed mb-4"
+          style={{
+            fontSize: '0.975rem',
+            color: 'var(--owf-text-primary)',
+            letterSpacing: '0.01em',
+          }}
         >
           {content.split(' ').map((word, i) =>
             word.startsWith('+') ? (
-              <span key={i} style={{ color: moodColor }} className="font-medium hover:underline cursor-pointer">
+              <span
+                key={i}
+                className="font-semibold hover:underline cursor-pointer"
+                style={{ color: moodColor }}
+              >
                 {word}{' '}
               </span>
             ) : (
@@ -136,41 +163,47 @@ export default function FeedCard({
 
         {/* Row 3 — Image */}
         {imageUrl && (
-          <div className="rounded-xl overflow-hidden mb-4 aspect-video bg-[#1E3A5F]">
+          <div className="rounded-xl overflow-hidden mb-4 aspect-video"
+            style={{ backgroundColor: 'var(--owf-bg)' }}>
             <img src={imageUrl} alt="" className="w-full h-full object-cover" />
           </div>
         )}
 
         {/* Row 4 — Engagement */}
-        <div className="flex items-center gap-6 pt-1">
+        <div
+          className="flex items-center gap-6 pt-3"
+          style={{ borderTop: '1px solid var(--owf-border)' }}
+        >
           <button
-            className="flex items-center gap-2 text-xs text-[#4B5563] hover:text-white transition-colors group/btn"
+            className="flex items-center gap-2 text-xs transition-colors group/btn"
+            style={{ color: 'var(--owf-text-secondary)' }}
           >
-            <span className="text-base group-hover/btn:scale-110 transition-transform">♡</span>
+            <span className="text-base">♡</span>
             <span>{likeCount}</span>
           </button>
           <button
-            className="flex items-center gap-2 text-xs text-[#4B5563] hover:text-white transition-colors group/btn"
+            className="flex items-center gap-2 text-xs transition-colors group/btn"
+            style={{ color: 'var(--owf-text-secondary)' }}
           >
-            <span className="text-base group-hover/btn:scale-110 transition-transform">◇</span>
+            <span className="text-base">◇</span>
             <span>{commentCount}</span>
           </button>
           <button
-            className="flex items-center gap-2 text-xs text-[#4B5563] transition-colors ml-auto group/btn"
-            style={{ '--hover-color': moodColor } as React.CSSProperties}
+            className="flex items-center gap-2 text-xs transition-colors ml-auto"
+            style={{ color: 'var(--owf-text-secondary)' }}
           >
-            <span className="text-base group-hover/btn:scale-110 transition-transform">↗</span>
+            <span className="text-base">↗</span>
             <span>Share</span>
           </button>
         </div>
 
       </div>
 
-      {/* Bottom mood glow line */}
+      {/* Bottom mood line */}
       <div
         className="absolute bottom-0 left-0 right-0 h-[1px]"
         style={{
-          background: `linear-gradient(90deg, transparent, ${moodColor}44, transparent)`,
+          background: `linear-gradient(90deg, transparent, ${moodColor}33, transparent)`,
         }}
       />
     </article>
