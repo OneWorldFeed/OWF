@@ -6,7 +6,7 @@ export default function Home() {
       <FeedCard
         id="1"
         authorName="Amara Diallo"
-        authorHandle="amara.diallo"
+        authorHandle="amaradiallo.feed"
         city="Lagos"
         timeAgo="2m ago"
         mood="electric"
@@ -18,7 +18,7 @@ export default function Home() {
       <FeedCard
         id="2"
         authorName="Mei Tanaka"
-        authorHandle="mei.tanaka"
+        authorHandle="meitanaka.feed"
         city="Tokyo"
         timeAgo="8m ago"
         mood="reflective"
@@ -29,7 +29,7 @@ export default function Home() {
       <FeedCard
         id="3"
         authorName="Carlos Mendez"
-        authorHandle="carlos.mx"
+        authorHandle="carlosmendez.feed"
         city="Mexico City"
         timeAgo="15m ago"
         mood="hopeful"
