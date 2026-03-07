@@ -19,13 +19,13 @@ const posts = [
     id: '3', authorName: 'Carlos Mendez', authorHandle: 'carlosmendez.feed',
     city: 'Mexico City', timeAgo: '15m ago', mood: 'hopeful' as const,
     safetyBadge: 'clear' as const, likeCount: 18, commentCount: 3,
-    content: 'Three years building this community garden. Today we harvested our first crop. The neighbourhood came out. +mexicocity +community',
+    content: 'Three years building this community garden. Today we harvested our first crop. +mexicocity +community',
   },
   {
     id: '4', authorName: 'Priya Sharma', authorHandle: 'priyasharma.feed',
     city: 'Mumbai', timeAgo: '22m ago', mood: 'ambitious' as const,
     likeCount: 56, commentCount: 19,
-    content: 'Just presented to 400 people. Hands were shaking but the idea landed. This is what we have been building toward. +mumbai +startups',
+    content: 'Just presented to 400 people. Hands were shaking but the idea landed. +mumbai +startups',
   },
   {
     id: '5', authorName: 'Omar Hassan', authorHandle: 'omarhassan.feed',
@@ -65,6 +65,24 @@ const posts = [
     likeCount: 88, commentCount: 31,
     imageUrl: 'https://images.unsplash.com/photo-1601042879364-f3947d3f9c16?w=800',
     content: 'Seoul at night from the rooftop. The city never sleeps and neither do we. +seoul +korea +nightlife',
+  },
+  {
+    id: '11', authorName: 'Amara Diallo', authorHandle: 'amaradiallo.feed',
+    city: 'Lagos', timeAgo: '3h ago', mood: 'electric' as const,
+    likeCount: 103, commentCount: 44, isOwner: true,
+    videoThumbnail: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800',
+    videoUrl: '',
+    videoDuration: 67,
+    content: 'Live performance from last night. The crowd was everything. +lagos +music +live',
+  },
+  {
+    id: '12', authorName: 'Kenji Mori', authorHandle: 'kenjimori.feed',
+    city: 'Osaka', timeAgo: '4h ago', mood: 'curious' as const,
+    likeCount: 55, commentCount: 18,
+    videoThumbnail: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=800',
+    videoUrl: '',
+    videoDuration: 45,
+    content: 'A walk through the alley where time stopped. +osaka +japan +documentary',
   },
 ];
 

@@ -1,9 +1,10 @@
 'use client';
 import { useState, useRef } from 'react';
 import FeedCard from '@/components/cards/FeedCard';
+import VideoCard from '@/components/cards/VideoCard';
 import type { MoodId } from '@/lib/theme';
 
-interface Post {
+export interface Post {
   id: string;
   authorName: string;
   authorHandle: string;
@@ -13,15 +14,18 @@ interface Post {
   mood: MoodId;
   imageUrl?: string;
   videoUrl?: string;
+  videoThumbnail?: string;
+  videoDuration?: number;
   safetyBadge?: 'clear' | 'notice' | 'rights';
   likeCount?: number;
   commentCount?: number;
   accolade?: string;
   trophy?: boolean;
   featured?: boolean;
+  isOwner?: boolean;
 }
 
-const TABS = ['All', 'Text', 'Media'] as const;
+const TABS = ['All', 'Text', 'Media', 'Video'] as const;
 type Tab = typeof TABS[number];
 
 export default function FeedTabs({ posts }: { posts: Post[] }) {
@@ -29,14 +33,11 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const textPosts = posts.filter(p => !p.imageUrl && !p.videoUrl);
-  const mediaPosts = posts.filter(p => p.imageUrl || p.videoUrl);
+  const mediaPosts = posts.filter(p => p.imageUrl && !p.videoUrl);
+  const videoPosts = posts.filter(p => p.videoUrl);
 
-  const scrollLeft = () => {
-    scrollRef.current?.scrollBy({ left: -320, behavior: 'smooth' });
-  };
-  const scrollRight = () => {
-    scrollRef.current?.scrollBy({ left: 320, behavior: 'smooth' });
-  };
+  const scrollLeft = () => scrollRef.current?.scrollBy({ left: -340, behavior: 'smooth' });
+  const scrollRight = () => scrollRef.current?.scrollBy({ left: 340, behavior: 'smooth' });
 
   return (
     <div>
@@ -47,6 +48,9 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
       >
         {TABS.map((tab) => {
           const active = activeTab === tab;
+          const count = tab === 'Media' ? mediaPosts.length
+                      : tab === 'Video' ? videoPosts.length
+                      : null;
           return (
             <button
               key={tab}
@@ -59,7 +63,7 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
               }}
             >
               {tab}
-              {tab === 'Media' && mediaPosts.length > 0 && (
+              {count !== null && count > 0 && (
                 <span
                   className="ml-1.5 text-xs px-1.5 py-0.5 rounded-full"
                   style={{
@@ -67,7 +71,7 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
                     color: active ? '#fff' : 'var(--owf-text-secondary)',
                   }}
                 >
-                  {mediaPosts.length}
+                  {count}
                 </span>
               )}
             </button>
@@ -75,48 +79,23 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
         })}
       </div>
 
-      {/* All tab */}
+      {/* ALL tab */}
       {activeTab === 'All' && (
         <div>
+          {/* Media strip */}
           {mediaPosts.length > 0 && (
             <div className="mb-5">
               <div className="flex items-center justify-between mb-2 px-1">
-                <p className="text-xs font-bold tracking-widest"
-                  style={{ color: 'var(--owf-text-secondary)' }}>
-                  MEDIA
+                <p className="text-xs font-bold tracking-widest" style={{ color: 'var(--owf-text-secondary)' }}>
+                  PHOTOS
                 </p>
-                {/* Desktop scroll arrows */}
                 <div className="hidden md:flex items-center gap-1">
-                  <button
-                    onClick={scrollLeft}
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-sm transition-all hover:scale-110"
-                    style={{
-                      backgroundColor: 'var(--owf-surface)',
-                      border: '1px solid var(--owf-border)',
-                      color: 'var(--owf-text-secondary)',
-                    }}
-                  >
-                    ‹
-                  </button>
-                  <button
-                    onClick={scrollRight}
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-sm transition-all hover:scale-110"
-                    style={{
-                      backgroundColor: 'var(--owf-surface)',
-                      border: '1px solid var(--owf-border)',
-                      color: 'var(--owf-text-secondary)',
-                    }}
-                  >
-                    ›
-                  </button>
+                  <ScrollBtn direction="left" onClick={scrollLeft} />
+                  <ScrollBtn direction="right" onClick={scrollRight} />
                 </div>
               </div>
-              {/* Horizontal scroll strip */}
-              <div
-                ref={scrollRef}
-                className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide"
-              >
-                {mediaPosts.map((post) => (
+              <div ref={scrollRef} className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+                {mediaPosts.map(post => (
                   <div key={post.id} className="flex-shrink-0 w-72 snap-start">
                     <FeedCard {...post} />
                   </div>
@@ -124,70 +103,89 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
               </div>
             </div>
           )}
+          {/* Video strip */}
+          {videoPosts.length > 0 && (
+            <div className="mb-5">
+              <p className="text-xs font-bold tracking-widest mb-2 px-1" style={{ color: 'var(--owf-text-secondary)' }}>
+                VIDEOS
+              </p>
+              <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+                {videoPosts.map(post => (
+                  <div key={post.id} className="flex-shrink-0 w-80 snap-start">
+                    <VideoCard {...post} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Text posts */}
           <MixedGrid posts={textPosts} />
         </div>
       )}
 
-      {/* Text tab */}
+      {/* TEXT tab */}
       {activeTab === 'Text' && <MixedGrid posts={textPosts} />}
 
-      {/* Media tab */}
+      {/* MEDIA tab — images only */}
       {activeTab === 'Media' && (
         <div>
           {mediaPosts.length === 0 ? (
-            <div className="text-center py-20" style={{ color: 'var(--owf-text-secondary)' }}>
-              <p className="text-4xl mb-3">◎</p>
-              <p className="text-sm">No media posts yet</p>
-            </div>
+            <EmptyState icon="◎" label="No photos yet" />
           ) : (
             <>
-              {/* Desktop — horizontal cinema scroll */}
+              {/* Desktop — horizontal scroll + arrows */}
               <div className="hidden md:block">
                 <div className="flex items-center justify-end gap-1 mb-3">
-                  <button
-                    onClick={scrollLeft}
-                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                    style={{
-                      backgroundColor: 'var(--owf-surface)',
-                      border: '1px solid var(--owf-border)',
-                      color: 'var(--owf-text-primary)',
-                      fontSize: '1.2rem',
-                    }}
-                  >
-                    ‹
-                  </button>
-                  <button
-                    onClick={scrollRight}
-                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
-                    style={{
-                      backgroundColor: 'var(--owf-surface)',
-                      border: '1px solid var(--owf-border)',
-                      color: 'var(--owf-text-primary)',
-                      fontSize: '1.2rem',
-                    }}
-                  >
-                    ›
-                  </button>
+                  <ScrollBtn direction="left" onClick={scrollLeft} />
+                  <ScrollBtn direction="right" onClick={scrollRight} />
                 </div>
-                <div
-                  ref={scrollRef}
-                  className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
-                >
-                  {mediaPosts.map((post) => (
+                <div ref={scrollRef} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+                  {mediaPosts.map(post => (
                     <div key={post.id} className="flex-shrink-0 w-96 snap-start">
                       <FeedCard {...post} featured />
                     </div>
                   ))}
                 </div>
               </div>
-
-              {/* Mobile — vertical scroll grid */}
+              {/* Mobile — 2 col vertical */}
               <div className="block md:hidden">
                 <div className="grid grid-cols-2 gap-3">
-                  {mediaPosts.map((post) => (
+                  {mediaPosts.map(post => (
                     <FeedCard key={post.id} {...post} compact />
                   ))}
                 </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* VIDEO tab */}
+      {activeTab === 'Video' && (
+        <div>
+          {videoPosts.length === 0 ? (
+            <EmptyState icon="▶" label="No videos yet" />
+          ) : (
+            <>
+              {/* Desktop — horizontal scroll */}
+              <div className="hidden md:block">
+                <div className="flex items-center justify-end gap-1 mb-3">
+                  <ScrollBtn direction="left" onClick={scrollLeft} />
+                  <ScrollBtn direction="right" onClick={scrollRight} />
+                </div>
+                <div ref={scrollRef} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
+                  {videoPosts.map(post => (
+                    <div key={post.id} className="flex-shrink-0 w-[420px] snap-start">
+                      <VideoCard {...post} featured />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {/* Mobile — single column vertical */}
+              <div className="block md:hidden space-y-4">
+                {videoPosts.map(post => (
+                  <VideoCard key={post.id} {...post} />
+                ))}
               </div>
             </>
           )}
@@ -197,33 +195,48 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
   );
 }
 
-function MixedGrid({ posts }: { posts: Post[] }) {
-  if (posts.length === 0) return (
+function ScrollBtn({ direction, onClick }: { direction: 'left' | 'right'; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
+      style={{
+        backgroundColor: 'var(--owf-surface)',
+        border: '1px solid var(--owf-border)',
+        color: 'var(--owf-text-primary)',
+        fontSize: '1.2rem',
+      }}
+    >
+      {direction === 'left' ? '‹' : '›'}
+    </button>
+  );
+}
+
+function EmptyState({ icon, label }: { icon: string; label: string }) {
+  return (
     <div className="text-center py-20" style={{ color: 'var(--owf-text-secondary)' }}>
-      <p className="text-4xl mb-3">◎</p>
-      <p className="text-sm">No posts here yet</p>
+      <p className="text-4xl mb-3">{icon}</p>
+      <p className="text-sm">{label}</p>
     </div>
   );
+}
 
+function MixedGrid({ posts }: { posts: Post[] }) {
+  if (posts.length === 0) return <EmptyState icon="◎" label="No posts here yet" />;
   const rows: JSX.Element[] = [];
   let i = 0;
   let rowIndex = 0;
   const patterns = ['featured', 'two', 'three', 'featured', 'two'] as const;
-
   while (i < posts.length) {
     const pattern = patterns[rowIndex % patterns.length];
     if (pattern === 'featured' && posts[i]) {
-      rows.push(
-        <div key={i} className="mb-4">
-          <FeedCard {...posts[i]} featured />
-        </div>
-      );
+      rows.push(<div key={i} className="mb-4"><FeedCard {...posts[i]} featured /></div>);
       i++;
     } else if (pattern === 'two' && posts[i]) {
       rows.push(
         <div key={i} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           {posts[i] && <FeedCard {...posts[i]} />}
-          {posts[i + 1] && <FeedCard {...posts[i + 1]} />}
+          {posts[i+1] && <FeedCard {...posts[i+1]} />}
         </div>
       );
       i += 2;
@@ -231,17 +244,13 @@ function MixedGrid({ posts }: { posts: Post[] }) {
       rows.push(
         <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
           {posts[i] && <FeedCard {...posts[i]} compact />}
-          {posts[i + 1] && <FeedCard {...posts[i + 1]} compact />}
-          {posts[i + 2] && <FeedCard {...posts[i + 2]} compact />}
+          {posts[i+1] && <FeedCard {...posts[i+1]} compact />}
+          {posts[i+2] && <FeedCard {...posts[i+2]} compact />}
         </div>
       );
       i += 3;
     } else {
-      rows.push(
-        <div key={i} className="mb-4">
-          <FeedCard {...posts[i]} />
-        </div>
-      );
+      rows.push(<div key={i} className="mb-4"><FeedCard {...posts[i]} /></div>);
       i++;
     }
     rowIndex++;
