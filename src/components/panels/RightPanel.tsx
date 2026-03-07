@@ -112,9 +112,11 @@ function Label({ children }: { children: React.ReactNode }) {
 export default function RightPanel() {
   const [theme, setTheme] = useState('light');
   const [times, setTimes] = useState<Record<string, string>>({});
-  const [aiInput, setAiInput] = useState('');
-  const [aiResponse, setAiResponse] = useState('');
-  const [aiLoading, setAiLoading] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [moodResult, setMoodResult] = useState('');
+  const [moodLoading, setMoodLoading] = useState(false);
+  const [summaryResult, setSummaryResult] = useState('');
+  const [summaryLoading, setSummaryLoading] = useState(false);
   const [spotIdx, setSpotIdx] = useState(0);
   const [pinned, setPinned] = useState<string[]>(['Tokyo', 'London', 'New York']);
   const [showPicker, setShowPicker] = useState(false);
@@ -165,28 +167,57 @@ export default function RightPanel() {
     }
   }
 
-  async function handleAI() {
-    if (!aiInput.trim()) return;
-    setAiLoading(true);
-    setAiResponse('');
+  const FEED_CONTEXT = `Lagos: "The energy in Lagos tonight is something else. The music never stops." +lagos +nightlife
+Tokyo: "Cherry blossom season begins today. Every year I forget how quickly it goes." +tokyo +cherryblossoms
+Mexico City: "Three years building this community garden. Today we harvested our first crop." +mexicocity +community
+Mumbai: "Just presented to 400 people. Hands were shaking but the idea landed." +mumbai +startups
+Cairo: "The Nile at sunrise never gets old. Thousands of years of history in one view." +cairo +egypt
+Buenos Aires: "Tango in the street at midnight. A stranger asked me to dance and now we are friends." +buenosaires +tango
+Osaka: "Found a 100 year old ramen shop hidden in an alley. The owner is 87. Still cooking every day." +osaka +japan
+Berlin: "Berlin winter is brutal but the studio is warm. Three months of work about to become something real." +berlin +art
+Accra: "Accra is buzzing. New art, new music, new energy. The world needs to pay attention." +accra +ghana +afrobeats
+Seoul: "Seoul at night from the rooftop. The city never sleeps and neither do we." +seoul +korea`;
+
+  async function callAI(prompt: string): Promise<string> {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 200,
+        messages: [{ role: 'user', content: prompt }],
+      }),
+    });
+    const data = await res.json();
+    return data.content?.map((c: any) => c.text || '').join('') || 'No response.';
+  }
+
+  async function handleMoodOfDay() {
+    setMoodLoading(true);
+    setMoodResult('');
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 300,
-          system: 'You are OWF AI — a helpful, concise assistant on OneWorldFeed, a global social platform. Answer in 2-3 sentences max.',
-          messages: [{ role: 'user', content: aiInput }],
-        }),
-      });
-      const data = await res.json();
-      setAiResponse(data.content?.map((c: any) => c.text || '').join('') || 'No response.');
+      const result = await callAI(
+        `You are OWF AI. Based on these real posts from OneWorldFeed today:\n\n${FEED_CONTEXT}\n\nIn 2 sentences, describe the overall emotional mood of the world today. Be poetic and specific. Start with an emoji mood indicator.`
+      );
+      setMoodResult(result);
     } catch {
-      setAiResponse('Unable to reach OWF AI right now.');
+      setMoodResult('Unable to read the global mood right now.');
     }
-    setAiLoading(false);
-    setAiInput('');
+    setMoodLoading(false);
+  }
+
+  async function handleFeedSummary() {
+    setSummaryLoading(true);
+    setSummaryResult('');
+    try {
+      const result = await callAI(
+        `You are OWF AI. Based on these posts from OneWorldFeed today:\n\n${FEED_CONTEXT}\n\nGive a TL;DR of what people around the world are talking about right now. 3 bullet points max, each one sentence. Use city names. Be direct and vivid.`
+      );
+      setSummaryResult(result);
+    } catch {
+      setSummaryResult('Unable to summarise the feed right now.');
+    }
+    setSummaryLoading(false);
   }
 
   const displayCities = [
@@ -237,29 +268,71 @@ export default function RightPanel() {
 
       {/* AI */}
       <Card>
-        <Label>OWF AI</Label>
-        <p className="text-xs mb-3" style={{ color: 'var(--owf-text-secondary)' }}>Ask anything about the world.</p>
-        <div className="flex gap-2 mb-2">
-          <input
-            type="text" value={aiInput}
-            onChange={e => setAiInput(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleAI()}
-            placeholder="Ask a question..."
-            className="flex-1 text-xs px-3 py-2 rounded-xl focus:outline-none"
-            style={{ backgroundColor: 'var(--owf-bg)', border: '1px solid var(--owf-border)', color: 'var(--owf-text-primary)' }}
-          />
-          <button
-            onClick={handleAI} disabled={aiLoading}
-            className="text-xs font-bold px-3 py-2 rounded-xl"
-            style={{ backgroundColor: 'var(--owf-gold)', color: '#fff', opacity: aiLoading ? 0.6 : 1 }}
-          >
-            {aiLoading ? '...' : '→'}
-          </button>
-        </div>
-        {aiResponse && (
-          <div className="text-xs leading-relaxed p-3 rounded-xl"
-            style={{ backgroundColor: 'var(--owf-bg)', color: 'var(--owf-text-primary)', border: '1px solid var(--owf-border)' }}>
-            {aiResponse}
+        <button
+          className="w-full flex items-center justify-between"
+          onClick={() => setAiOpen(!aiOpen)}
+        >
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm"
+              style={{ background: 'linear-gradient(135deg, var(--owf-gold), #F97316)' }}>
+              ✦
+            </div>
+            <p className="text-xs font-black tracking-widest" style={{ color: 'var(--owf-text-secondary)' }}>OWF AI</p>
+          </div>
+          <span className="text-xs" style={{ color: 'var(--owf-text-secondary)' }}>{aiOpen ? '▲' : '▼'}</span>
+        </button>
+
+        {aiOpen && (
+          <div className="mt-4 space-y-3">
+
+            {/* Mood of the Day */}
+            <div className="rounded-xl p-3" style={{ backgroundColor: 'var(--owf-bg)', border: '1px solid var(--owf-border)' }}>
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <p className="text-xs font-bold" style={{ color: 'var(--owf-text-primary)' }}>🌍 Mood of the Day</p>
+                  <p className="text-[10px]" style={{ color: 'var(--owf-text-secondary)' }}>AI reads the global feed</p>
+                </div>
+                <button
+                  onClick={handleMoodOfDay}
+                  disabled={moodLoading}
+                  className="text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-all"
+                  style={{ backgroundColor: 'var(--owf-gold)', color: '#fff', opacity: moodLoading ? 0.6 : 1 }}
+                >
+                  {moodLoading ? '...' : moodResult ? '↺' : 'Read'}
+                </button>
+              </div>
+              {moodResult && (
+                <div className="text-xs leading-relaxed mt-2 p-2 rounded-lg"
+                  style={{ backgroundColor: 'var(--owf-surface)', color: 'var(--owf-text-primary)', borderLeft: '3px solid var(--owf-gold)' }}>
+                  {moodResult}
+                </div>
+              )}
+            </div>
+
+            {/* Feed Summary */}
+            <div className="rounded-xl p-3" style={{ backgroundColor: 'var(--owf-bg)', border: '1px solid var(--owf-border)' }}>
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <p className="text-xs font-bold" style={{ color: 'var(--owf-text-primary)' }}>📋 Feed Summary</p>
+                  <p className="text-[10px]" style={{ color: 'var(--owf-text-secondary)' }}>TL;DR of what's happening</p>
+                </div>
+                <button
+                  onClick={handleFeedSummary}
+                  disabled={summaryLoading}
+                  className="text-[10px] font-bold px-2.5 py-1.5 rounded-lg transition-all"
+                  style={{ backgroundColor: '#2563EB', color: '#fff', opacity: summaryLoading ? 0.6 : 1 }}
+                >
+                  {summaryLoading ? '...' : summaryResult ? '↺' : 'Read'}
+                </button>
+              </div>
+              {summaryResult && (
+                <div className="text-xs leading-relaxed mt-2 p-2 rounded-lg"
+                  style={{ backgroundColor: 'var(--owf-surface)', color: 'var(--owf-text-primary)', borderLeft: '3px solid #2563EB' }}>
+                  {summaryResult}
+                </div>
+              )}
+            </div>
+
           </div>
         )}
       </Card>

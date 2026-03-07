@@ -1,5 +1,6 @@
 import FeedTabs from '@/components/feed/FeedTabs';
 import GlobalMomentsStrip from '@/components/feed/GlobalMomentsStrip';
+import RightPanel from '@/components/panels/RightPanel';
 
 const posts = [
   {
@@ -89,9 +90,14 @@ const posts = [
 
 export default function Home() {
   return (
-    <div className="px-3 md:px-6 py-4 max-w-5xl mx-auto">
-      <GlobalMomentsStrip />
-      <FeedTabs posts={posts} />
+    <div className="px-3 md:px-6 py-4 max-w-6xl mx-auto">
+      <div className="flex gap-6">
+        <div className="flex-1 min-w-0">
+          <GlobalMomentsStrip />
+          <FeedTabs posts={posts} />
+        </div>
+        <RightPanel />
+      </div>
     </div>
   );
 }
