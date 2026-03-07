@@ -28,7 +28,7 @@ export async function escalatingCall(
 
   // Check if API key is available — if not, use rules engine
   const hasApiKey = typeof process !== 'undefined'
-    ? curl -s -o /dev/null -w %{http_code} https://api.anthropic.comprocess.env.NEXT_PUBLIC_ANTHROPIC_API_KEY
+    ? !!process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY
     : false;
 
   const intent = detectIntent(userMessage);
