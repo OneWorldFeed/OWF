@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import FeedCard from '@/components/cards/FeedCard';
 import type { MoodId } from '@/lib/theme';
 
@@ -26,9 +26,17 @@ type Tab = typeof TABS[number];
 
 export default function FeedTabs({ posts }: { posts: Post[] }) {
   const [activeTab, setActiveTab] = useState<Tab>('All');
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const textPosts = posts.filter(p => !p.imageUrl && !p.videoUrl);
   const mediaPosts = posts.filter(p => p.imageUrl || p.videoUrl);
+
+  const scrollLeft = () => {
+    scrollRef.current?.scrollBy({ left: -320, behavior: 'smooth' });
+  };
+  const scrollRight = () => {
+    scrollRef.current?.scrollBy({ left: 320, behavior: 'smooth' });
+  };
 
   return (
     <div>
@@ -70,14 +78,44 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
       {/* All tab */}
       {activeTab === 'All' && (
         <div>
-          {/* Media strip at top of All */}
           {mediaPosts.length > 0 && (
             <div className="mb-5">
-              <p className="text-xs font-bold mb-2 px-1 tracking-widest"
-                style={{ color: 'var(--owf-text-secondary)' }}>
-                MEDIA
-              </p>
-              <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
+              <div className="flex items-center justify-between mb-2 px-1">
+                <p className="text-xs font-bold tracking-widest"
+                  style={{ color: 'var(--owf-text-secondary)' }}>
+                  MEDIA
+                </p>
+                {/* Desktop scroll arrows */}
+                <div className="hidden md:flex items-center gap-1">
+                  <button
+                    onClick={scrollLeft}
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-sm transition-all hover:scale-110"
+                    style={{
+                      backgroundColor: 'var(--owf-surface)',
+                      border: '1px solid var(--owf-border)',
+                      color: 'var(--owf-text-secondary)',
+                    }}
+                  >
+                    ‹
+                  </button>
+                  <button
+                    onClick={scrollRight}
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-sm transition-all hover:scale-110"
+                    style={{
+                      backgroundColor: 'var(--owf-surface)',
+                      border: '1px solid var(--owf-border)',
+                      color: 'var(--owf-text-secondary)',
+                    }}
+                  >
+                    ›
+                  </button>
+                </div>
+              </div>
+              {/* Horizontal scroll strip */}
+              <div
+                ref={scrollRef}
+                className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide"
+              >
                 {mediaPosts.map((post) => (
                   <div key={post.id} className="flex-shrink-0 w-72 snap-start">
                     <FeedCard {...post} />
@@ -86,8 +124,6 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
               </div>
             </div>
           )}
-
-          {/* Text posts — mixed grid */}
           <MixedGrid posts={textPosts} />
         </div>
       )}
@@ -104,13 +140,56 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
               <p className="text-sm">No media posts yet</p>
             </div>
           ) : (
-            <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-              {mediaPosts.map((post) => (
-                <div key={post.id} className="flex-shrink-0 w-80 snap-start">
-                  <FeedCard {...post} featured />
+            <>
+              {/* Desktop — horizontal cinema scroll */}
+              <div className="hidden md:block">
+                <div className="flex items-center justify-end gap-1 mb-3">
+                  <button
+                    onClick={scrollLeft}
+                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                    style={{
+                      backgroundColor: 'var(--owf-surface)',
+                      border: '1px solid var(--owf-border)',
+                      color: 'var(--owf-text-primary)',
+                      fontSize: '1.2rem',
+                    }}
+                  >
+                    ‹
+                  </button>
+                  <button
+                    onClick={scrollRight}
+                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                    style={{
+                      backgroundColor: 'var(--owf-surface)',
+                      border: '1px solid var(--owf-border)',
+                      color: 'var(--owf-text-primary)',
+                      fontSize: '1.2rem',
+                    }}
+                  >
+                    ›
+                  </button>
                 </div>
-              ))}
-            </div>
+                <div
+                  ref={scrollRef}
+                  className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide"
+                >
+                  {mediaPosts.map((post) => (
+                    <div key={post.id} className="flex-shrink-0 w-96 snap-start">
+                      <FeedCard {...post} featured />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mobile — vertical scroll grid */}
+              <div className="block md:hidden">
+                <div className="grid grid-cols-2 gap-3">
+                  {mediaPosts.map((post) => (
+                    <FeedCard key={post.id} {...post} compact />
+                  ))}
+                </div>
+              </div>
+            </>
           )}
         </div>
       )}
@@ -133,7 +212,6 @@ function MixedGrid({ posts }: { posts: Post[] }) {
 
   while (i < posts.length) {
     const pattern = patterns[rowIndex % patterns.length];
-
     if (pattern === 'featured' && posts[i]) {
       rows.push(
         <div key={i} className="mb-4">
@@ -168,6 +246,5 @@ function MixedGrid({ posts }: { posts: Post[] }) {
     }
     rowIndex++;
   }
-
   return <div>{rows}</div>;
 }
