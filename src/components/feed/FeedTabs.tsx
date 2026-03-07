@@ -43,7 +43,7 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
     <div>
       {/* Tab bar */}
       <div
-        className="flex items-center gap-1 mb-4 px-1 sticky top-14 z-40 py-3"
+        className="flex items-center gap-1 mb-4 px-1 py-3"
         style={{ backgroundColor: 'var(--owf-bg)' }}
       >
         {TABS.map((tab) => {
