@@ -1,5 +1,5 @@
-import React from 'react';
 'use client';
+import React from 'react';
 import { useState, useRef } from 'react';
 import FeedCard from '@/components/cards/FeedCard';
 import VideoCard from '@/components/cards/VideoCard';
@@ -35,7 +35,7 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
 
   const textPosts = posts.filter(p => !p.imageUrl && !p.videoUrl);
   const mediaPosts = posts.filter(p => p.imageUrl && !p.videoUrl);
-  const videoPosts = posts.filter(p => p.videoUrl);
+  const videoPosts = posts.filter(p => p.videoUrl !== undefined);
 
   const scrollLeft = () => scrollRef.current?.scrollBy({ left: -340, behavior: 'smooth' });
   const scrollRight = () => scrollRef.current?.scrollBy({ left: 340, behavior: 'smooth' });
@@ -134,27 +134,17 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
             <EmptyState icon="◎" label="No photos yet" />
           ) : (
             <>
-              {/* Desktop — horizontal scroll + arrows */}
-              <div className="hidden md:block">
-                <div className="flex items-center justify-end gap-1 mb-3">
-                  <ScrollBtn direction="left" onClick={scrollLeft} />
-                  <ScrollBtn direction="right" onClick={scrollRight} />
-                </div>
-                <div ref={scrollRef} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-                  {mediaPosts.map(post => (
-                    <div key={post.id} className="flex-shrink-0 w-96 snap-start">
-                      <FeedCard {...post} featured />
-                    </div>
-                  ))}
-                </div>
+              {/* Desktop — 2 col vertical grid */}
+              <div className="hidden md:grid grid-cols-2 gap-4">
+                {mediaPosts.map(post => (
+                  <FeedCard key={post.id} {...post} />
+                ))}
               </div>
               {/* Mobile — 2 col vertical */}
-              <div className="block md:hidden">
-                <div className="grid grid-cols-2 gap-3">
-                  {mediaPosts.map(post => (
-                    <FeedCard key={post.id} {...post} compact />
-                  ))}
-                </div>
+              <div className="grid md:hidden grid-cols-2 gap-3">
+                {mediaPosts.map(post => (
+                  <FeedCard key={post.id} {...post} compact />
+                ))}
               </div>
             </>
           )}
@@ -168,24 +158,10 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
             <EmptyState icon="▶" label="No videos yet" />
           ) : (
             <>
-              {/* Desktop — horizontal scroll */}
-              <div className="hidden md:block">
-                <div className="flex items-center justify-end gap-1 mb-3">
-                  <ScrollBtn direction="left" onClick={scrollLeft} />
-                  <ScrollBtn direction="right" onClick={scrollRight} />
-                </div>
-                <div ref={scrollRef} className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-                  {videoPosts.map(post => (
-                    <div key={post.id} className="flex-shrink-0 w-[420px] snap-start">
-                      <VideoCard {...post} featured />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {/* Mobile — single column vertical */}
-              <div className="block md:hidden space-y-4">
+              {/* Desktop + Mobile — vertical list */}
+              <div className="space-y-4">
                 {videoPosts.map(post => (
-                  <VideoCard key={post.id} {...post} />
+                  <VideoCard key={post.id} {...post} featured />
                 ))}
               </div>
             </>
