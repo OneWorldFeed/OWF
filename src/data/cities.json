@@ -1,5 +1,32 @@
 [
-  { "name": "Tokyo", "timezone": "Asia/Tokyo", "temp": 72 },
-  { "name": "London", "timezone": "Europe/London", "temp": 58 },
-  { "name": "New York", "timezone": "America/New_York", "temp": 65 }
+  {
+    "name": "Tokyo",
+    "timezone": "Asia/Tokyo",
+    "temp": 72
+  },
+  {
+    "name": "London",
+    "timezone": "Europe/London",
+    "temp": 58
+  },
+  {
+    "name": "New York",
+    "timezone": "America/New_York",
+    "temp": 65
+  },
+  {
+    "name": "Lagos",
+    "timezone": "Africa/Lagos",
+    "temp": 88
+  },
+  {
+    "name": "Mumbai",
+    "timezone": "Asia/Kolkata",
+    "temp": 91
+  },
+  {
+    "name": "São Paulo",
+    "timezone": "America/Sao_Paulo",
+    "temp": 75
+  }
 ]
