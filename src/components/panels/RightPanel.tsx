@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { copilotCall } from '@/lib/ai/copilot';
 
 const THEMES = [
   { id: 'light',    label: 'Light',    gradient: 'linear-gradient(135deg, #F9FAFB, #FFFFFF)',   vars: { '--owf-bg': '#F9FAFB', '--owf-surface': '#FFFFFF', '--owf-border': '#E5E7EB', '--owf-text-primary': '#111827', '--owf-text-secondary': '#6B7280', '--owf-navy': '#0D1F35' } },
@@ -209,28 +210,16 @@ Seoul: "Seoul at night from the rooftop. The city never sleeps and neither do we
   async function handleMoodOfDay() {
     setMoodLoading(true);
     setMoodResult('');
-    try {
-      const result = await callAI(
-        `You are OWF AI. Based on these real posts from OneWorldFeed today:\n\n${FEED_CONTEXT}\n\nIn 2 sentences, describe the overall emotional mood of the world today. Be poetic and specific. Start with an emoji mood indicator.`
-      );
-      setMoodResult(result);
-    } catch {
-      setMoodResult('Unable to read the global mood right now.');
-    }
+    const res = await copilotCall('right_panel', 'In 2 sentences, describe the overall emotional mood of the world today based on the feed. Be poetic. Start with an emoji.');
+    setMoodResult(res.text);
     setMoodLoading(false);
   }
 
   async function handleFeedSummary() {
     setSummaryLoading(true);
     setSummaryResult('');
-    try {
-      const result = await callAI(
-        `You are OWF AI. Based on these posts from OneWorldFeed today:\n\n${FEED_CONTEXT}\n\nGive a TL;DR of what people around the world are talking about right now. 3 bullet points max, each one sentence. Use city names. Be direct and vivid.`
-      );
-      setSummaryResult(result);
-    } catch {
-      setSummaryResult('Unable to summarise the feed right now.');
-    }
+    const res = await copilotCall('right_panel', 'Give a TL;DR of what people around the world are talking about on the feed right now. 3 bullet points, one sentence each. Use city names.');
+    setSummaryResult(res.text);
     setSummaryLoading(false);
   }
 
