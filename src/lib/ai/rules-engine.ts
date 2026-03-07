@@ -233,7 +233,7 @@ export function rulesEngineCall(input: string, context?: RulesContext): RulesRes
   }
 
   // 3. TIME
-  if (/\b(time|clock|what time|current time)\b/.test(lower)) {
+  if (/\b(time|clock|hour|current time)\b/.test(lower) || lower.trim() === 'current time ?' || lower.trim() === 'current time') {
     for (const [key, val] of Object.entries(CITY_TZ)) {
       if (lower.includes(key)) {
         try {
