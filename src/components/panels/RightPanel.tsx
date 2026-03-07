@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { copilotCall } from '@/lib/ai/copilot';
+import { escalatingCall } from '@/lib/ai/escalation';
 
 const THEMES = [
   { id: 'light',    label: 'Light',    gradient: 'linear-gradient(135deg, #F9FAFB, #FFFFFF)',   vars: { '--owf-bg': '#F9FAFB', '--owf-surface': '#FFFFFF', '--owf-border': '#E5E7EB', '--owf-text-primary': '#111827', '--owf-text-secondary': '#6B7280', '--owf-navy': '#0D1F35' } },
@@ -210,7 +210,7 @@ Seoul: "Seoul at night from the rooftop. The city never sleeps and neither do we
   async function handleMoodOfDay() {
     setMoodLoading(true);
     setMoodResult('');
-    const res = await copilotCall('right_panel', 'In 2 sentences, describe the overall emotional mood of the world today based on the feed. Be poetic. Start with an emoji.');
+    const res = await escalatingCall('right_panel', 'In 2 sentences, describe the overall emotional mood of the world today based on the feed. Be poetic. Start with an emoji.');
     setMoodResult(res.text);
     setMoodLoading(false);
   }
@@ -218,7 +218,7 @@ Seoul: "Seoul at night from the rooftop. The city never sleeps and neither do we
   async function handleFeedSummary() {
     setSummaryLoading(true);
     setSummaryResult('');
-    const res = await copilotCall('right_panel', 'Give a TL;DR of what people around the world are talking about on the feed right now. 3 bullet points, one sentence each. Use city names.');
+    const res = await escalatingCall('right_panel', 'Give a TL;DR of what people around the world are talking about on the feed right now. 3 bullet points, one sentence each. Use city names.');
     setSummaryResult(res.text);
     setSummaryLoading(false);
   }

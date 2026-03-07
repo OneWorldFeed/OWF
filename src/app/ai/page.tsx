@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import { copilotCall, type CopilotMessage } from '@/lib/ai/copilot';
+import { escalatingCall } from '@/lib/ai/escalation';
+import type { CopilotMessage } from '@/lib/ai/copilot';
 
 const QUICK_ACTIONS = [
   { label: 'Global Moments Today',  prompt: 'What are the most significant global moments happening on OneWorldFeed right now? Be vivid and specific.' },
@@ -40,7 +41,7 @@ export default function AIPage() {
     setMessages(newMessages);
     setLoading(true);
     const history: CopilotMessage[] = messages.map(m => ({ role: m.role, content: m.text }));
-    const response = await copilotCall('ai_page', msg, history);
+    const response = await escalatingCall('ai_page', msg, history);
     setMessages([...newMessages, { role: 'assistant', text: response.text }]);
     setLoading(false);
   }
