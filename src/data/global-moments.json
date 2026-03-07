@@ -1,0 +1,90 @@
+[
+  {
+    "id": "gm1",
+    "title": "Cherry Blossom Season",
+    "location": "Tokyo, Japan",
+    "emoji": "🌸",
+    "mood": "reflective",
+    "color": "#2563EB",
+    "tag": "+cherryblossoms",
+    "participants": 4821,
+    "live": false
+  },
+  {
+    "id": "gm2",
+    "title": "Lagos Music Festival",
+    "location": "Lagos, Nigeria",
+    "emoji": "🎵",
+    "mood": "electric",
+    "color": "#D97706",
+    "tag": "+lagosmusicfest",
+    "participants": 12340,
+    "live": true
+  },
+  {
+    "id": "gm3",
+    "title": "Ramadan Begins",
+    "location": "Global",
+    "emoji": "🌙",
+    "mood": "ancient",
+    "color": "#7C3AED",
+    "tag": "+ramadan",
+    "participants": 89200,
+    "live": false
+  },
+  {
+    "id": "gm4",
+    "title": "Amazon Reforestation",
+    "location": "Brazil",
+    "emoji": "🌿",
+    "mood": "hopeful",
+    "color": "#16A34A",
+    "tag": "+amazon",
+    "participants": 3410,
+    "live": false
+  },
+  {
+    "id": "gm5",
+    "title": "Seoul Night Markets",
+    "location": "Seoul, Korea",
+    "emoji": "🏮",
+    "mood": "joyful",
+    "color": "#059669",
+    "tag": "+seoulnights",
+    "participants": 6780,
+    "live": true
+  },
+  {
+    "id": "gm6",
+    "title": "Holi Festival of Colours",
+    "location": "India",
+    "emoji": "🎨",
+    "mood": "joyful",
+    "color": "#EA580C",
+    "tag": "+holi",
+    "participants": 54300,
+    "live": false
+  },
+  {
+    "id": "gm7",
+    "title": "Arctic Ice Study",
+    "location": "Arctic Circle",
+    "emoji": "🧊",
+    "mood": "fragile",
+    "color": "#BE185D",
+    "tag": "+arctic",
+    "participants": 1200,
+    "live": false
+  },
+  {
+    "id": "gm8",
+    "title": "Buenos Aires Tango Week",
+    "location": "Buenos Aires",
+    "emoji": "💃",
+    "mood": "ambitious",
+    "color": "#EA580C",
+    "tag": "+tangoweek",
+    "participants": 8900,
+    "live": true
+  }
+]
