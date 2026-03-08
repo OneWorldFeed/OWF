@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { escalatingCall } from '@/lib/ai/escalation';
 
 const THEMES = [
   { id: 'dawn',     label: 'Dawn',     gradient: 'linear-gradient(135deg, #F5A623, #E8650A, #C94A00)', vars: { '--owf-bg': '#FDF6EC', '--owf-surface': '#FFFAF4', '--owf-border': '#E8C99A', '--owf-text-primary': '#2C1A08', '--owf-text-secondary': '#8A5C35', '--owf-navy': '#2C1A08', '--owf-accent': '#E8650A', '--owf-gold': '#E8650A', '--owf-glow': 'rgba(232,101,10,0.28)', '--owf-card-glow': 'rgba(232,101,10,0.07)' } },
@@ -85,6 +86,10 @@ export default function RightPanel() {
   const [showCityPicker, setShowCityPicker] = useState(false);
   const [citySearch, setCitySearch] = useState('');
   const [activeRegion, setActiveRegion] = useState('All');
+  const [aiOpen, setAiOpen] = useState(true);
+  const [aiInput, setAiInput] = useState('');
+  const [aiMessages, setAiMessages] = useState<{role: 'user'|'assistant'; text: string}[]>([]);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     const saved = typeof window !== 'undefined' ? (localStorage.getItem('owf-theme') || 'noon') : 'noon';
@@ -122,6 +127,23 @@ export default function RightPanel() {
       : pinnedCities.length < 4 ? [...pinnedCities, cityName] : pinnedCities;
     setPinnedCities(next);
     if (typeof window !== 'undefined') localStorage.setItem('owf-cities', JSON.stringify(next));
+  }
+
+  async function handleAiSend(text?: string) {
+    const msg = (text || aiInput).trim();
+    if (!msg || aiLoading) return;
+    setAiInput('');
+    const newMessages = [...aiMessages, { role: 'user' as const, text: msg }];
+    setAiMessages(newMessages);
+    setAiLoading(true);
+    try {
+      const history = aiMessages.map(m => ({ role: m.role, content: m.text }));
+      const res = await escalatingCall('right_panel', msg, history);
+      setAiMessages([...newMessages, { role: 'assistant' as const, text: res.text }]);
+    } catch {
+      setAiMessages([...newMessages, { role: 'assistant' as const, text: 'Unable to reach OWF AI right now.' }]);
+    }
+    setAiLoading(false);
   }
 
   const regions = ['All', 'Africa', 'Asia', 'Europe', 'Americas', 'Oceania'];
@@ -230,10 +252,10 @@ export default function RightPanel() {
                 return (
                   <button key={city.name} onClick={() => toggleCity(city.name)}
                     className="w-full flex items-center justify-between py-1.5 px-2 rounded-xl transition-all"
-                    style={{ backgroundColor: pinned ? 'var(--owf-card-glow)' : 'transparent' }} disabled={isHome}>
+                    style={{ backgroundColor: pinned ? 'var(--owf-accent)22' : 'transparent' }} disabled={isHome}>
                     <div className="flex items-center gap-2">
                       <div className="w-4 h-4 rounded flex items-center justify-center text-xs"
-                        style={{ backgroundColor: pinned ? 'var(--owf-accent)' : 'var(--owf-border)', color: '#fff' }}>
+                        style={{ backgroundColor: pinned ? 'var(--owf-accent)' : 'var(--owf-border)', color: pinned ? '#fff' : 'transparent' }}>
                         {pinned ? '✓' : ''}
                       </div>
                       <span className="text-xs font-semibold" style={{ color: 'var(--owf-text-primary)' }}>{city.name}</span>
@@ -271,6 +293,83 @@ export default function RightPanel() {
             </div>
           ))}
         </div>
+      </SectionCard>
+
+      {/* OWF AI Panel */}
+      <SectionCard>
+        <button className="w-full flex items-center justify-between" onClick={() => setAiOpen(p => !p)}>
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0"
+              style={{ background: 'linear-gradient(135deg, var(--owf-accent), var(--owf-gold))', color: '#fff' }}>✦</div>
+            <SectionTitle>OWF AI</SectionTitle>
+          </div>
+          <span className="text-xs" style={{ color: 'var(--owf-text-secondary)' }}>{aiOpen ? '▲' : '▼'}</span>
+        </button>
+
+        {aiOpen && (
+          <div className="mt-3 space-y-2">
+            {/* Quick chips */}
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {['🌍 Global mood', '🏙 City pick', '✍️ Post idea', '🕐 World time', '🔖 +Tags'].map(chip => (
+                <button key={chip} onClick={() => handleAiSend(chip.slice(3))}
+                  disabled={aiLoading}
+                  className="text-[10px] font-semibold px-2 py-1 rounded-full transition-all hover:scale-105"
+                  style={{ backgroundColor: 'var(--owf-accent)12', border: '1px solid var(--owf-accent)30', color: 'var(--owf-accent)' }}>
+                  {chip}
+                </button>
+              ))}
+            </div>
+
+            {/* Message thread */}
+            {aiMessages.length > 0 && (
+              <div className="space-y-2 max-h-48 overflow-y-auto mb-2">
+                {aiMessages.map((m, i) => (
+                  <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className="max-w-[85%] text-xs px-3 py-2 rounded-xl leading-relaxed"
+                      style={{
+                        backgroundColor: m.role === 'user' ? 'var(--owf-accent)18' : 'var(--owf-bg)',
+                        color: 'var(--owf-text-primary)',
+                        border: '1px solid var(--owf-border)',
+                        borderRadius: m.role === 'user' ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
+                      }}>
+                      {m.text}
+                    </div>
+                  </div>
+                ))}
+                {aiLoading && (
+                  <div className="flex justify-start">
+                    <div className="text-xs px-3 py-2 rounded-xl animate-pulse"
+                      style={{ backgroundColor: 'var(--owf-bg)', border: '1px solid var(--owf-border)', color: 'var(--owf-text-secondary)' }}>
+                      Thinking...
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Input */}
+            <div className="flex gap-1.5 items-center">
+              <input type="text" value={aiInput}
+                onChange={e => setAiInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleAiSend()}
+                placeholder="Ask anything..."
+                className="flex-1 text-xs px-3 py-2 rounded-xl focus:outline-none"
+                style={{ backgroundColor: 'var(--owf-bg)', border: '1px solid var(--owf-border)', color: 'var(--owf-text-primary)' }} />
+              <button onClick={() => handleAiSend()} disabled={aiLoading || !aiInput.trim()}
+                className="text-xs font-bold px-3 py-2 rounded-xl transition-all"
+                style={{ backgroundColor: aiInput.trim() ? 'var(--owf-accent)' : 'var(--owf-border)', color: '#fff' }}>
+                →
+              </button>
+            </div>
+            {aiMessages.length > 0 && (
+              <button onClick={() => setAiMessages([])}
+                className="text-[10px] w-full text-center mt-1"
+                style={{ color: 'var(--owf-text-secondary)' }}>
+                Clear conversation
+              </button>
+            )}
+          </div>
+        )}
       </SectionCard>
 
       {/* Theme selector */}
