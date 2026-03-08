@@ -23,21 +23,26 @@ export default function Home() {
       display: 'flex',
       alignItems: 'flex-start',
       width: '100%',
-      minHeight: 'calc(100vh - 56px)',
     }}>
 
-      {/* Feed — flows naturally with page scroll */}
+      {/* Feed — has its own scroll AND scrolls with page */}
       <div style={{
         flex: 1,
         minWidth: 0,
         padding: '8px 24px 32px 20px',
         borderRight: '1px solid var(--owf-border)',
+        maxHeight: 'calc(100vh - 56px)',
+        overflowY: 'auto',
+        position: 'sticky',
+        top: '56px',
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgba(128,128,128,0.2) transparent',
       }}>
         <GlobalMomentsStrip />
         <FeedTabs posts={posts} />
       </div>
 
-      {/* Right panel — scrolls with page, panels inside have their own scroll too */}
+      {/* Right panel — all cards fully displayed, scrolls with main page only */}
       <div style={{
         width: '300px',
         minWidth: '300px',
