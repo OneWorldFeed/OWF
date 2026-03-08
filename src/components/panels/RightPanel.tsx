@@ -1,451 +1,662 @@
 'use client';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { escalatingCall } from '@/lib/ai/escalation';
+import { THEMES, THEME_ORDER, applyTheme, getStoredTheme } from '@/lib/theme';
+import type { ThemeId } from '@/lib/theme';
 
-const THEMES = [
-  { id: 'dawn',     label: 'Dawn',     gradient: 'linear-gradient(135deg, #F5A623, #E8650A, #C94A00)', vars: { '--owf-bg': '#FDF6EC', '--owf-surface': '#FFFAF4', '--owf-border': '#E8C99A', '--owf-text-primary': '#2C1A08', '--owf-text-secondary': '#8A5C35', '--owf-navy': '#2C1A08', '--owf-accent': '#E8650A', '--owf-gold': '#E8650A', '--owf-glow': 'rgba(232,101,10,0.28)', '--owf-card-glow': 'rgba(232,101,10,0.07)' } },
-  { id: 'noon',     label: 'Noon',     gradient: 'linear-gradient(135deg, #E0F4FF, #FFFFFF, #F0F9FF)', vars: { '--owf-bg': '#F5F7FA', '--owf-surface': '#FFFFFF', '--owf-border': '#E2E8F0', '--owf-text-primary': '#0F172A', '--owf-text-secondary': '#64748B', '--owf-navy': '#0D1F35', '--owf-accent': '#0284C7', '--owf-gold': '#0284C7', '--owf-glow': 'rgba(2,132,199,0.25)', '--owf-card-glow': 'rgba(2,132,199,0.06)' } },
-  { id: 'golden',   label: 'Golden',   gradient: 'linear-gradient(135deg, #FFF3CD, #FFB347, #FF6B35)', vars: { '--owf-bg': '#FFFBF0', '--owf-surface': '#FFFDF5', '--owf-border': '#F0E0B0', '--owf-text-primary': '#1A0F00', '--owf-text-secondary': '#7A5C20', '--owf-navy': '#1A0F00', '--owf-accent': '#D97706', '--owf-gold': '#D97706', '--owf-glow': 'rgba(217,119,6,0.30)', '--owf-card-glow': 'rgba(217,119,6,0.08)' } },
-  { id: 'dusk',     label: 'Dusk',     gradient: 'linear-gradient(135deg, #2D1B69, #C2185B, #FF6E40)', vars: { '--owf-bg': '#1A0F2E', '--owf-surface': '#251540', '--owf-border': '#3D2060', '--owf-text-primary': '#F5E6FF', '--owf-text-secondary': '#9B7EC8', '--owf-navy': '#FFFFFF', '--owf-accent': '#E040FB', '--owf-gold': '#E040FB', '--owf-glow': 'rgba(224,64,251,0.30)', '--owf-card-glow': 'rgba(224,64,251,0.08)' } },
-  { id: 'midnight', label: 'Midnight', gradient: 'linear-gradient(135deg, #060E1A, #0D1F35)', vars: { '--owf-bg': '#060E1A', '--owf-surface': '#0D1F35', '--owf-border': '#1E3A5F', '--owf-text-primary': '#F0F6FF', '--owf-text-secondary': '#7A9EC0', '--owf-navy': '#FFFFFF', '--owf-accent': '#00DCBE', '--owf-gold': '#00DCBE', '--owf-glow': 'rgba(0,220,190,0.28)', '--owf-card-glow': 'rgba(0,220,190,0.07)' } },
-  { id: 'cosmos',   label: 'Cosmos',   gradient: 'linear-gradient(135deg, #05020F, #120830, #1A0530)', vars: { '--owf-bg': '#05020F', '--owf-surface': '#0E0720', '--owf-border': '#1E1040', '--owf-text-primary': '#E8DFFF', '--owf-text-secondary': '#6B5B8A', '--owf-navy': '#FFFFFF', '--owf-accent': '#9D4EDD', '--owf-gold': '#9D4EDD', '--owf-glow': 'rgba(157,78,221,0.30)', '--owf-card-glow': 'rgba(157,78,221,0.08)' } },
-  { id: 'crimson',  label: 'Crimson',  gradient: 'linear-gradient(135deg, #7F0000, #DC143C, #FF6B6B)', vars: { '--owf-bg': '#FDF5F5', '--owf-surface': '#FFFFFF', '--owf-border': '#F5C6C6', '--owf-text-primary': '#1A0305', '--owf-text-secondary': '#8A3A3A', '--owf-navy': '#7F0000', '--owf-accent': '#CC0022', '--owf-gold': '#CC0022', '--owf-glow': 'rgba(204,0,34,0.25)', '--owf-card-glow': 'rgba(204,0,34,0.06)' } },
-  { id: 'ocean',    label: 'Ocean',    gradient: 'linear-gradient(135deg, #003366, #006994, #00B4D8)', vars: { '--owf-bg': '#020C1B', '--owf-surface': '#051828', '--owf-border': '#0A3050', '--owf-text-primary': '#E0F4FF', '--owf-text-secondary': '#4A8FA8', '--owf-navy': '#FFFFFF', '--owf-accent': '#00B4D8', '--owf-gold': '#00B4D8', '--owf-glow': 'rgba(0,180,216,0.30)', '--owf-card-glow': 'rgba(0,180,216,0.08)' } },
-  { id: 'forest',   label: 'Forest',   gradient: 'linear-gradient(135deg, #1B5E20, #2E7D32, #4CAF50)', vars: { '--owf-bg': '#F4FAF4', '--owf-surface': '#FFFFFF', '--owf-border': '#C8E6C9', '--owf-text-primary': '#0A1F0A', '--owf-text-secondary': '#2E7D32', '--owf-navy': '#0A2E0A', '--owf-accent': '#1B5E20', '--owf-gold': '#1B5E20', '--owf-glow': 'rgba(27,94,32,0.25)', '--owf-card-glow': 'rgba(27,94,32,0.06)' } },
-  { id: 'violet',   label: 'Violet',   gradient: 'linear-gradient(135deg, #1A0038, #4A0080, #9C27B0)', vars: { '--owf-bg': '#0A0015', '--owf-surface': '#130025', '--owf-border': '#2A0050', '--owf-text-primary': '#F0E0FF', '--owf-text-secondary': '#8050A0', '--owf-navy': '#FFFFFF', '--owf-accent': '#AA00FF', '--owf-gold': '#AA00FF', '--owf-glow': 'rgba(170,0,255,0.28)', '--owf-card-glow': 'rgba(170,0,255,0.07)' } },
-  { id: 'obsidian', label: 'Obsidian', gradient: 'linear-gradient(135deg, #000000, #1A1A1A, #2D2D2D)', vars: { '--owf-bg': '#000000', '--owf-surface': '#111111', '--owf-border': '#222222', '--owf-text-primary': '#F5F5F5', '--owf-text-secondary': '#666666', '--owf-navy': '#FFFFFF', '--owf-accent': '#E0E0E0', '--owf-gold': '#E0E0E0', '--owf-glow': 'rgba(255,255,255,0.15)', '--owf-card-glow': 'rgba(255,255,255,0.04)' } },
-  { id: 'pearl',    label: 'Pearl',    gradient: 'linear-gradient(135deg, #FDFCFB, #F5F0E8, #EDE8DF)', vars: { '--owf-bg': '#FDFCFB', '--owf-surface': '#FFFFFF', '--owf-border': '#E8E0D5', '--owf-text-primary': '#1A1410', '--owf-text-secondary': '#7A6E65', '--owf-navy': '#1A1410', '--owf-accent': '#B8860B', '--owf-gold': '#B8860B', '--owf-glow': 'rgba(184,134,11,0.22)', '--owf-card-glow': 'rgba(184,134,11,0.06)' } },
-];
+// ─── Data ────────────────────────────────────────────────────────────────────
 
-const TRENDING_TAGS = [
+const TRENDING = [
   { tag: '+lagos',          count: '12.4k', color: '#D97706' },
-  { tag: '+cherryblossoms', count: '8.1k',  color: '#2563EB' },
-  { tag: '+ramadan',        count: '89.2k', color: '#7C3AED' },
-  { tag: '+community',      count: '4.3k',  color: '#16A34A' },
-  { tag: '+nightlife',      count: '6.7k',  color: '#D97706' },
-  { tag: '+afrobeats',      count: '11.2k', color: '#059669' },
-  { tag: '+startups',       count: '3.8k',  color: '#EA580C' },
+  { tag: '+cherryblossoms', count: '8.1k',  color: '#60A5FA' },
+  { tag: '+ramadan',        count: '89.2k', color: '#A78BFA' },
+  { tag: '+community',      count: '4.3k',  color: '#34D399' },
+  { tag: '+nightlife',      count: '6.7k',  color: '#FB923C' },
+  { tag: '+afrobeats',      count: '11.2k', color: '#10B981' },
+  { tag: '+startups',       count: '3.8k',  color: '#F472B6' },
 ];
 
 const SPOTLIGHT = [
-  { title: 'Sunrise in Tokyo',          subtitle: 'A new day begins',              image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600' },
-  { title: 'Voices of Nairobi',         subtitle: 'Street stories at golden hour', image: 'https://images.unsplash.com/photo-1611348586840-ea9872d33411?w=600' },
+  { title: 'Sunrise in Tokyo',       subtitle: 'A new day begins',              image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600' },
+  { title: 'Voices of Nairobi',      subtitle: 'Street stories at golden hour', image: 'https://images.unsplash.com/photo-1611348586840-ea9872d33411?w=600' },
 ];
 
 const WHO_TO_FOLLOW = [
-  { name: 'Yaw Darko',    handle: 'yawdarko.feed',    color: '#059669' },
-  { name: 'Priya Sharma', handle: 'priyasharma.feed', color: '#EA580C' },
-  { name: 'Lena Müller',  handle: 'lenamuller.feed',  color: '#B45309' },
+  { name: 'Yaw Darko',    handle: 'yawdarko.feed',    color: '#10B981' },
+  { name: 'Priya Sharma', handle: 'priyasharma.feed', color: '#FB923C' },
+  { name: 'Lena Müller',  handle: 'lenamuller.feed',  color: '#A78BFA' },
 ];
 
 const ALL_CITIES = [
-  { name: 'Lagos',        timezone: 'Africa/Lagos',                      temp: 88, region: 'Africa'   },
-  { name: 'Cairo',        timezone: 'Africa/Cairo',                      temp: 82, region: 'Africa'   },
-  { name: 'Nairobi',      timezone: 'Africa/Nairobi',                    temp: 70, region: 'Africa'   },
-  { name: 'Accra',        timezone: 'Africa/Accra',                      temp: 85, region: 'Africa'   },
-  { name: 'Tokyo',        timezone: 'Asia/Tokyo',                        temp: 72, region: 'Asia'     },
-  { name: 'Mumbai',       timezone: 'Asia/Kolkata',                      temp: 91, region: 'Asia'     },
-  { name: 'Seoul',        timezone: 'Asia/Seoul',                        temp: 58, region: 'Asia'     },
-  { name: 'Dubai',        timezone: 'Asia/Dubai',                        temp: 95, region: 'Asia'     },
-  { name: 'Singapore',    timezone: 'Asia/Singapore',                    temp: 86, region: 'Asia'     },
-  { name: 'London',       timezone: 'Europe/London',                     temp: 58, region: 'Europe'   },
-  { name: 'Paris',        timezone: 'Europe/Paris',                      temp: 60, region: 'Europe'   },
-  { name: 'Berlin',       timezone: 'Europe/Berlin',                     temp: 52, region: 'Europe'   },
-  { name: 'New York',     timezone: 'America/New_York',                  temp: 65, region: 'Americas' },
-  { name: 'Los Angeles',  timezone: 'America/Los_Angeles',               temp: 72, region: 'Americas' },
-  { name: 'São Paulo',    timezone: 'America/Sao_Paulo',                 temp: 75, region: 'Americas' },
-  { name: 'Mexico City',  timezone: 'America/Mexico_City',               temp: 70, region: 'Americas' },
-  { name: 'Buenos Aires', timezone: 'America/Argentina/Buenos_Aires',    temp: 68, region: 'Americas' },
-  { name: 'Sydney',       timezone: 'Australia/Sydney',                  temp: 74, region: 'Oceania'  },
+  { name: 'Lagos',        timezone: 'Africa/Lagos',                   region: 'Africa'   },
+  { name: 'Cairo',        timezone: 'Africa/Cairo',                   region: 'Africa'   },
+  { name: 'Nairobi',      timezone: 'Africa/Nairobi',                 region: 'Africa'   },
+  { name: 'Accra',        timezone: 'Africa/Accra',                   region: 'Africa'   },
+  { name: 'Tokyo',        timezone: 'Asia/Tokyo',                     region: 'Asia'     },
+  { name: 'Mumbai',       timezone: 'Asia/Kolkata',                   region: 'Asia'     },
+  { name: 'Seoul',        timezone: 'Asia/Seoul',                     region: 'Asia'     },
+  { name: 'Singapore',    timezone: 'Asia/Singapore',                 region: 'Asia'     },
+  { name: 'Dubai',        timezone: 'Asia/Dubai',                     region: 'Asia'     },
+  { name: 'Bangkok',      timezone: 'Asia/Bangkok',                   region: 'Asia'     },
+  { name: 'London',       timezone: 'Europe/London',                  region: 'Europe'   },
+  { name: 'Paris',        timezone: 'Europe/Paris',                   region: 'Europe'   },
+  { name: 'Berlin',       timezone: 'Europe/Berlin',                  region: 'Europe'   },
+  { name: 'Amsterdam',    timezone: 'Europe/Amsterdam',               region: 'Europe'   },
+  { name: 'New York',     timezone: 'America/New_York',               region: 'Americas' },
+  { name: 'Los Angeles',  timezone: 'America/Los_Angeles',            region: 'Americas' },
+  { name: 'São Paulo',    timezone: 'America/Sao_Paulo',              region: 'Americas' },
+  { name: 'Mexico City',  timezone: 'America/Mexico_City',            region: 'Americas' },
+  { name: 'Buenos Aires', timezone: 'America/Argentina/Buenos_Aires', region: 'Americas' },
+  { name: 'Sydney',       timezone: 'Australia/Sydney',               region: 'Oceania'  },
 ];
 
-const DEFAULT_PINNED = ['Lagos', 'Tokyo', 'London', 'New York'];
-const DEFAULT_HOME = 'Lagos';
+const REGIONS = ['All', 'Africa', 'Asia', 'Europe', 'Americas', 'Oceania'];
+const MAX_PINNED = 3;
 
-function getLocalTime(timezone: string) {
-  return new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: timezone });
+function getLocalTime(tz: string) {
+  try { return new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz }); }
+  catch { return '--'; }
 }
 
-function SectionCard({ children }: { children: React.ReactNode }) {
+// ─── Sub-components ──────────────────────────────────────────────────────────
+
+function Panel({ children, glow }: { children: React.ReactNode; glow?: boolean }) {
   return (
-    <div className="rounded-2xl p-4" style={{ backgroundColor: 'var(--owf-surface)', border: '1px solid var(--owf-border)' }}>
+    <div style={{
+      background: 'var(--owf-surface)',
+      backdropFilter: 'blur(24px) saturate(160%)',
+      WebkitBackdropFilter: 'blur(24px) saturate(160%)',
+      border: '1px solid var(--owf-border)',
+      borderRadius: '18px',
+      padding: '16px',
+      position: 'relative',
+      overflow: 'hidden',
+      boxShadow: glow
+        ? `0 8px 32px rgba(var(--owf-horizon-rgb), 0.08), 0 1px 0 var(--owf-border) inset`
+        : `0 4px 20px rgba(0,0,0,0.12), 0 1px 0 var(--owf-border) inset`,
+    }}>
       {children}
     </div>
   );
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-black tracking-widest mb-3" style={{ color: 'var(--owf-text-secondary)' }}>{children}</p>;
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <p style={{
+      fontSize: '9px', fontWeight: 900, letterSpacing: '0.14em',
+      color: 'var(--owf-text-muted)', marginBottom: '12px', textTransform: 'uppercase',
+    }}>
+      {children}
+    </p>
+  );
 }
 
+// The horizon line — the AI page's signature mark
+function HorizonLine({ color }: { color?: string }) {
+  return (
+    <div style={{
+      position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px',
+      background: color
+        ? `linear-gradient(90deg, transparent 0%, ${color}90 30%, ${color} 50%, ${color}90 70%, transparent 100%)`
+        : `linear-gradient(90deg, transparent 0%, var(--owf-horizon) 40% 60%, transparent 100%)`,
+      opacity: 0.6,
+    }} />
+  );
+}
+
+// ─── Theme Selector ──────────────────────────────────────────────────────────
+
+function ThemeSelector({ current, onChange }: { current: ThemeId; onChange: (id: ThemeId) => void }) {
+  const darkThemes  = THEME_ORDER.filter(id => THEMES[id].isDark);
+  const lightThemes = THEME_ORDER.filter(id => !THEMES[id].isDark);
+
+  return (
+    <div>
+      {/* Dark themes */}
+      <p style={{ fontSize: '8px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--owf-text-muted)', marginBottom: '8px' }}>
+        DARK
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '14px' }}>
+        {darkThemes.map(id => {
+          const t = THEMES[id];
+          const active = current === id;
+          return (
+            <button key={id} onClick={() => onChange(id)} title={t.label} style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px',
+              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+            }}>
+              {/* Swatch */}
+              <div style={{
+                width: '44px', height: '44px', borderRadius: '14px',
+                background: t.swatch,
+                border: active
+                  ? `2px solid ${t.horizon}`
+                  : '2px solid rgba(255,255,255,0.06)',
+                boxShadow: active
+                  ? `0 0 0 3px ${t.horizon}30, 0 0 16px ${t.aurora}`
+                  : '0 2px 8px rgba(0,0,0,0.3)',
+                position: 'relative', overflow: 'hidden',
+                transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
+                transform: active ? 'scale(1.08)' : 'scale(1)',
+              }}>
+                {/* Horizon glow inside swatch */}
+                <div style={{
+                  position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px',
+                  background: t.horizon, opacity: active ? 1 : 0.4,
+                  boxShadow: `0 0 6px ${t.horizon}`,
+                  transition: 'opacity 0.2s',
+                }} />
+                {/* Active check */}
+                {active && (
+                  <div style={{
+                    position: 'absolute', top: '4px', right: '4px',
+                    width: '10px', height: '10px', borderRadius: '50%',
+                    background: t.horizon,
+                    boxShadow: `0 0 6px ${t.horizon}`,
+                  }} />
+                )}
+              </div>
+              <span style={{
+                fontSize: '8px', fontWeight: active ? 800 : 500,
+                color: active ? t.horizon : 'var(--owf-text-muted)',
+                letterSpacing: '0.02em',
+                transition: 'color 0.2s',
+                whiteSpace: 'nowrap',
+              }}>
+                {t.emoji} {t.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Divider */}
+      <div style={{ height: '1px', background: 'var(--owf-border)', marginBottom: '14px' }} />
+
+      {/* Light themes */}
+      <p style={{ fontSize: '8px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--owf-text-muted)', marginBottom: '8px' }}>
+        LIGHT
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+        {lightThemes.map(id => {
+          const t = THEMES[id];
+          const active = current === id;
+          return (
+            <button key={id} onClick={() => onChange(id)} title={t.label} style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px',
+              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+            }}>
+              <div style={{
+                width: '44px', height: '44px', borderRadius: '14px',
+                background: t.swatch,
+                border: active
+                  ? `2px solid ${t.horizon}`
+                  : '2px solid rgba(0,0,0,0.08)',
+                boxShadow: active
+                  ? `0 0 0 3px ${t.horizon}30, 0 4px 16px ${t.aurora}`
+                  : '0 2px 8px rgba(0,0,0,0.08)',
+                position: 'relative', overflow: 'hidden',
+                transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
+                transform: active ? 'scale(1.08)' : 'scale(1)',
+              }}>
+                <div style={{
+                  position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px',
+                  background: t.horizon, opacity: active ? 1 : 0.35,
+                  boxShadow: `0 0 6px ${t.horizon}`,
+                  transition: 'opacity 0.2s',
+                }} />
+                {active && (
+                  <div style={{
+                    position: 'absolute', top: '4px', right: '4px',
+                    width: '10px', height: '10px', borderRadius: '50%',
+                    background: t.horizon,
+                    boxShadow: `0 0 6px ${t.horizon}`,
+                  }} />
+                )}
+              </div>
+              <span style={{
+                fontSize: '8px', fontWeight: active ? 800 : 500,
+                color: active ? t.horizon : 'var(--owf-text-muted)',
+                letterSpacing: '0.02em',
+                transition: 'color 0.2s',
+                whiteSpace: 'nowrap',
+              }}>
+                {t.emoji} {t.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 export default function RightPanel() {
-  const [activeTheme, setActiveTheme] = useState('noon');
-  const [times, setTimes] = useState<Record<string, string>>({});
-  const [spotlightIdx, setSpotlightIdx] = useState(0);
-  const [pinnedCities, setPinnedCities] = useState<string[]>(DEFAULT_PINNED);
-  const [showCityPicker, setShowCityPicker] = useState(false);
-  const [citySearch, setCitySearch] = useState('');
-  const [activeRegion, setActiveRegion] = useState('All');
-  const [homeCity, setHomeCity] = useState(DEFAULT_HOME);
-  const [settingHome, setSettingHome] = useState(false);
-  const [aiOpen, setAiOpen] = useState(true);
-  const [aiInput, setAiInput] = useState('');
-  const [aiMessages, setAiMessages] = useState<{role: 'user'|'assistant'; text: string}[]>([]);
-  const [aiLoading, setAiLoading] = useState(false);
+  const [theme, setTheme]               = useState<ThemeId>('void');
+  const [times, setTimes]               = useState<Record<string, string>>({});
+  const [aiOpen, setAiOpen]             = useState(false);
+  const [moodResult, setMoodResult]     = useState('');
+  const [moodLoading, setMoodLoading]   = useState(false);
+  const [summaryResult, setSummaryResult]   = useState('');
+  const [summaryLoading, setSummaryLoading] = useState(false);
+  const [spotIdx, setSpotIdx]           = useState(0);
+  const [homeCity, setHomeCity]         = useState('Lagos');
+  const [pinned, setPinned]             = useState<string[]>(['Tokyo', 'London', 'New York']);
+  const [showPicker, setShowPicker]     = useState(false);
+  const [settingHome, setSettingHome]   = useState(false);
+  const [search, setSearch]             = useState('');
+  const [region, setRegion]             = useState('All');
 
   useEffect(() => {
-    const saved = typeof window !== 'undefined' ? (localStorage.getItem('owf-theme') || 'noon') : 'noon';
-    const savedHome = typeof window !== 'undefined' ? localStorage.getItem('owf-home-city') : null;
-    if (savedHome) setHomeCity(savedHome);
-    const savedCities = typeof window !== 'undefined' ? localStorage.getItem('owf-cities') : null;
-    if (savedCities) try { setPinnedCities(JSON.parse(savedCities)); } catch {}
-    setActiveTheme(saved);
-    applyTheme(saved);
-    updateTimes();
-    const interval = setInterval(updateTimes, 30000);
-    return () => clearInterval(interval);
+    const stored = getStoredTheme();
+    const c = localStorage.getItem('owf-cities');
+    const h = localStorage.getItem('owf-home-city');
+    setTheme(stored);
+    applyTheme(stored);
+    if (c) setPinned(JSON.parse(c));
+    if (h) setHomeCity(h);
+    tick();
+    const id = setInterval(tick, 30000);
+    return () => clearInterval(id);
   }, []);
 
-  function updateTimes() {
+  function tick() {
     const t: Record<string, string> = {};
     ALL_CITIES.forEach(c => { t[c.name] = getLocalTime(c.timezone); });
     setTimes(t);
   }
 
-  function applyTheme(id: string) {
-    const t = THEMES.find(x => x.id === id);
-    if (!t) return;
-    Object.entries(t.vars).forEach(([k, v]) => document.documentElement.style.setProperty(k, v));
-  }
-
-  function handleTheme(id: string) {
-    setActiveTheme(id);
+  function handleTheme(id: ThemeId) {
+    setTheme(id);
     applyTheme(id);
-    if (typeof window !== 'undefined') localStorage.setItem('owf-theme', id);
   }
 
-  function toggleCity(cityName: string) {
-    if (cityName === homeCity) return;
-    const next = pinnedCities.includes(cityName)
-      ? pinnedCities.filter(c => c !== cityName)
-      : pinnedCities.length < 4 ? [...pinnedCities, cityName] : pinnedCities;
-    setPinnedCities(next);
-    if (typeof window !== 'undefined') localStorage.setItem('owf-cities', JSON.stringify(next));
-  }
-
-  async function handleAiSend(text?: string) {
-    const msg = (text || aiInput).trim();
-    if (!msg || aiLoading) return;
-    setAiInput('');
-    const newMessages = [...aiMessages, { role: 'user' as const, text: msg }];
-    setAiMessages(newMessages);
-    setAiLoading(true);
-    try {
-      const history = aiMessages.map(m => ({ role: m.role, content: m.text }));
-      const res = await escalatingCall('right_panel', msg, history);
-      setAiMessages([...newMessages, { role: 'assistant' as const, text: res.text }]);
-    } catch {
-      setAiMessages([...newMessages, { role: 'assistant' as const, text: 'Unable to reach OWF AI right now.' }]);
+  function toggleCity(name: string) {
+    if (name === homeCity) return;
+    if (pinned.includes(name)) {
+      const next = pinned.filter(c => c !== name);
+      setPinned(next);
+      localStorage.setItem('owf-cities', JSON.stringify(next));
+    } else {
+      const nonHome = pinned.filter(c => c !== homeCity);
+      if (nonHome.length >= MAX_PINNED) return;
+      const next = [...pinned, name];
+      setPinned(next);
+      localStorage.setItem('owf-cities', JSON.stringify(next));
     }
-    setAiLoading(false);
   }
 
-  function setAsHome(cityName: string) {
-    setHomeCity(cityName);
+  function setAsHome(name: string) {
+    const oldHome = homeCity;
+    setHomeCity(name);
+    localStorage.setItem('owf-home-city', name);
+    const next = pinned.filter(c => c !== name && c !== oldHome).slice(0, MAX_PINNED - 1);
+    setPinned(next);
+    localStorage.setItem('owf-cities', JSON.stringify(next));
     setSettingHome(false);
-    if (typeof window !== 'undefined') localStorage.setItem('owf-home-city', cityName);
   }
 
-  const regions = ['All', 'Africa', 'Asia', 'Europe', 'Americas', 'Oceania'];
-  const filteredCities = ALL_CITIES.filter(c => {
-    const matchRegion = activeRegion === 'All' || c.region === activeRegion;
-    const matchSearch = c.name.toLowerCase().includes(citySearch.toLowerCase());
-    return matchRegion && matchSearch;
-  });
+  async function handleMoodOfDay() {
+    setMoodLoading(true); setMoodResult('');
+    const res = await escalatingCall('right_panel', 'In 2 sentences, describe the overall emotional mood of the world today. Be poetic. Start with an emoji.');
+    setMoodResult(res.text);
+    setMoodLoading(false);
+  }
+
+  async function handleFeedSummary() {
+    setSummaryLoading(true); setSummaryResult('');
+    const res = await escalatingCall('right_panel', 'Give a TL;DR of what people around the world are talking about right now. 3 bullet points, one sentence each. Use city names.');
+    setSummaryResult(res.text);
+    setSummaryLoading(false);
+  }
 
   const displayCities = [
     ALL_CITIES.find(c => c.name === homeCity)!,
-    ...pinnedCities.filter(n => n !== homeCity).map(n => ALL_CITIES.find(c => c.name === n)!).filter(Boolean),
-  ];
+    ...pinned.filter(n => n !== homeCity).map(n => ALL_CITIES.find(c => c.name === n)!).filter(Boolean),
+  ].filter(Boolean);
 
-  const spotlight = SPOTLIGHT[spotlightIdx];
+  const filteredCities = ALL_CITIES.filter(c => {
+    const byRegion = region === 'All' || c.region === region;
+    const bySearch = c.name.toLowerCase().includes(search.toLowerCase());
+    return byRegion && bySearch;
+  });
+
+  const nonHomePinned = pinned.filter(c => c !== homeCity).length;
+  const spot = SPOTLIGHT[spotIdx];
+  const T = THEMES[theme];
 
   return (
-    <aside className="hidden lg:flex flex-col gap-4 w-72 flex-shrink-0" suppressHydrationWarning>
+    <aside style={{
+      display: 'none',
+      flexDirection: 'column',
+      gap: '10px',
+      width: '272px',
+      flexShrink: 0,
+      position: 'sticky',
+      top: '16px',
+      maxHeight: 'calc(100vh - 5rem)',
+      overflowY: 'auto',
+      paddingBottom: '24px',
+      scrollbarWidth: 'thin',
+      scrollbarColor: 'var(--owf-border) transparent',
+    }}
+    className="lg:flex"
+    >
 
-      {/* Spotlight */}
-      <SectionCard>
-        <SectionTitle>SPOTLIGHT</SectionTitle>
-        <div className="relative rounded-xl overflow-hidden cursor-pointer" style={{ height: '140px' }}
-          onClick={() => setSpotlightIdx((spotlightIdx + 1) % SPOTLIGHT.length)}>
-          <img src={spotlight.image} alt={spotlight.title} className="w-full h-full object-cover"
-            draggable={false} onContextMenu={e => e.preventDefault()} style={{ pointerEvents: 'none' }} />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.65), transparent)' }} />
-          <div className="absolute bottom-3 left-3 right-3">
-            <p className="text-white text-sm font-bold">{spotlight.title}</p>
-            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.7rem' }}>{spotlight.subtitle}</p>
+      {/* ── Spotlight ───────────────────────────────────────────────────── */}
+      <Panel>
+        <Label>SPOTLIGHT</Label>
+        <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', height: '130px', cursor: 'pointer' }}
+          onClick={() => setSpotIdx((spotIdx + 1) % SPOTLIGHT.length)}>
+          <img src={spot.image} alt={spot.title} draggable={false}
+            onContextMenu={e => e.preventDefault()}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none', display: 'block' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent 50%)' }} />
+          {/* Horizon glow over image */}
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px',
+            background: `linear-gradient(90deg, transparent, ${T.horizon}80, transparent)` }} />
+          <div style={{ position: 'absolute', bottom: '12px', left: '12px', right: '12px' }}>
+            <p style={{ color: '#fff', fontSize: '13px', fontWeight: 700, marginBottom: '2px' }}>{spot.title}</p>
+            <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '11px' }}>{spot.subtitle}</p>
           </div>
-          <div className="absolute top-2 right-2 flex gap-1">
+          <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', gap: '4px' }}>
             {SPOTLIGHT.map((_, i) => (
-              <div key={i} className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: i === spotlightIdx ? '#fff' : 'rgba(255,255,255,0.4)' }} />
+              <div key={i} style={{ width: '5px', height: '5px', borderRadius: '50%',
+                background: i === spotIdx ? T.horizon : 'rgba(255,255,255,0.35)',
+                boxShadow: i === spotIdx ? `0 0 6px ${T.horizon}` : 'none' }} />
             ))}
           </div>
         </div>
-      </SectionCard>
+        <HorizonLine />
+      </Panel>
 
-      {/* Trending */}
-      <SectionCard>
-        <SectionTitle>TRENDING</SectionTitle>
-        <div className="space-y-1.5">
-          {TRENDING_TAGS.map((item, i) => (
-            <button key={item.tag} className="w-full flex items-center justify-between py-1.5 px-2 rounded-xl transition-all hover:scale-[1.01]"
-              style={{ backgroundColor: item.color + '0A' }}>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold w-4 text-right" style={{ color: 'var(--owf-text-secondary)' }}>{i + 1}</span>
-                <span className="text-sm font-bold" style={{ color: item.color }}>{item.tag}</span>
+      {/* ── OWF AI ──────────────────────────────────────────────────────── */}
+      <Panel glow>
+        <button onClick={() => setAiOpen(!aiOpen)} style={{
+          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{
+              width: '28px', height: '28px', borderRadius: '9px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              background: `rgba(var(--owf-horizon-rgb), 0.15)`,
+              border: `1px solid rgba(var(--owf-horizon-rgb), 0.3)`,
+              fontSize: '14px', color: T.horizon,
+            }}>◈</div>
+            <p style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '0.14em', color: 'var(--owf-text-muted)' }}>
+              OWF AI
+            </p>
+            <span style={{
+              fontSize: '8px', fontWeight: 700, padding: '2px 6px', borderRadius: '99px',
+              background: `rgba(var(--owf-horizon-rgb), 0.12)`,
+              color: T.horizon,
+              border: `1px solid rgba(var(--owf-horizon-rgb), 0.2)`,
+            }}>LIVE</span>
+          </div>
+          <span style={{ fontSize: '10px', color: 'var(--owf-text-muted)', transition: 'transform 0.2s',
+            transform: aiOpen ? 'rotate(180deg)' : 'rotate(0deg)', display: 'inline-block' }}>▾</span>
+        </button>
+
+        {aiOpen && (
+          <div style={{ marginTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {/* Mood of the Day */}
+            <div style={{
+              borderRadius: '12px', padding: '12px',
+              background: 'var(--owf-raised)',
+              border: '1px solid var(--owf-border)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <div>
+                  <p style={{ fontSize: '11px', fontWeight: 700, color: 'var(--owf-text)' }}>🌍 Mood of the Day</p>
+                  <p style={{ fontSize: '9px', color: 'var(--owf-text-muted)', marginTop: '1px' }}>AI reads the global feed</p>
+                </div>
+                <button onClick={handleMoodOfDay} disabled={moodLoading} style={{
+                  fontSize: '9px', fontWeight: 800, padding: '5px 10px', borderRadius: '8px', cursor: 'pointer',
+                  background: `rgba(var(--owf-horizon-rgb), 0.15)`,
+                  color: T.horizon,
+                  border: `1px solid rgba(var(--owf-horizon-rgb), 0.3)`,
+                  opacity: moodLoading ? 0.5 : 1,
+                }}>
+                  {moodLoading ? '···' : moodResult ? '↺' : 'Read'}
+                </button>
               </div>
-              <span className="text-xs" style={{ color: 'var(--owf-text-secondary)' }}>{item.count}</span>
+              {moodResult && (
+                <p style={{
+                  fontSize: '11px', lineHeight: 1.6, color: 'var(--owf-text-sub)',
+                  borderLeft: `2px solid ${T.horizon}`,
+                  paddingLeft: '8px', margin: 0,
+                }}>{moodResult}</p>
+              )}
+            </div>
+
+            {/* Feed Summary */}
+            <div style={{
+              borderRadius: '12px', padding: '12px',
+              background: 'var(--owf-raised)',
+              border: '1px solid var(--owf-border)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <div>
+                  <p style={{ fontSize: '11px', fontWeight: 700, color: 'var(--owf-text)' }}>📋 Feed Summary</p>
+                  <p style={{ fontSize: '9px', color: 'var(--owf-text-muted)', marginTop: '1px' }}>TL;DR of what's happening</p>
+                </div>
+                <button onClick={handleFeedSummary} disabled={summaryLoading} style={{
+                  fontSize: '9px', fontWeight: 800, padding: '5px 10px', borderRadius: '8px', cursor: 'pointer',
+                  background: `rgba(var(--owf-horizon-rgb), 0.15)`,
+                  color: T.horizon,
+                  border: `1px solid rgba(var(--owf-horizon-rgb), 0.3)`,
+                  opacity: summaryLoading ? 0.5 : 1,
+                }}>
+                  {summaryLoading ? '···' : summaryResult ? '↺' : 'Read'}
+                </button>
+              </div>
+              {summaryResult && (
+                <p style={{
+                  fontSize: '11px', lineHeight: 1.6, color: 'var(--owf-text-sub)',
+                  borderLeft: `2px solid ${T.horizon}`,
+                  paddingLeft: '8px', margin: 0,
+                  whiteSpace: 'pre-line',
+                }}>{summaryResult}</p>
+              )}
+            </div>
+          </div>
+        )}
+        <HorizonLine />
+      </Panel>
+
+      {/* ── Trending ─────────────────────────────────────────────────────── */}
+      <Panel>
+        <Label>TRENDING NOW</Label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+          {TRENDING.map((item, i) => (
+            <button key={item.tag} style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '7px 8px', borderRadius: '10px', cursor: 'pointer',
+              background: `${item.color}08`, border: 'none',
+              transition: 'background 0.15s',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '9px', fontWeight: 900, color: 'var(--owf-text-muted)', width: '12px', textAlign: 'right' }}>
+                  {i + 1}
+                </span>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: item.color }}>{item.tag}</span>
+              </div>
+              <span style={{ fontSize: '9px', fontWeight: 600, color: 'var(--owf-text-muted)' }}>{item.count}</span>
             </button>
           ))}
         </div>
-      </SectionCard>
+        <HorizonLine />
+      </Panel>
 
-      {/* World Clocks */}
-      <SectionCard>
-        <div className="flex items-center justify-between mb-3">
-          <SectionTitle>WORLD CLOCKS</SectionTitle>
-          <div className="flex gap-1">
-            <button onClick={() => { setSettingHome(!settingHome); setShowCityPicker(false); }}
-              className="text-xs font-bold px-2 py-1 rounded-lg transition-all"
-              style={{ color: settingHome ? '#fff' : 'var(--owf-accent)', backgroundColor: settingHome ? 'var(--owf-accent)' : 'var(--owf-card-glow)', border: '1px solid var(--owf-glow)' }}>
-              🏠
+      {/* ── World Clocks ─────────────────────────────────────────────────── */}
+      <Panel>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <Label>WORLD CLOCKS</Label>
+          <div style={{ display: 'flex', gap: '4px', marginTop: '-8px' }}>
+            <button onClick={() => { setSettingHome(!settingHome); setShowPicker(false); setSearch(''); setRegion('All'); }}
+              style={{
+                fontSize: '9px', fontWeight: 800, padding: '4px 8px', borderRadius: '7px', cursor: 'pointer',
+                color: settingHome ? '#fff' : T.horizon,
+                background: settingHome ? T.horizon : `rgba(var(--owf-horizon-rgb), 0.10)`,
+                border: `1px solid rgba(var(--owf-horizon-rgb), 0.25)`,
+              }}>
+              {settingHome ? 'Cancel' : '🏠'}
             </button>
-            <button onClick={() => { setShowCityPicker(!showCityPicker); setSettingHome(false); }}
-              className="text-xs font-bold px-2 py-1 rounded-lg transition-all"
-              style={{ color: showCityPicker ? '#fff' : 'var(--owf-accent)', backgroundColor: showCityPicker ? 'var(--owf-accent)' : 'var(--owf-card-glow)', border: '1px solid var(--owf-glow)' }}>
-              {showCityPicker ? 'Done' : '+ Cities'}
+            <button onClick={() => { setShowPicker(!showPicker); setSettingHome(false); setSearch(''); setRegion('All'); }}
+              style={{
+                fontSize: '9px', fontWeight: 800, padding: '4px 8px', borderRadius: '7px', cursor: 'pointer',
+                color: showPicker ? '#fff' : T.horizon,
+                background: showPicker ? T.horizon : `rgba(var(--owf-horizon-rgb), 0.10)`,
+                border: `1px solid rgba(var(--owf-horizon-rgb), 0.25)`,
+              }}>
+              {showPicker ? 'Done' : '+ Cities'}
             </button>
           </div>
         </div>
-        {!showCityPicker ? (
-          <div className="space-y-2">
-            {displayCities.map((city, i) => city && (
-              <div key={city.name} className="flex items-center justify-between py-1.5 px-2 rounded-xl"
-                style={{ backgroundColor: i === 0 ? 'var(--owf-card-glow)' : 'transparent', border: i === 0 ? '1px solid var(--owf-glow)' : 'none' }}>
+
+        {!showPicker && !settingHome && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {displayCities.map((city, i) => (
+              <div key={city.name} style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '8px 10px', borderRadius: '11px',
+                background: i === 0 ? `rgba(var(--owf-horizon-rgb), 0.08)` : 'transparent',
+                border: i === 0 ? `1px solid rgba(var(--owf-horizon-rgb), 0.15)` : '1px solid transparent',
+              }}>
                 <div>
-                  <div className="flex items-center gap-1.5">
-                    <p className="text-sm font-bold" style={{ color: 'var(--owf-text-primary)' }}>{city.name}</p>
-                    {i === 0 && <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full" style={{ backgroundColor: 'var(--owf-accent)', color: '#fff' }}>HOME</span>}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--owf-text)' }}>{city.name}</span>
+                    {city.name === homeCity && (
+                      <span style={{
+                        fontSize: '7px', fontWeight: 900, padding: '1px 5px', borderRadius: '99px',
+                        background: T.horizon, color: T.isDark ? '#000' : '#fff',
+                      }}>HOME</span>
+                    )}
                   </div>
-                  <p className="text-xs" suppressHydrationWarning style={{ color: 'var(--owf-text-secondary)' }}>{times[city.name] || '--'}</p>
+                  <p style={{ fontSize: '10px', color: 'var(--owf-text-muted)', marginTop: '1px' }}>
+                    {times[city.name] || '--'}
+                  </p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold" style={{ color: 'var(--owf-text-secondary)' }}>{city.temp}°F</span>
-                  {i > 0 && (
-                    <button onClick={() => toggleCity(city.name)} className="text-xs opacity-40 hover:opacity-100" style={{ color: 'var(--owf-text-secondary)' }}>✕</button>
-                  )}
-                </div>
+                {city.name !== homeCity && (
+                  <button onClick={() => toggleCity(city.name)} style={{
+                    fontSize: '11px', color: 'var(--owf-text-muted)', background: 'none',
+                    border: 'none', cursor: 'pointer', opacity: 0.5, padding: '2px 6px',
+                  }}>✕</button>
+                )}
               </div>
             ))}
           </div>
-        ) : (
+        )}
+
+        {(settingHome || showPicker) && (
           <div>
-            <input type="text" value={citySearch} onChange={e => setCitySearch(e.target.value)}
-              placeholder="Search cities..." className="w-full text-xs px-3 py-2 rounded-xl mb-3 focus:outline-none"
-              style={{ backgroundColor: 'var(--owf-bg)', border: '1px solid var(--owf-border)', color: 'var(--owf-text-primary)' }} />
-            <div className="flex gap-1 flex-wrap mb-3">
-              {regions.map(r => (
-                <button key={r} onClick={() => setActiveRegion(r)}
-                  className="text-[10px] font-bold px-2 py-1 rounded-lg transition-all"
-                  style={{ backgroundColor: activeRegion === r ? 'var(--owf-accent)' : 'var(--owf-bg)', color: activeRegion === r ? '#fff' : 'var(--owf-text-secondary)', border: '1px solid var(--owf-border)' }}>
-                  {r}
-                </button>
+            <p style={{ fontSize: '10px', color: 'var(--owf-text-muted)', marginBottom: '8px', fontWeight: 600 }}>
+              {settingHome ? 'Tap a city to set as home' : `Select up to ${MAX_PINNED} cities (${nonHomePinned}/${MAX_PINNED})`}
+            </p>
+            <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Search cities..."
+              style={{
+                width: '100%', fontSize: '11px', padding: '7px 10px', borderRadius: '9px',
+                background: 'var(--owf-raised)', border: '1px solid var(--owf-border)',
+                color: 'var(--owf-text)', outline: 'none', boxSizing: 'border-box', marginBottom: '8px',
+              }} />
+            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '8px' }}>
+              {REGIONS.map(r => (
+                <button key={r} onClick={() => setRegion(r)} style={{
+                  fontSize: '8px', fontWeight: 700, padding: '3px 7px', borderRadius: '6px', cursor: 'pointer',
+                  background: region === r ? T.horizon : 'var(--owf-raised)',
+                  color: region === r ? (T.isDark ? '#000' : '#fff') : 'var(--owf-text-muted)',
+                  border: '1px solid var(--owf-border)',
+                }}>{r}</button>
               ))}
             </div>
-            <div className="space-y-1 max-h-52 overflow-y-auto">
+            <div style={{ maxHeight: '200px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' }}>
               {filteredCities.map(city => {
-                const pinned = pinnedCities.includes(city.name);
+                const isPinned = pinned.includes(city.name);
                 const isHome = city.name === homeCity;
+                const atMax = !isPinned && !isHome && nonHomePinned >= MAX_PINNED;
                 return (
-                  <button key={city.name} onClick={() => toggleCity(city.name)}
-                    className="w-full flex items-center justify-between py-1.5 px-2 rounded-xl transition-all"
-                    style={{ backgroundColor: pinned ? 'var(--owf-accent)22' : 'transparent' }} disabled={isHome}>
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded flex items-center justify-center text-xs"
-                        style={{ backgroundColor: pinned ? 'var(--owf-accent)' : 'var(--owf-border)', color: pinned ? '#fff' : 'transparent' }}>
-                        {pinned ? '✓' : ''}
-                      </div>
-                      <span className="text-xs font-semibold" style={{ color: 'var(--owf-text-primary)' }}>{city.name}</span>
-                      {isHome && <span className="text-[9px] font-black px-1 py-0.5 rounded" style={{ backgroundColor: 'var(--owf-accent)', color: '#fff' }}>HOME</span>}
+                  <button key={city.name}
+                    onClick={() => showPicker ? toggleCity(city.name) : setAsHome(city.name)}
+                    disabled={showPicker ? (isHome || atMax) : false}
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      padding: '6px 8px', borderRadius: '8px', cursor: atMax ? 'not-allowed' : 'pointer',
+                      background: (isPinned && showPicker) || (isHome && settingHome) ? `rgba(var(--owf-horizon-rgb), 0.10)` : 'transparent',
+                      border: 'none', opacity: atMax ? 0.3 : 1, textAlign: 'left',
+                    }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      {showPicker && (
+                        <div style={{
+                          width: '14px', height: '14px', borderRadius: '4px', flexShrink: 0,
+                          background: isPinned ? T.horizon : 'var(--owf-border)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '8px', color: isPinned ? (T.isDark ? '#000' : '#fff') : 'transparent',
+                        }}>✓</div>
+                      )}
+                      <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--owf-text)' }}>{city.name}</span>
+                      {isHome && <span style={{
+                        fontSize: '7px', fontWeight: 900, padding: '1px 5px', borderRadius: '99px',
+                        background: T.horizon, color: T.isDark ? '#000' : '#fff',
+                      }}>HOME</span>}
                     </div>
-                    <span className="text-[10px]" style={{ color: 'var(--owf-text-secondary)' }}>{city.region}</span>
+                    <span style={{ fontSize: '9px', color: 'var(--owf-text-muted)' }}>{city.region}</span>
                   </button>
                 );
               })}
             </div>
           </div>
         )}
-        {settingHome && (
-          <div className="mt-3">
-            <p className="text-xs mb-2 font-semibold" style={{ color: 'var(--owf-text-secondary)' }}>Tap a city to set as HOME</p>
-            <input type="text" value={citySearch} onChange={e => setCitySearch(e.target.value)}
-              placeholder="Search cities..."
-              className="w-full text-xs px-3 py-2 rounded-xl mb-2 focus:outline-none"
-              style={{ backgroundColor: 'var(--owf-bg)', border: '1px solid var(--owf-border)', color: 'var(--owf-text-primary)' }} />
-            <div className="flex gap-1 flex-wrap mb-2">
-              {regions.map(r => (
-                <button key={r} onClick={() => setActiveRegion(r)}
-                  className="text-[10px] font-bold px-2 py-1 rounded-lg"
-                  style={{ backgroundColor: activeRegion === r ? 'var(--owf-accent)' : 'var(--owf-bg)', color: activeRegion === r ? '#fff' : 'var(--owf-text-secondary)', border: '1px solid var(--owf-border)' }}>
-                  {r}
-                </button>
-              ))}
-            </div>
-            <div className="space-y-1 max-h-48 overflow-y-auto">
-              {filteredCities.map(city => (
-                <button key={city.name} onClick={() => setAsHome(city.name)}
-                  className="w-full flex items-center justify-between py-1.5 px-2 rounded-xl transition-all hover:scale-[1.01]"
-                  style={{ backgroundColor: city.name === homeCity ? 'var(--owf-accent)18' : 'transparent' }}>
-                  <div className="flex items-center gap-2">
-                    {city.name === homeCity && (
-                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full" style={{ backgroundColor: 'var(--owf-accent)', color: '#fff' }}>HOME</span>
-                    )}
-                    <span className="text-xs font-semibold" style={{ color: 'var(--owf-text-primary)' }}>{city.name}</span>
-                  </div>
-                  <span className="text-[10px]" style={{ color: 'var(--owf-text-secondary)' }}>{city.region}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </SectionCard>
+        <HorizonLine />
+      </Panel>
 
-      {/* Who to follow */}
-      <SectionCard>
-        <SectionTitle>WHO TO FOLLOW</SectionTitle>
-        <div className="space-y-3">
+      {/* ── Who to Follow ────────────────────────────────────────────────── */}
+      <Panel>
+        <Label>WHO TO FOLLOW</Label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {WHO_TO_FOLLOW.map(person => (
-            <div key={person.handle} className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-sm font-black flex-shrink-0"
-                  style={{ background: `linear-gradient(135deg, ${person.color}, ${person.color}bb)`, boxShadow: `0 0 8px ${person.color}44` }}>
-                  {person.name.charAt(0)}
-                </div>
+            <div key={person.handle} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{
+                  width: '36px', height: '36px', borderRadius: '12px', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: '#fff', fontSize: '14px', fontWeight: 900,
+                  background: `linear-gradient(135deg, ${person.color}, ${person.color}99)`,
+                  boxShadow: `0 0 12px ${person.color}40`,
+                }}>{person.name.charAt(0)}</div>
                 <div>
-                  <p className="text-sm font-bold" style={{ color: 'var(--owf-text-primary)' }}>{person.name}</p>
-                  <p className="text-xs" style={{ color: 'var(--owf-text-secondary)' }}>{person.handle}</p>
+                  <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--owf-text)' }}>{person.name}</p>
+                  <p style={{ fontSize: '10px', color: 'var(--owf-text-muted)', marginTop: '1px' }}>{person.handle}</p>
                 </div>
               </div>
-              <button className="text-xs font-bold px-3 py-1 rounded-full transition-all hover:scale-105"
-                style={{ backgroundColor: person.color + '18', color: person.color, border: `1px solid ${person.color}33` }}>
-                Follow
-              </button>
+              <button style={{
+                fontSize: '10px', fontWeight: 700, padding: '5px 12px', borderRadius: '99px', cursor: 'pointer',
+                background: `${person.color}15`, color: person.color,
+                border: `1px solid ${person.color}30`,
+              }}>Follow</button>
             </div>
           ))}
         </div>
-      </SectionCard>
+        <HorizonLine />
+      </Panel>
 
-      {/* OWF AI Panel */}
-      <SectionCard>
-        <button className="w-full flex items-center justify-between" onClick={() => setAiOpen(p => !p)}>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm flex-shrink-0"
-              style={{ background: 'linear-gradient(135deg, var(--owf-accent), var(--owf-gold))', color: '#fff' }}>✦</div>
-            <SectionTitle>OWF AI</SectionTitle>
-          </div>
-          <span className="text-xs" style={{ color: 'var(--owf-text-secondary)' }}>{aiOpen ? '▲' : '▼'}</span>
-        </button>
-
-        {aiOpen && (
-          <div className="mt-3 space-y-2">
-            {/* Quick chips */}
-            <div className="flex flex-wrap gap-1.5 mb-2">
-              {['🌍 Global mood', '🏙 City pick', '✍️ Post idea', '🕐 World time', '🔖 +Tags'].map(chip => (
-                <button key={chip} onClick={() => handleAiSend(chip.slice(3))}
-                  disabled={aiLoading}
-                  className="text-[10px] font-semibold px-2 py-1 rounded-full transition-all hover:scale-105"
-                  style={{ backgroundColor: 'var(--owf-accent)12', border: '1px solid var(--owf-accent)30', color: 'var(--owf-accent)' }}>
-                  {chip}
-                </button>
-              ))}
-            </div>
-
-            {/* Message thread */}
-            {aiMessages.length > 0 && (
-              <div className="space-y-2 max-h-48 overflow-y-auto mb-2">
-                {aiMessages.map((m, i) => (
-                  <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className="max-w-[85%] text-xs px-3 py-2 rounded-xl leading-relaxed"
-                      style={{
-                        backgroundColor: m.role === 'user' ? 'var(--owf-accent)18' : 'var(--owf-bg)',
-                        color: 'var(--owf-text-primary)',
-                        border: '1px solid var(--owf-border)',
-                        borderRadius: m.role === 'user' ? '12px 12px 4px 12px' : '12px 12px 12px 4px',
-                      }}>
-                      {m.text}
-                    </div>
-                  </div>
-                ))}
-                {aiLoading && (
-                  <div className="flex justify-start">
-                    <div className="text-xs px-3 py-2 rounded-xl animate-pulse"
-                      style={{ backgroundColor: 'var(--owf-bg)', border: '1px solid var(--owf-border)', color: 'var(--owf-text-secondary)' }}>
-                      Thinking...
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Input */}
-            <div className="flex gap-1.5 items-center">
-              <input type="text" value={aiInput}
-                onChange={e => setAiInput(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && handleAiSend()}
-                placeholder="Ask anything..."
-                className="flex-1 text-xs px-3 py-2 rounded-xl focus:outline-none"
-                style={{ backgroundColor: 'var(--owf-bg)', border: '1px solid var(--owf-border)', color: 'var(--owf-text-primary)' }} />
-              <button onClick={() => handleAiSend()} disabled={aiLoading || !aiInput.trim()}
-                className="text-xs font-bold px-3 py-2 rounded-xl transition-all"
-                style={{ backgroundColor: aiInput.trim() ? 'var(--owf-accent)' : 'var(--owf-border)', color: '#fff' }}>
-                →
-              </button>
-            </div>
-            {aiMessages.length > 0 && (
-              <button onClick={() => setAiMessages([])}
-                className="text-[10px] w-full text-center mt-1"
-                style={{ color: 'var(--owf-text-secondary)' }}>
-                Clear conversation
-              </button>
-            )}
-          </div>
-        )}
-      </SectionCard>
-
-      {/* Theme selector */}
-      <SectionCard>
-        <SectionTitle>THEME</SectionTitle>
-        <div className="grid grid-cols-4 gap-3">
-          {THEMES.map(t => {
-            const active = activeTheme === t.id;
-            return (
-              <button key={t.id} onClick={() => handleTheme(t.id)}
-                className="flex flex-col items-center gap-1.5 transition-all hover:scale-105">
-                <div className="w-12 h-12 rounded-2xl border-2 transition-all"
-                  style={{
-                    background: t.gradient,
-                    borderColor: active ? 'var(--owf-accent)' : 'var(--owf-border)',
-                    boxShadow: active ? '0 0 0 3px var(--owf-glow), 0 4px 12px var(--owf-glow)' : 'none',
-                  }} />
-                <span className="text-[9px] font-bold tracking-wide text-center leading-tight"
-                  style={{ color: active ? 'var(--owf-accent)' : 'var(--owf-text-secondary)' }}>
-                  {t.label.toUpperCase()}
-                </span>
-              </button>
-            );
-          })}
+      {/* ── Theme Selector ───────────────────────────────────────────────── */}
+      <Panel>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '14px' }}>
+          <div style={{
+            width: '20px', height: '20px', borderRadius: '6px', flexShrink: 0,
+            background: T.swatch, border: `1px solid ${T.horizon}50`,
+          }} />
+          <p style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '0.14em', color: 'var(--owf-text-muted)' }}>
+            THEME — <span style={{ color: T.horizon }}>{T.emoji} {T.label}</span>
+          </p>
         </div>
-      </SectionCard>
+        <ThemeSelector current={theme} onChange={handleTheme} />
+        <HorizonLine />
+      </Panel>
 
     </aside>
   );

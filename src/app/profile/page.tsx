@@ -327,8 +327,23 @@ export default function ProfilePage(){
         .desktop-right{display:flex !important;}
         .desktop-center{flex:1;}
         .three-col{display:flex !important;gap:16px;align-items:flex-start;}
-        .feed-col{height:calc(100vh - 200px);overflow-y:auto;padding-right:4px;}
-        .feed-col::-webkit-scrollbar{width:3px;} .feed-col::-webkit-scrollbar-track{background:transparent;}
+        /* Feed scroll column */
+        .feed-col{height:calc(100vh - 220px);overflow-y:auto;padding-right:6px;}
+        .feed-col::-webkit-scrollbar{width:4px;}
+        .feed-col::-webkit-scrollbar-track{background:transparent;}
+        .feed-col::-webkit-scrollbar-thumb{border-radius:99px;background:rgba(180,160,140,0.35);}
+        .feed-col::-webkit-scrollbar-thumb:hover{background:rgba(180,160,140,0.6);}
+        /* Right panel scroll */
+        .rp-scroll{height:calc(100vh - 32px);overflow-y:auto;padding-right:4px;padding-bottom:32px;}
+        .rp-scroll::-webkit-scrollbar{width:4px;}
+        .rp-scroll::-webkit-scrollbar-track{background:transparent;}
+        .rp-scroll::-webkit-scrollbar-thumb{border-radius:99px;background:rgba(180,160,140,0.35);}
+        .rp-scroll::-webkit-scrollbar-thumb:hover{background:rgba(180,160,140,0.6);}
+        /* Left panel scroll */
+        .lp-scroll{height:calc(100vh - 32px);overflow-y:auto;padding-right:4px;padding-bottom:32px;}
+        .lp-scroll::-webkit-scrollbar{width:3px;}
+        .lp-scroll::-webkit-scrollbar-track{background:transparent;}
+        .lp-scroll::-webkit-scrollbar-thumb{border-radius:99px;background:rgba(180,160,140,0.25);}
       }
       @media(max-width:1023px){
         .desktop-left{display:none !important;}
@@ -425,7 +440,7 @@ export default function ProfilePage(){
         <div className="three-col" style={{display:'flex',gap:'16px',alignItems:'flex-start'}}>
 
           {/* ── DESKTOP LEFT PANEL ── */}
-          <div className="desktop-left ns" style={{display:'none',flexShrink:0,width:'200px',position:'sticky',top:'16px',maxHeight:'calc(100vh - 32px)',overflowY:'auto',flexDirection:'column',gap:'12px',marginTop:'-16px',paddingBottom:'24px'}}>
+          <div className="desktop-left lp-scroll" style={{display:'none',flexShrink:0,width:'200px',position:'sticky',top:'16px',flexDirection:'column',gap:'12px',marginTop:'-16px'}}>
             <div style={PC}>
               <p style={{...LS,marginBottom:'10px'}}>MY CIRCLES</p>
               <div style={{display:'flex',flexDirection:'column',gap:'5px'}}>
@@ -534,7 +549,7 @@ export default function ProfilePage(){
               </div>
 
               {/* FEED */}
-              <div className={!isMobile?'feed-col ns':''} style={!isMobile?{height:'calc(100vh - 220px)',overflowY:'auto',paddingRight:'4px',paddingBottom:'32px'}:{paddingBottom:isMobile?'90px':'32px'}}>
+              <div className={!isMobile?'feed-col':'ns'} style={{paddingBottom:isMobile?'90px':'32px'}}>
                 {tab==='posts'&&SAMPLE_POSTS.map(p=><PostCard key={p.id} post={p}/>)}
                 {tab==='notebook'&&(<div>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}}><p style={LS}>YOUR CHAPTERS</p><button style={{fontSize:'12px',fontWeight:700,padding:'8px 16px',borderRadius:'99px',cursor:'pointer',background:accent,color:'#fff',border:'none',boxShadow:`0 4px 14px ${accent}50`}}>+ New</button></div>
@@ -590,7 +605,7 @@ export default function ProfilePage(){
           </div>
 
           {/* ── DESKTOP RIGHT PANEL ── */}
-          <div className="desktop-right ns" style={{display:'none',flexShrink:0,width:'220px',position:'sticky',top:'16px',maxHeight:'calc(100vh - 32px)',overflowY:'auto',flexDirection:'column',gap:'12px',marginTop:'-16px',paddingBottom:'24px'}}>
+          <div className="desktop-right rp-scroll" style={{display:'none',flexShrink:0,width:'220px',position:'sticky',top:'16px',flexDirection:'column',gap:'12px',marginTop:'-16px'}}>
             <div style={PC}><p style={{...LS,marginBottom:'10px'}}>MY WORLD CLOCK</p><div style={{display:'flex',flexDirection:'column',gap:'7px'}}>{clocks.map(city=>{const {bg,sub}=clockStyle(city.hour,T.isDark);return(<div key={city.name} className="cc" style={{borderRadius:'14px',padding:'12px',cursor:'pointer',background:bg,boxShadow:'0 4px 14px rgba(0,0,0,0.16)'}}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}><div><p suppressHydrationWarning style={{fontSize:'18px',fontWeight:900,color:'#fff',lineHeight:1,letterSpacing:'-0.02em'}}>{city.time}</p><p style={{fontSize:'10px',fontWeight:600,marginTop:'2px',color:sub}}>{city.name}</p></div><span style={{fontSize:'18px'}}>{clockIcon(city.hour)}</span></div></div>);})}</div></div>
             <div style={PC}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'10px'}}><p style={LS}>NOW PLAYING</p><button onClick={()=>{setNpDraft({track:profile.nowPlaying.track,artist:profile.nowPlaying.artist});setEditNP(true);}} style={{fontSize:'10px',fontWeight:600,color:accent,background:'none',border:'none',cursor:'pointer'}}>Edit</button></div>{editNP?(<div style={{display:'flex',flexDirection:'column',gap:'7px'}}><input value={npDraft.track} onChange={e=>setNpDraft(p=>({...p,track:e.target.value}))} placeholder="Track" style={{fontSize:'11px',padding:'7px 9px',borderRadius:'9px',outline:'none',background:T.isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.04)',border:`1px solid ${T.border}`,color:T.text}}/><input value={npDraft.artist} onChange={e=>setNpDraft(p=>({...p,artist:e.target.value}))} placeholder="Artist" style={{fontSize:'11px',padding:'7px 9px',borderRadius:'9px',outline:'none',background:T.isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.04)',border:`1px solid ${T.border}`,color:T.text}}/><div style={{display:'flex',gap:'5px'}}><button onClick={()=>setEditNP(false)} style={{flex:1,fontSize:'10px',fontWeight:600,padding:'6px',borderRadius:'8px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.05)',border:`1px solid ${T.border}`,color:T.textSub}}>Cancel</button><button onClick={saveNowPlaying} style={{flex:1,fontSize:'10px',fontWeight:700,padding:'6px',borderRadius:'8px',cursor:'pointer',background:accent,color:'#fff',border:'none'}}>Save</button></div></div>):(<div style={{display:'flex',alignItems:'center',gap:'10px',padding:'10px',borderRadius:'13px',background:T.isDark?`${accent}15`:`${accent}10`,border:`1px solid ${accent}22`}}><div style={{width:'36px',height:'36px',borderRadius:'10px',background:`linear-gradient(135deg,${accent},${accent}90)`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px',flexShrink:0}}>🎵</div><div style={{flex:1,minWidth:0}}><p style={{fontSize:'11px',fontWeight:700,color:T.text,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{profile.nowPlaying.track}</p><p style={{fontSize:'10px',color:T.textSub,marginTop:'2px'}}>{profile.nowPlaying.artist}</p></div>{profile.nowPlaying.playing&&<div style={{display:'flex',alignItems:'center',gap:'2px',flexShrink:0}}>{['w1','w2','w3','w4','w5'].map(w=><div key={w} className={w} style={{width:'2.5px',height:'14px',borderRadius:'99px',background:accent,transformOrigin:'bottom'}}/>)}</div>}</div>)}</div>
             <div style={PC}><p style={{...LS,marginBottom:'12px'}}>MOOD THIS WEEK</p><div style={{display:'flex',alignItems:'flex-end',gap:'4px',height:'52px'}}>{MOOD_WEEK.map(m=>{const mc=MOOD_COLORS[m.mood]||accent;const h=Math.round((m.val/maxMood)*100);return(<div key={m.day} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:'3px'}}><div className="lift" title={m.mood} style={{width:'100%',height:`${h}%`,minHeight:'5px',borderRadius:'5px',background:`linear-gradient(to top,${mc},${mc}90)`,boxShadow:`0 2px 6px ${mc}35`,cursor:'pointer'}}/><span style={{fontSize:'8px',fontWeight:700,color:T.textMuted}}>{m.day.slice(0,1)}</span></div>);})}</div><div style={{display:'flex',justifyContent:'space-between',marginTop:'8px'}}><span style={{fontSize:'10px',color:T.textSub}}>Best: <span style={{fontWeight:700,color:MOOD_COLORS['Joyful']}}>Joyful 😄</span></span><span style={{fontSize:'9px',color:T.textMuted}}>7 days</span></div></div>
