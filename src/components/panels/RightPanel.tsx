@@ -198,7 +198,7 @@ export default function RightPanel() {
                     <p className="text-sm font-bold" style={{ color: 'var(--owf-text-primary)' }}>{city.name}</p>
                     {i === 0 && <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full" style={{ backgroundColor: 'var(--owf-accent)', color: '#fff' }}>HOME</span>}
                   </div>
-                  <p className="text-xs" style={{ color: 'var(--owf-text-secondary)' }}>{times[city.name] || '--'}</p>
+                  <p className="text-xs" suppressHydrationWarning style={{ color: 'var(--owf-text-secondary)' }}>{times[city.name] || '--'}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-bold" style={{ color: 'var(--owf-text-secondary)' }}>{city.temp}°F</span>
