@@ -2,22 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* ============================================================
+   OWF DESIGN SYSTEM — SKY OS THEMES
+   13 themes: 1 light default + 12 sky moment dark themes
+   Card backgrounds always white across all dark themes
+   ============================================================ */
+
+/* ── DEFAULT: DAYLIGHT (Light) ─────────────────────────────── */
+:root,
+[data-theme="light"] {
   --owf-bg: #F2F5F8;
   --owf-surface: rgba(255,255,255,0.82);
   --owf-surface-hover: rgba(255,255,255,0.95);
   --owf-raised: rgba(255,255,255,0.98);
+  --owf-card: #ffffff;
+  --owf-card-border: rgba(0,210,190,0.3);
+  --owf-card-glow: rgba(0,210,190,0.15);
   --owf-border: rgba(0,0,0,0.06);
   --owf-border-strong: rgba(0,210,190,0.45);
   --owf-text: #0F1924;
   --owf-text-sub: #5A6E80;
   --owf-text-muted: #9AAFBE;
   --owf-horizon: rgba(0,210,190,0.8);
+  --owf-horizon-solid: #00D2BE;
   --owf-horizon-rgb: 0,210,190;
   --owf-aurora: rgba(0,200,180,0.08);
   --owf-glow: rgba(0,210,190,0.12);
   --owf-gold: #F97316;
-  /* Legacy aliases */
   --owf-text-primary: #0F1924;
   --owf-text-secondary: #5A6E80;
   --owf-navy: #060E1A;
@@ -25,6 +36,346 @@
   --owf-teal: #007A6E;
   --owf-purple: #5B54D6;
 }
+
+/* ── 1. MIDNIGHT ───────────────────────────────────────────── */
+[data-theme="midnight"] {
+  --owf-bg: #08080F;
+  --owf-surface: rgba(16,16,28,0.9);
+  --owf-surface-hover: rgba(22,22,38,0.95);
+  --owf-raised: rgba(18,18,32,0.98);
+  --owf-card: #ffffff;
+  --owf-card-border: rgba(99,102,241,0.35);
+  --owf-card-glow: rgba(99,102,241,0.12);
+  --owf-border: rgba(99,102,241,0.1);
+  --owf-border-strong: rgba(99,102,241,0.4);
+  --owf-text: #e0e0ff;
+  --owf-text-sub: #8888b8;
+  --owf-text-muted: #4a4a6a;
+  --owf-horizon: rgba(99,102,241,0.85);
+  --owf-horizon-solid: #6366f1;
+  --owf-horizon-rgb: 99,102,241;
+  --owf-aurora: rgba(99,102,241,0.07);
+  --owf-glow: rgba(99,102,241,0.14);
+  --owf-gold: #c7d2fe;
+  --owf-text-primary: #e0e0ff;
+  --owf-text-secondary: #8888b8;
+  --owf-navy: #08080F;
+  --owf-orange: #a5b4fc;
+  --owf-teal: #6366f1;
+  --owf-purple: #818cf8;
+}
+
+/* ── 2. PRE-DAWN ───────────────────────────────────────────── */
+[data-theme="predawn"] {
+  --owf-bg: #080C18;
+  --owf-surface: rgba(12,16,32,0.9);
+  --owf-surface-hover: rgba(18,22,42,0.95);
+  --owf-raised: rgba(14,18,36,0.98);
+  --owf-card: #ffffff;
+  --owf-card-border: rgba(79,70,229,0.35);
+  --owf-card-glow: rgba(79,70,229,0.12);
+  --owf-border: rgba(79,70,229,0.1);
+  --owf-border-strong: rgba(79,70,229,0.4);
+  --owf-text: #dde0ff;
+  --owf-text-sub: #7e80b0;
+  --owf-text-muted: #44466a;
+  --owf-horizon: rgba(79,70,229,0.85);
+  --owf-horizon-solid: #4f46e5;
+  --owf-horizon-rgb: 79,70,229;
+  --owf-aurora: rgba(79,70,229,0.07);
+  --owf-glow: rgba(79,70,229,0.14);
+  --owf-gold: #818cf8;
+  --owf-text-primary: #dde0ff;
+  --owf-text-secondary: #7e80b0;
+  --owf-navy: #080C18;
+  --owf-orange: #818cf8;
+  --owf-teal: #4f46e5;
+  --owf-purple: #6366f1;
+}
+
+/* ── 3. FIRST LIGHT ────────────────────────────────────────── */
+[data-theme="firstlight"] {
+  --owf-bg: #090F12;
+  --owf-surface: rgba(14,22,26,0.9);
+  --owf-surface-hover: rgba(20,30,34,0.95);
+  --owf-raised: rgba(16,24,28,0.98);
+  --owf-card: #ffffff;
+  --owf-card-border: rgba(45,212,191,0.3);
+  --owf-card-glow: rgba(45,212,191,0.1);
+  --owf-border: rgba(45,212,191,0.1);
+  --owf-border-strong: rgba(45,212,191,0.38);
+  --owf-text: #d0f0ec;
+  --owf-text-sub: #6aada4;
+  --owf-text-muted: #365a56;
+  --owf-horizon: rgba(45,212,191,0.85);
+  --owf-horizon-solid: #2dd4bf;
+  --owf-horizon-rgb: 45,212,191;
+  --owf-aurora: rgba(45,212,191,0.07);
+  --owf-glow: rgba(253,164,175,0.14);
+  --owf-gold: #fda4af;
+  --owf-text-primary: #d0f0ec;
+  --owf-text-secondary: #6aada4;
+  --owf-navy: #090F12;
+  --owf-orange: #fda4af;
+  --owf-teal: #2dd4bf;
+  --owf-purple: #f9a8d4;
+}
+
+/* ── 4. DAWN ───────────────────────────────────────────────── */
+[data-theme="dawn"] {
+  --owf-bg: #110D0C;
+  --owf-surface: rgba(24,16,14,0.9);
+  --owf-surface-hover: rgba(32,22,18,0.95);
+  --owf-raised: rgba(26,18,16,0.98);
+  --owf-card: #ffffff;
+  --owf-card-border: rgba(251,113,133,0.3);
+  --owf-card-glow: rgba(251,113,133,0.1);
+  --owf-border: rgba(251,113,133,0.1);
+  --owf-border-strong: rgba(251,113,133,0.38);
+  --owf-text: #ffe4e8;
+  --owf-text-sub: #b07880;
+  --owf-text-muted: #5a3840;
+  --owf-horizon: rgba(251,113,133,0.85);
+  --owf-horizon-solid: #fb7185;
+  --owf-horizon-rgb: 251,113,133;
+  --owf-aurora: rgba(251,113,133,0.07);
+  --owf-glow: rgba(253,186,116,0.14);
+  --owf-gold: #fdba74;
+  --owf-text-primary: #ffe4e8;
+  --owf-text-secondary: #b07880;
+  --owf-navy: #110D0C;
+  --owf-orange: #fdba74;
+  --owf-teal: #fb7185;
+  --owf-purple: #fda4af;
+}
+
+/* ── 5. GOLDEN HOUR ────────────────────────────────────────── */
+[data-theme="goldenhour"] {
+  --owf-bg: #100D08;
+  --owf-surface: rgba(22,17,10,0.9);
+  --owf-surface-hover: rgba(30,23,12,0.95);
+  --owf-raised: rgba(24,19,11,0.98);
+  --owf-card: #ffffff;
+  --owf-card-border: rgba(245,158,11,0.32);
+  --owf-card-glow: rgba(245,158,11,0.1);
+  --owf-border: rgba(245,158,11,0.1);
+  --owf-border-strong: rgba(245,158,11,0.4);
+  --owf-text: #fef3c7;
+  --owf-text-sub: #b09050;
+  --owf-text-muted: #5a4820;
+  --owf-horizon: rgba(245,158,11,0.85);
+  --owf-horizon-solid: #f59e0b;
+  --owf-horizon-rgb: 245,158,11;
+  --owf-aurora: rgba(245,158,11,0.07);
+  --owf-glow: rgba(245,158,11,0.14);
+  --owf-gold: #fde68a;
+  --owf-text-primary: #fef3c7;
+  --owf-text-secondary: #b09050;
+  --owf-navy: #100D08;
+  --owf-orange: #f59e0b;
+  --owf-teal: #d97706;
+  --owf-purple: #fbbf24;
+}
+
+/* ── 6. MORNING ────────────────────────────────────────────── */
+[data-theme="morning"] {
+  --owf-bg: #080F12;
+  --owf-surface: rgba(10,20,26,0.9);
+  --owf-surface-hover: rgba(14,28,36,0.95);
+  --owf-raised: rgba(12,22,30,0.98);
+  --owf-card: #ffffff;
+  --owf-card-border: rgba(6,182,212,0.3);
+  --owf-card-glow: rgba(6,182,212,0.1);
+  --owf-border: rgba(6,182,212,0.1);
+  --owf-border-strong: rgba(6,182,212,0.4);
+  --owf-text: #e0f8ff;
+  --owf-text-sub: #60a8b8;
+  --owf-text-muted: #2a5a68;
+  --owf-horizon: rgba(6,182,212,0.85);
+  --owf-horizon-solid: #06b6d4;
+  --owf-horizon-rgb: 6,182,212;
+  --owf-aurora: rgba(6,182,212,0.07);
+  --owf-glow: rgba(6,182,212,0.14);
+  --owf-gold: #a5f3fc;
+  --owf-text-primary: #e0f8ff;
+  --owf-text-secondary: #60a8b8;
+  --owf-navy: #080F12;
+  --owf-orange: #67e8f9;
+  --owf-teal: #06b6d4;
+  --owf-purple: #22d3ee;
+}
+
+/* ── 7. NOON ───────────────────────────────────────────────── */
+[data-theme="noon"] {
+  --owf-bg: #080C12;
+  --owf-surface: rgba(10,16,26,0.9);
+  --owf-surface-hover: rgba(14,22,36,0.95);
+  --owf-raised: rgba(12,18,30,0.98);
+  --owf-card: #ffffff;
+  --owf-card-border: rgba(59,130,246,0.3);
+  --owf-card-glow: rgba(59,130,246,0.1);
+  --owf-border: rgba(59,130,246,0.1);
+  --owf-border-strong: rgba(59,130,246,0.4);
+  --owf-text: #dbeafe;
+  --owf-text-sub: #6090c8;
+  --owf-text-muted: #2a4870;
+  --owf-horizon: rgba(59,130,246,0.85);
+  --owf-horizon-solid: #3b82f6;
+  --owf-horizon-rgb: 59,130,246;
+  --owf-aurora: rgba(59,130,246,0.07);
+  --owf-glow: rgba(59,130,246,0.14);
+  --owf-gold: #bfdbfe;
+  --owf-text-primary: #dbeafe;
+  --owf-text-secondary: #6090c8;
+  --owf-navy: #080C12;
+  --owf-orange: #93c5fd;
+  --owf-teal: #3b82f6;
+  --owf-purple: #60a5fa;
+}
+
+/* ── 8. AFTERNOON ──────────────────────────────────────────── */
+[data-theme="afternoon"] {
+  --owf-bg: #0C0C10;
+  --owf-surface: rgba(18,18,24,0.9);
+  --owf-surface-hover: rgba(24,24,32,0.95);
+  --owf-raised: rgba(20,20,28,0.98);
+  --owf-card: #ffffff;
+  --owf-card-border: rgba(129,140,248,0.3);
+  --owf-card-glow: rgba(129,140,248,0.1);
+  --owf-border: rgba(129,140,248,0.1);
+  --owf-border-strong: rgba(129,140,248,0.38);
+  --owf-text: #e2e8f0;
+  --owf-text-sub: #8890b0;
+  --owf-text-muted: #444868;
+  --owf-horizon: rgba(129,140,248,0.85);
+  --owf-horizon-solid: #818cf8;
+  --owf-horizon-rgb: 129,140,248;
+  --owf-aurora: rgba(129,140,248,0.07);
+  --owf-glow: rgba(129,140,248,0.14);
+  --owf-gold: #e2e8f0;
+  --owf-text-primary: #e2e8f0;
+  --owf-text-secondary: #8890b0;
+  --owf-navy: #0C0C10;
+  --owf-orange: #c7d2fe;
+  --owf-teal: #818cf8;
+  --owf-purple: #a5b4fc;
+}
+
+/* ── 9. BLUE HOUR ──────────────────────────────────────────── */
+[data-theme="bluehour"] {
+  --owf-bg: #090B14;
+  --owf-surface: rgba(14,16,26,0.9);
+  --owf-surface-hover: rgba(18,22,36,0.95);
+  --owf-raised: rgba(16,18,30,0.98);
+  --owf-card: #ffffff;
+  --owf-card-border: rgba(165,180,252,0.3);
+  --owf-card-glow: rgba(165,180,252,0.1);
+  --owf-border: rgba(165,180,252,0.1);
+  --owf-border-strong: rgba(165,180,252,0.38);
+  --owf-text: #ede9fe;
+  --owf-text-sub: #9090c8;
+  --owf-text-muted: #484870;
+  --owf-horizon: rgba(165,180,252,0.85);
+  --owf-horizon-solid: #a5b4fc;
+  --owf-horizon-rgb: 165,180,252;
+  --owf-aurora: rgba(165,180,252,0.07);
+  --owf-glow: rgba(165,180,252,0.14);
+  --owf-gold: #ddd6fe;
+  --owf-text-primary: #ede9fe;
+  --owf-text-secondary: #9090c8;
+  --owf-navy: #090B14;
+  --owf-orange: #c4b5fd;
+  --owf-teal: #a5b4fc;
+  --owf-purple: #818cf8;
+}
+
+/* ── 10. DUSK ──────────────────────────────────────────────── */
+[data-theme="dusk"] {
+  --owf-bg: #0F0A08;
+  --owf-surface: rgba(22,14,10,0.9);
+  --owf-surface-hover: rgba(30,18,12,0.95);
+  --owf-raised: rgba(26,16,11,0.98);
+  --owf-card: #ffffff;
+  --owf-card-border: rgba(249,115,22,0.3);
+  --owf-card-glow: rgba(249,115,22,0.1);
+  --owf-border: rgba(249,115,22,0.1);
+  --owf-border-strong: rgba(249,115,22,0.38);
+  --owf-text: #ffedd5;
+  --owf-text-sub: #b07850;
+  --owf-text-muted: #5a3820;
+  --owf-horizon: rgba(249,115,22,0.85);
+  --owf-horizon-solid: #f97316;
+  --owf-horizon-rgb: 249,115,22;
+  --owf-aurora: rgba(249,115,22,0.07);
+  --owf-glow: rgba(249,115,22,0.14);
+  --owf-gold: #fed7aa;
+  --owf-text-primary: #ffedd5;
+  --owf-text-secondary: #b07850;
+  --owf-navy: #0F0A08;
+  --owf-orange: #fb923c;
+  --owf-teal: #f97316;
+  --owf-purple: #fca5a5;
+}
+
+/* ── 11. SUNSET ────────────────────────────────────────────── */
+[data-theme="sunset"] {
+  --owf-bg: #0D0810;
+  --owf-surface: rgba(20,12,22,0.9);
+  --owf-surface-hover: rgba(28,16,30,0.95);
+  --owf-raised: rgba(22,14,26,0.98);
+  --owf-card: #ffffff;
+  --owf-card-border: rgba(168,85,247,0.3);
+  --owf-card-glow: rgba(168,85,247,0.1);
+  --owf-border: rgba(168,85,247,0.1);
+  --owf-border-strong: rgba(168,85,247,0.38);
+  --owf-text: #f3e8ff;
+  --owf-text-sub: #a070c0;
+  --owf-text-muted: #503068;
+  --owf-horizon: rgba(168,85,247,0.85);
+  --owf-horizon-solid: #a855f7;
+  --owf-horizon-rgb: 168,85,247;
+  --owf-aurora: rgba(168,85,247,0.07);
+  --owf-glow: rgba(168,85,247,0.14);
+  --owf-gold: #e9d5ff;
+  --owf-text-primary: #f3e8ff;
+  --owf-text-secondary: #a070c0;
+  --owf-navy: #0D0810;
+  --owf-orange: #d946ef;
+  --owf-teal: #a855f7;
+  --owf-purple: #c084fc;
+}
+
+/* ── 12. TWILIGHT ──────────────────────────────────────────── */
+[data-theme="twilight"] {
+  --owf-bg: #08050F;
+  --owf-surface: rgba(14,8,22,0.9);
+  --owf-surface-hover: rgba(20,12,30,0.95);
+  --owf-raised: rgba(16,10,24,0.98);
+  --owf-card: #ffffff;
+  --owf-card-border: rgba(236,72,153,0.3);
+  --owf-card-glow: rgba(236,72,153,0.1);
+  --owf-border: rgba(236,72,153,0.1);
+  --owf-border-strong: rgba(236,72,153,0.38);
+  --owf-text: #fce7f3;
+  --owf-text-sub: #b06090;
+  --owf-text-muted: #582848;
+  --owf-horizon: rgba(236,72,153,0.85);
+  --owf-horizon-solid: #ec4899;
+  --owf-horizon-rgb: 236,72,153;
+  --owf-aurora: rgba(236,72,153,0.07);
+  --owf-glow: rgba(192,132,252,0.14);
+  --owf-gold: #fbcfe8;
+  --owf-text-primary: #fce7f3;
+  --owf-text-secondary: #b06090;
+  --owf-navy: #08050F;
+  --owf-orange: #f472b6;
+  --owf-teal: #ec4899;
+  --owf-purple: #c084fc;
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
 
 * {
   box-sizing: border-box;
@@ -36,7 +387,15 @@ body {
   background-color: var(--owf-bg);
   color: var(--owf-text-primary);
   font-family: 'DM Sans', Inter, system-ui, sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Feed cards — always white with theme glow border */
+.owf-card {
+  background-color: var(--owf-card) !important;
+  border: 1px solid var(--owf-card-border) !important;
+  box-shadow: 0 0 12px var(--owf-card-glow) !important;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 /* Hide scrollbar for horizontal scroll rows */

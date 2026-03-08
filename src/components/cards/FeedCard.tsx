@@ -125,10 +125,11 @@ export default function FeedCard({
     <article
       className="relative rounded-2xl overflow-hidden cursor-pointer"
       style={{
-        backgroundColor: 'var(--owf-surface)',
-        border: `1px solid ${moodColor}55`,
+        backgroundColor: 'var(--owf-card)',
+        border: '1px solid var(--owf-card-border)',
         boxShadow: mounted
-          ? `0 2px 16px rgba(${moodRgb}, ${currentIntensity * 0.2}),
+          ? `0 0 12px var(--owf-card-glow),
+             0 2px 16px rgba(${moodRgb}, ${currentIntensity * 0.1}),
              0 0 0 ${glowIntensity * 3}px ${moodColor}22`
           : '0 1px 3px rgba(0,0,0,0.06)',
         transform: `scale(${pulseScale})`,
@@ -136,7 +137,7 @@ export default function FeedCard({
                      box-shadow ${pulseDuration}ms ease,
                      border-color 300ms ease`,
         ...(featured && {
-          background: `linear-gradient(135deg, var(--owf-surface) 0%, ${moodColor}08 100%)`,
+          background: `linear-gradient(135deg, var(--owf-card) 0%, ${moodColor}08 100%)`,
         }),
       }}
     >
@@ -186,7 +187,7 @@ export default function FeedCard({
                 width: compact ? '8px' : '12px',
                 height: compact ? '8px' : '12px',
                 backgroundColor: moodColor,
-                borderColor: 'var(--owf-surface)',
+                borderColor: 'var(--owf-card)',
               }}
             />
           </div>
@@ -197,7 +198,7 @@ export default function FeedCard({
                 className="font-bold"
                 style={{
                   fontSize: featured ? '1rem' : compact ? '0.78rem' : '0.875rem',
-                  color: 'var(--owf-text-primary)',
+                  color: '#0F1924',
                 }}
               >
                 {authorName}
@@ -212,11 +213,11 @@ export default function FeedCard({
               )}
             </div>
             <div className="flex items-center gap-1 mt-0.5 flex-wrap">
-              <span style={{ color: 'var(--owf-text-secondary)', fontSize: '0.68rem' }}>{authorHandle}</span>
-              <span style={{ color: 'var(--owf-border)', fontSize: '0.68rem' }}>·</span>
-              <span style={{ color: 'var(--owf-text-secondary)', fontSize: '0.68rem' }}>{city}</span>
-              <span style={{ color: 'var(--owf-border)', fontSize: '0.68rem' }}>·</span>
-              <span style={{ color: 'var(--owf-text-secondary)', fontSize: '0.68rem' }}>{timeAgo}</span>
+              <span style={{ color: '#5A6E80', fontSize: '0.68rem' }}>{authorHandle}</span>
+              <span style={{ color: '#9AAFBE', fontSize: '0.68rem' }}>·</span>
+              <span style={{ color: '#5A6E80', fontSize: '0.68rem' }}>{city}</span>
+              <span style={{ color: '#9AAFBE', fontSize: '0.68rem' }}>·</span>
+              <span style={{ color: '#5A6E80', fontSize: '0.68rem' }}>{timeAgo}</span>
             </div>
           </div>
 
@@ -255,7 +256,7 @@ export default function FeedCard({
           className={`leading-relaxed ${compact ? 'mb-2 line-clamp-3' : 'mb-4'}`}
           style={{
             fontSize: featured ? '1rem' : compact ? '0.78rem' : '0.95rem',
-            color: 'var(--owf-text-primary)',
+            color: '#0F1924',
             letterSpacing: '0.01em',
           }}
         >
@@ -275,7 +276,7 @@ export default function FeedCard({
           <div
             className="rounded-xl overflow-hidden mb-3"
             style={{
-              backgroundColor: 'var(--owf-bg)',
+              backgroundColor: '#f0f0f0',
               height: featured ? '200px' : '160px',
             }}
           >
@@ -292,14 +293,14 @@ export default function FeedCard({
         {/* Engagement row */}
         <div
           className={`flex items-center gap-4 ${compact ? 'pt-2' : 'pt-3'}`}
-          style={{ borderTop: '1px solid var(--owf-border)' }}
+          style={{ borderTop: '1px solid rgba(0,0,0,0.06)' }}
         >
           {/* Like */}
           <button
             onClick={handleLike}
             className="flex items-center gap-1.5 text-xs transition-all"
             style={{
-              color: liked ? moodColor : 'var(--owf-text-secondary)',
+              color: liked ? moodColor : '#5A6E80',
               transform: pulse === 'like' ? 'scale(1.3)' : 'scale(1)',
               transition: 'transform 300ms cubic-bezier(0.34,1.56,0.64,1), color 200ms ease',
             }}
@@ -312,7 +313,7 @@ export default function FeedCard({
           <button
             onClick={handleCommentToggle}
             className="flex items-center gap-1.5 text-xs transition-all hover:scale-110"
-            style={{ color: commentsOpen ? moodColor : 'var(--owf-text-secondary)' }}
+            style={{ color: commentsOpen ? moodColor : '#5A6E80' }}
           >
             <span className="text-base">{commentsOpen ? '◆' : '◇'}</span>
             <span>{commentCount2}</span>
@@ -323,7 +324,7 @@ export default function FeedCard({
             onClick={handleRepost}
             className="flex items-center gap-1.5 text-xs transition-all hover:scale-110"
             style={{
-              color: reposted ? moodColor : 'var(--owf-text-secondary)',
+              color: reposted ? moodColor : '#5A6E80',
               transition: 'color 200ms ease, transform 200ms ease',
             }}
           >
@@ -337,7 +338,7 @@ export default function FeedCard({
               onClick={handleSave}
               className="flex items-center gap-1.5 text-xs transition-all"
               style={{
-                color: saved ? moodColor : 'var(--owf-text-secondary)',
+                color: saved ? moodColor : '#5A6E80',
                 transform: pulse === 'save' ? 'scale(1.3)' : 'scale(1)',
                 transition: 'transform 400ms cubic-bezier(0.34,1.56,0.64,1), color 200ms ease',
               }}
@@ -352,7 +353,7 @@ export default function FeedCard({
               onClick={handleShare}
               className="flex items-center gap-1.5 text-xs ml-auto transition-all"
               style={{
-                color: 'var(--owf-text-secondary)',
+                color: '#5A6E80',
                 transform: pulse === 'share' ? 'scale(1.2)' : 'scale(1)',
                 transition: 'transform 300ms cubic-bezier(0.34,1.56,0.64,1)',
               }}
@@ -379,17 +380,17 @@ export default function FeedCard({
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-xs font-bold" style={{ color: 'var(--owf-text-primary)' }}>{c.handle}</span>
-                      <span className="text-[10px]" style={{ color: 'var(--owf-text-secondary)' }}>{c.time}</span>
+                      <span className="text-xs font-bold" style={{ color: '#0F1924' }}>{c.handle}</span>
+                      <span className="text-[10px]" style={{ color: '#5A6E80' }}>{c.time}</span>
                     </div>
-                    <p className="text-xs leading-relaxed" style={{ color: 'var(--owf-text-primary)' }}>{c.text}</p>
+                    <p className="text-xs leading-relaxed" style={{ color: '#0F1924' }}>{c.text}</p>
                   </div>
                 </div>
               ))}
             </div>
           )}
           {comments.length === 0 && (
-            <p className="text-xs mb-3 text-center" style={{ color: 'var(--owf-text-secondary)' }}>Be the first to comment</p>
+            <p className="text-xs mb-3 text-center" style={{ color: '#5A6E80' }}>Be the first to comment</p>
           )}
           {/* Comment input */}
           <div className="flex gap-2 items-center">
@@ -400,16 +401,16 @@ export default function FeedCard({
               onKeyDown={e => e.key === 'Enter' && handleCommentSubmit()}
               placeholder="Add a comment..."
               className="flex-1 text-xs px-3 py-2 rounded-xl focus:outline-none"
-              style={{ backgroundColor: 'var(--owf-bg)', border: `1px solid ${moodColor}33`, color: 'var(--owf-text-primary)' }}
+              style={{ backgroundColor: '#f5f5f5', border: `1px solid ${moodColor}33`, color: '#0F1924' }}
             />
-            <span className="text-[10px] flex-shrink-0" style={{ color: commentText.length > 250 ? '#EF4444' : 'var(--owf-text-secondary)' }}>
+            <span className="text-[10px] flex-shrink-0" style={{ color: commentText.length > 250 ? '#EF4444' : '#5A6E80' }}>
               {280 - commentText.length}
             </span>
             <button
               onClick={handleCommentSubmit}
               disabled={!commentText.trim()}
               className="text-xs font-bold px-3 py-2 rounded-xl transition-all hover:scale-105"
-              style={{ backgroundColor: commentText.trim() ? moodColor : 'var(--owf-border)', color: '#fff' }}>
+              style={{ backgroundColor: commentText.trim() ? moodColor : '#e0e0e0', color: '#fff' }}>
               Post
             </button>
           </div>

@@ -19,28 +19,23 @@ const posts = [
 
 export default function Home() {
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'flex-start',
-      width: '100%',
-    }}>
+    <div style={{ display: 'flex', alignItems: 'flex-start', width: '100%' }}>
 
-      {/* Feed — full natural height, page scroll + own always-visible scrollbar */}
-      <div style={{
-        flex: 1,
-        minWidth: 0,
-        padding: '8px 24px 32px 20px',
-        borderRight: '1px solid var(--owf-border)',
-        scrollbarWidth: 'thin',
-        scrollbarColor: 'rgba(128,128,128,0.3) transparent',
-      }}
-      className="feed-center"
+      {/* Feed — natural height, page scroll controls everything */}
+      <div
+        className="feed-center"
+        style={{
+          flex: 1,
+          minWidth: 0,
+          padding: '8px 24px 32px 20px',
+          borderRight: '1px solid var(--owf-border)',
+        }}
       >
         <GlobalMomentsStrip />
         <FeedTabs posts={posts} />
       </div>
 
-      {/* Right panel — flows with page, all cards fully visible */}
+      {/* Right panel */}
       <div style={{
         width: '300px',
         minWidth: '300px',
