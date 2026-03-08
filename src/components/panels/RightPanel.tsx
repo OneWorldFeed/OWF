@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { escalatingCall } from '@/lib/ai/escalation';
-import { THEMES, THEME_ORDER, applyTheme, getStoredTheme } from '@/lib/theme';
+import { THEMES, THEME_ORDER, applyTheme } from '@/lib/theme';
 import type { ThemeId } from '@/lib/theme';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -67,8 +67,8 @@ function Panel({ children, glow }: { children: React.ReactNode; glow?: boolean }
       backdropFilter: 'blur(24px) saturate(160%)',
       WebkitBackdropFilter: 'blur(24px) saturate(160%)',
       border: '1px solid var(--owf-border)',
-      borderRadius: '18px',
-      padding: '16px',
+      borderRadius: '20px',
+      padding: '20px',
       position: 'relative',
       overflow: 'hidden',
       boxShadow: glow
@@ -83,8 +83,8 @@ function Panel({ children, glow }: { children: React.ReactNode; glow?: boolean }
 function Label({ children }: { children: React.ReactNode }) {
   return (
     <p style={{
-      fontSize: '9px', fontWeight: 900, letterSpacing: '0.14em',
-      color: 'var(--owf-text-muted)', marginBottom: '12px', textTransform: 'uppercase',
+      fontSize: '10px', fontWeight: 900, letterSpacing: '0.14em',
+      color: 'var(--owf-text-muted)', marginBottom: '14px', textTransform: 'uppercase',
     }}>
       {children}
     </p>
@@ -113,57 +113,55 @@ function ThemeSelector({ current, onChange }: { current: ThemeId; onChange: (id:
   return (
     <div>
       {/* Dark themes */}
-      <p style={{ fontSize: '8px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--owf-text-muted)', marginBottom: '8px' }}>
+      <p style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--owf-text-muted)', marginBottom: '10px' }}>
         DARK
       </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '14px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '18px' }}>
         {darkThemes.map(id => {
           const t = THEMES[id];
           const active = current === id;
           return (
             <button key={id} onClick={() => onChange(id)} title={t.label} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px',
-              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
+              background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0',
             }}>
               {/* Swatch */}
               <div style={{
-                width: '44px', height: '44px', borderRadius: '14px',
+                width: '52px', height: '52px', borderRadius: '16px',
                 background: t.swatch,
                 border: active
                   ? `2px solid ${t.horizon}`
-                  : '2px solid rgba(255,255,255,0.06)',
+                  : '2px solid rgba(255,255,255,0.08)',
                 boxShadow: active
-                  ? `0 0 0 3px ${t.horizon}30, 0 0 16px ${t.aurora}`
-                  : '0 2px 8px rgba(0,0,0,0.3)',
+                  ? `0 0 0 3px ${t.horizon}35, 0 0 20px ${t.aurora}`
+                  : '0 2px 10px rgba(0,0,0,0.35)',
                 position: 'relative', overflow: 'hidden',
                 transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
-                transform: active ? 'scale(1.08)' : 'scale(1)',
+                transform: active ? 'scale(1.1)' : 'scale(1)',
               }}>
-                {/* Horizon glow inside swatch */}
                 <div style={{
-                  position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px',
+                  position: 'absolute', bottom: 0, left: 0, right: 0, height: '3px',
                   background: t.horizon, opacity: active ? 1 : 0.4,
-                  boxShadow: `0 0 6px ${t.horizon}`,
+                  boxShadow: `0 0 8px ${t.horizon}`,
                   transition: 'opacity 0.2s',
                 }} />
-                {/* Active check */}
                 {active && (
                   <div style={{
-                    position: 'absolute', top: '4px', right: '4px',
-                    width: '10px', height: '10px', borderRadius: '50%',
+                    position: 'absolute', top: '5px', right: '5px',
+                    width: '11px', height: '11px', borderRadius: '50%',
                     background: t.horizon,
-                    boxShadow: `0 0 6px ${t.horizon}`,
+                    boxShadow: `0 0 8px ${t.horizon}`,
                   }} />
                 )}
               </div>
               <span style={{
-                fontSize: '8px', fontWeight: active ? 800 : 500,
+                fontSize: '9px', fontWeight: active ? 800 : 500,
                 color: active ? t.horizon : 'var(--owf-text-muted)',
                 letterSpacing: '0.02em',
                 transition: 'color 0.2s',
                 whiteSpace: 'nowrap',
               }}>
-                {t.emoji} {t.label}
+                {t.label}
               </span>
             </button>
           );
@@ -171,57 +169,57 @@ function ThemeSelector({ current, onChange }: { current: ThemeId; onChange: (id:
       </div>
 
       {/* Divider */}
-      <div style={{ height: '1px', background: 'var(--owf-border)', marginBottom: '14px' }} />
+      <div style={{ height: '1px', background: 'var(--owf-border)', marginBottom: '18px' }} />
 
       {/* Light themes */}
-      <p style={{ fontSize: '8px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--owf-text-muted)', marginBottom: '8px' }}>
+      <p style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--owf-text-muted)', marginBottom: '10px' }}>
         LIGHT
       </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
         {lightThemes.map(id => {
           const t = THEMES[id];
           const active = current === id;
           return (
             <button key={id} onClick={() => onChange(id)} title={t.label} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px',
-              background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
+              background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0',
             }}>
               <div style={{
-                width: '44px', height: '44px', borderRadius: '14px',
+                width: '52px', height: '52px', borderRadius: '16px',
                 background: t.swatch,
                 border: active
                   ? `2px solid ${t.horizon}`
-                  : '2px solid rgba(0,0,0,0.08)',
+                  : '2px solid rgba(0,0,0,0.10)',
                 boxShadow: active
-                  ? `0 0 0 3px ${t.horizon}30, 0 4px 16px ${t.aurora}`
-                  : '0 2px 8px rgba(0,0,0,0.08)',
+                  ? `0 0 0 3px ${t.horizon}35, 0 4px 20px ${t.aurora}`
+                  : '0 2px 10px rgba(0,0,0,0.10)',
                 position: 'relative', overflow: 'hidden',
                 transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
-                transform: active ? 'scale(1.08)' : 'scale(1)',
+                transform: active ? 'scale(1.1)' : 'scale(1)',
               }}>
                 <div style={{
-                  position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px',
+                  position: 'absolute', bottom: 0, left: 0, right: 0, height: '3px',
                   background: t.horizon, opacity: active ? 1 : 0.35,
-                  boxShadow: `0 0 6px ${t.horizon}`,
+                  boxShadow: `0 0 8px ${t.horizon}`,
                   transition: 'opacity 0.2s',
                 }} />
                 {active && (
                   <div style={{
-                    position: 'absolute', top: '4px', right: '4px',
-                    width: '10px', height: '10px', borderRadius: '50%',
+                    position: 'absolute', top: '5px', right: '5px',
+                    width: '11px', height: '11px', borderRadius: '50%',
                     background: t.horizon,
-                    boxShadow: `0 0 6px ${t.horizon}`,
+                    boxShadow: `0 0 8px ${t.horizon}`,
                   }} />
                 )}
               </div>
               <span style={{
-                fontSize: '8px', fontWeight: active ? 800 : 500,
+                fontSize: '9px', fontWeight: active ? 800 : 500,
                 color: active ? t.horizon : 'var(--owf-text-muted)',
                 letterSpacing: '0.02em',
                 transition: 'color 0.2s',
                 whiteSpace: 'nowrap',
               }}>
-                {t.emoji} {t.label}
+                {t.label}
               </span>
             </button>
           );
@@ -234,7 +232,8 @@ function ThemeSelector({ current, onChange }: { current: ThemeId; onChange: (id:
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function RightPanel() {
-  const [theme, setTheme]               = useState<ThemeId>('void');
+  const [theme, setTheme]               = useState<ThemeId>('chalk');
+  const [isDesktop, setIsDesktop]       = useState(false);
   const [times, setTimes]               = useState<Record<string, string>>({});
   const [aiOpen, setAiOpen]             = useState(false);
   const [moodResult, setMoodResult]     = useState('');
@@ -250,16 +249,20 @@ export default function RightPanel() {
   const [region, setRegion]             = useState('All');
 
   useEffect(() => {
-    const stored = getStoredTheme();
+    const stored = (localStorage.getItem('owf-theme') as ThemeId) || 'chalk';
     const c = localStorage.getItem('owf-cities');
     const h = localStorage.getItem('owf-home-city');
     setTheme(stored);
     applyTheme(stored);
     if (c) setPinned(JSON.parse(c));
     if (h) setHomeCity(h);
+    // Responsive: show panel on desktop
+    const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024);
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
     tick();
     const id = setInterval(tick, 30000);
-    return () => clearInterval(id);
+    return () => { clearInterval(id); window.removeEventListener('resize', checkDesktop); };
   }, []);
 
   function tick() {
@@ -325,24 +328,24 @@ export default function RightPanel() {
 
   const nonHomePinned = pinned.filter(c => c !== homeCity).length;
   const spot = SPOTLIGHT[spotIdx];
-  const T = THEMES[theme];
+  const T = THEMES[theme] ?? THEMES['chalk'] ?? Object.values(THEMES)[0];
 
   return (
     <aside style={{
-      display: 'none',
+      display: isDesktop ? 'flex' : 'none',
       flexDirection: 'column',
-      gap: '10px',
-      width: '272px',
+      gap: '12px',
+      width: '280px',
+      minWidth: '280px',
       flexShrink: 0,
       position: 'sticky',
       top: '16px',
       maxHeight: 'calc(100vh - 5rem)',
       overflowY: 'auto',
-      paddingBottom: '24px',
+      paddingBottom: '32px',
       scrollbarWidth: 'thin',
-      scrollbarColor: 'var(--owf-border) transparent',
+      scrollbarColor: 'rgba(255,255,255,0.15) transparent',
     }}
-    className="lg:flex"
     >
 
       {/* ── Spotlight ───────────────────────────────────────────────────── */}
@@ -470,21 +473,21 @@ export default function RightPanel() {
       {/* ── Trending ─────────────────────────────────────────────────────── */}
       <Panel>
         <Label>TRENDING NOW</Label>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {TRENDING.map((item, i) => (
             <button key={item.tag} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '7px 8px', borderRadius: '10px', cursor: 'pointer',
+              padding: '10px 12px', borderRadius: '12px', cursor: 'pointer',
               background: `${item.color}08`, border: 'none',
               transition: 'background 0.15s',
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '9px', fontWeight: 900, color: 'var(--owf-text-muted)', width: '12px', textAlign: 'right' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '10px', fontWeight: 900, color: 'var(--owf-text-muted)', width: '14px', textAlign: 'right' }}>
                   {i + 1}
                 </span>
-                <span style={{ fontSize: '12px', fontWeight: 700, color: item.color }}>{item.tag}</span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: item.color }}>{item.tag}</span>
               </div>
-              <span style={{ fontSize: '9px', fontWeight: 600, color: 'var(--owf-text-muted)' }}>{item.count}</span>
+              <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--owf-text-muted)' }}>{item.count}</span>
             </button>
           ))}
         </div>
@@ -616,24 +619,24 @@ export default function RightPanel() {
       {/* ── Who to Follow ────────────────────────────────────────────────── */}
       <Panel>
         <Label>WHO TO FOLLOW</Label>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {WHO_TO_FOLLOW.map(person => (
             <div key={person.handle} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{
-                  width: '36px', height: '36px', borderRadius: '12px', flexShrink: 0,
+                  width: '42px', height: '42px', borderRadius: '14px', flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#fff', fontSize: '14px', fontWeight: 900,
+                  color: '#fff', fontSize: '16px', fontWeight: 900,
                   background: `linear-gradient(135deg, ${person.color}, ${person.color}99)`,
-                  boxShadow: `0 0 12px ${person.color}40`,
+                  boxShadow: `0 0 14px ${person.color}40`,
                 }}>{person.name.charAt(0)}</div>
                 <div>
-                  <p style={{ fontSize: '12px', fontWeight: 700, color: 'var(--owf-text)' }}>{person.name}</p>
-                  <p style={{ fontSize: '10px', color: 'var(--owf-text-muted)', marginTop: '1px' }}>{person.handle}</p>
+                  <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--owf-text)' }}>{person.name}</p>
+                  <p style={{ fontSize: '11px', color: 'var(--owf-text-muted)', marginTop: '2px' }}>{person.handle}</p>
                 </div>
               </div>
               <button style={{
-                fontSize: '10px', fontWeight: 700, padding: '5px 12px', borderRadius: '99px', cursor: 'pointer',
+                fontSize: '11px', fontWeight: 700, padding: '6px 14px', borderRadius: '99px', cursor: 'pointer',
                 background: `${person.color}15`, color: person.color,
                 border: `1px solid ${person.color}30`,
               }}>Follow</button>

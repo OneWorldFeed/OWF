@@ -346,7 +346,7 @@ export function applyTheme(id: ThemeId) {
 
 export function getStoredTheme(): ThemeId {
   if (typeof window === 'undefined') return 'void';
-  return (localStorage.getItem('owf-theme') as ThemeId) || 'void';
+  return (localStorage.getItem('owf-theme') as ThemeId) || 'chalk';
 }
 
 // ─── Mood system (unchanged, preserved fully) ────────────────────────────────
