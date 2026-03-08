@@ -19,13 +19,28 @@ const posts = [
 
 export default function Home() {
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 16px' }}>
-      <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-        <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+    <div style={{ padding: '8px 0 32px', width: '100%', boxSizing: 'border-box' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', width: '100%' }}>
+
+        {/* Feed */}
+        <div style={{ flex: 1, minWidth: 0, paddingLeft: '16px', paddingRight: '24px' }}>
           <GlobalMomentsStrip />
           <FeedTabs posts={posts} />
         </div>
-        <RightPanel />
+
+        {/* Divider */}
+        <div style={{
+          width: '1px',
+          alignSelf: 'stretch',
+          background: 'var(--owf-border)',
+          flexShrink: 0,
+        }} />
+
+        {/* Right panel */}
+        <div style={{ paddingLeft: '24px', paddingRight: '16px', flexShrink: 0 }}>
+          <RightPanel />
+        </div>
+
       </div>
     </div>
   );
