@@ -1,7 +1,8 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { escalatingCall } from '@/lib/ai/escalation';
-import { THEMES, THEME_ORDER, applyTheme } from '@/lib/theme';
+import { THEMES, THEME_ORDER } from '@/lib/theme';
+import { useTheme } from '@/context/ThemeProvider';
 import type { ThemeId } from '@/lib/theme';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -90,7 +91,6 @@ function Label({ children }: { children: React.ReactNode }) {
   );
 }
 
-// The horizon line — the AI page's signature mark
 function HorizonLine({ color }: { color?: string }) {
   return (
     <div style={{
@@ -115,7 +115,6 @@ function ThemeSelector({ current, onChange }: { current: ThemeId; onChange: (id:
 
   return (
     <div>
-      {/* Dark themes */}
       <p style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--owf-text-muted)', marginBottom: '10px' }}>
         DARK
       </p>
@@ -128,16 +127,11 @@ function ThemeSelector({ current, onChange }: { current: ThemeId; onChange: (id:
               display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
               background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0',
             }}>
-              {/* Swatch */}
               <div style={{
                 width: '52px', height: '52px', borderRadius: '16px',
                 background: t.swatch,
-                border: active
-                  ? `2px solid ${t.horizon}`
-                  : '2px solid rgba(255,255,255,0.08)',
-                boxShadow: active
-                  ? `0 0 0 3px ${t.horizon}35, 0 0 20px ${t.aurora}`
-                  : '0 2px 10px rgba(0,0,0,0.35)',
+                border: active ? `2px solid ${t.horizon}` : '2px solid rgba(255,255,255,0.08)',
+                boxShadow: active ? `0 0 0 3px ${t.horizon}35, 0 0 20px ${t.aurora}` : '0 2px 10px rgba(0,0,0,0.35)',
                 position: 'relative', overflow: 'hidden',
                 transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
                 transform: active ? 'scale(1.1)' : 'scale(1)',
@@ -152,17 +146,14 @@ function ThemeSelector({ current, onChange }: { current: ThemeId; onChange: (id:
                   <div style={{
                     position: 'absolute', top: '5px', right: '5px',
                     width: '11px', height: '11px', borderRadius: '50%',
-                    background: t.horizon,
-                    boxShadow: `0 0 8px ${t.horizon}`,
+                    background: t.horizon, boxShadow: `0 0 8px ${t.horizon}`,
                   }} />
                 )}
               </div>
               <span style={{
                 fontSize: '9px', fontWeight: active ? 800 : 500,
                 color: active ? t.horizon : 'var(--owf-text-muted)',
-                letterSpacing: '0.02em',
-                transition: 'color 0.2s',
-                whiteSpace: 'nowrap',
+                letterSpacing: '0.02em', transition: 'color 0.2s', whiteSpace: 'nowrap',
               }}>
                 {t.label}
               </span>
@@ -171,10 +162,8 @@ function ThemeSelector({ current, onChange }: { current: ThemeId; onChange: (id:
         })}
       </div>
 
-      {/* Divider */}
       <div style={{ height: '1px', background: 'var(--owf-border)', marginBottom: '18px' }} />
 
-      {/* Light themes */}
       <p style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--owf-text-muted)', marginBottom: '10px' }}>
         LIGHT
       </p>
@@ -190,12 +179,8 @@ function ThemeSelector({ current, onChange }: { current: ThemeId; onChange: (id:
               <div style={{
                 width: '52px', height: '52px', borderRadius: '16px',
                 background: t.swatch,
-                border: active
-                  ? `2px solid ${t.horizon}`
-                  : '2px solid rgba(0,0,0,0.10)',
-                boxShadow: active
-                  ? `0 0 0 3px ${t.horizon}35, 0 4px 20px ${t.aurora}`
-                  : '0 2px 10px rgba(0,0,0,0.10)',
+                border: active ? `2px solid ${t.horizon}` : '2px solid rgba(0,0,0,0.10)',
+                boxShadow: active ? `0 0 0 3px ${t.horizon}35, 0 4px 20px ${t.aurora}` : '0 2px 10px rgba(0,0,0,0.10)',
                 position: 'relative', overflow: 'hidden',
                 transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
                 transform: active ? 'scale(1.1)' : 'scale(1)',
@@ -210,17 +195,14 @@ function ThemeSelector({ current, onChange }: { current: ThemeId; onChange: (id:
                   <div style={{
                     position: 'absolute', top: '5px', right: '5px',
                     width: '11px', height: '11px', borderRadius: '50%',
-                    background: t.horizon,
-                    boxShadow: `0 0 8px ${t.horizon}`,
+                    background: t.horizon, boxShadow: `0 0 8px ${t.horizon}`,
                   }} />
                 )}
               </div>
               <span style={{
                 fontSize: '9px', fontWeight: active ? 800 : 500,
                 color: active ? t.horizon : 'var(--owf-text-muted)',
-                letterSpacing: '0.02em',
-                transition: 'color 0.2s',
-                whiteSpace: 'nowrap',
+                letterSpacing: '0.02em', transition: 'color 0.2s', whiteSpace: 'nowrap',
               }}>
                 {t.label}
               </span>
@@ -235,33 +217,30 @@ function ThemeSelector({ current, onChange }: { current: ThemeId; onChange: (id:
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function RightPanel() {
-  const [mounted, setMounted]           = useState(false);
-  const [theme, setTheme]               = useState<ThemeId>('chalk');
-  const [isDesktop, setIsDesktop]       = useState(false);
-  const [times, setTimes]               = useState<Record<string, string>>({});
-  const [aiOpen, setAiOpen]             = useState(false);
-  const [moodResult, setMoodResult]     = useState('');
-  const [moodLoading, setMoodLoading]   = useState(false);
+  const { themeId, theme: T, setTheme } = useTheme();
+
+  const [mounted, setMounted]               = useState(false);
+  const [isDesktop, setIsDesktop]           = useState(false);
+  const [times, setTimes]                   = useState<Record<string, string>>({});
+  const [aiOpen, setAiOpen]                 = useState(false);
+  const [moodResult, setMoodResult]         = useState('');
+  const [moodLoading, setMoodLoading]       = useState(false);
   const [summaryResult, setSummaryResult]   = useState('');
   const [summaryLoading, setSummaryLoading] = useState(false);
-  const [spotIdx, setSpotIdx]           = useState(0);
-  const [homeCity, setHomeCity]         = useState('Lagos');
-  const [pinned, setPinned]             = useState<string[]>(['Tokyo', 'London', 'New York']);
-  const [showPicker, setShowPicker]     = useState(false);
-  const [settingHome, setSettingHome]   = useState(false);
-  const [search, setSearch]             = useState('');
-  const [region, setRegion]             = useState('All');
+  const [spotIdx, setSpotIdx]               = useState(0);
+  const [homeCity, setHomeCity]             = useState('Lagos');
+  const [pinned, setPinned]                 = useState<string[]>(['Tokyo', 'London', 'New York']);
+  const [showPicker, setShowPicker]         = useState(false);
+  const [settingHome, setSettingHome]       = useState(false);
+  const [search, setSearch]                 = useState('');
+  const [region, setRegion]                 = useState('All');
 
   useEffect(() => {
     setMounted(true);
-    const stored = (localStorage.getItem('owf-theme') as ThemeId) || 'chalk';
     const c = localStorage.getItem('owf-cities');
     const h = localStorage.getItem('owf-home-city');
-    setTheme(stored);
-    applyTheme(stored);
     if (c) setPinned(JSON.parse(c));
     if (h) setHomeCity(h);
-    // Responsive: show panel on desktop
     const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024);
     checkDesktop();
     window.addEventListener('resize', checkDesktop);
@@ -274,11 +253,6 @@ export default function RightPanel() {
     const t: Record<string, string> = {};
     ALL_CITIES.forEach(c => { t[c.name] = getLocalTime(c.timezone); });
     setTimes(t);
-  }
-
-  function handleTheme(id: ThemeId) {
-    setTheme(id);
-    applyTheme(id);
   }
 
   function toggleCity(name: string) {
@@ -333,9 +307,7 @@ export default function RightPanel() {
 
   const nonHomePinned = pinned.filter(c => c !== homeCity).length;
   const spot = SPOTLIGHT[spotIdx];
-  const T = THEMES[theme] ?? THEMES['chalk'] ?? Object.values(THEMES)[0];
 
-  // Render a skeleton on server to hold layout space, swap to real panel on client
   if (!mounted) return (
     <aside style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
       {[140, 60, 180, 200, 140, 320].map((h, i) => (
@@ -348,12 +320,7 @@ export default function RightPanel() {
   );
 
   return (
-    <aside style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '12px',
-      width: '100%',
-    }}>
+    <aside style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
 
       {/* ── Spotlight ───────────────────────────────────────────────────── */}
       <Panel>
@@ -364,7 +331,6 @@ export default function RightPanel() {
             onContextMenu={e => e.preventDefault()}
             style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none', display: 'block' }} />
           <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent 50%)' }} />
-          {/* Horizon glow over image */}
           <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px',
             background: `linear-gradient(90deg, transparent, ${T.horizon}80, transparent)` }} />
           <div style={{ position: 'absolute', bottom: '12px', left: '12px', right: '12px' }}>
@@ -412,12 +378,7 @@ export default function RightPanel() {
 
         {aiOpen && (
           <div style={{ marginTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {/* Mood of the Day */}
-            <div style={{
-              borderRadius: '12px', padding: '12px',
-              background: 'var(--owf-raised)',
-              border: '1px solid var(--owf-border)',
-            }}>
+            <div style={{ borderRadius: '12px', padding: '12px', background: 'var(--owf-raised)', border: '1px solid var(--owf-border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <div>
                   <p style={{ fontSize: '11px', fontWeight: 700, color: 'var(--owf-text)' }}>🌍 Mood of the Day</p>
@@ -434,20 +395,12 @@ export default function RightPanel() {
                 </button>
               </div>
               {moodResult && (
-                <p style={{
-                  fontSize: '11px', lineHeight: 1.6, color: 'var(--owf-text-sub)',
-                  borderLeft: `2px solid ${T.horizon}`,
-                  paddingLeft: '8px', margin: 0,
-                }}>{moodResult}</p>
+                <p style={{ fontSize: '11px', lineHeight: 1.6, color: 'var(--owf-text-sub)',
+                  borderLeft: `2px solid ${T.horizon}`, paddingLeft: '8px', margin: 0 }}>{moodResult}</p>
               )}
             </div>
 
-            {/* Feed Summary */}
-            <div style={{
-              borderRadius: '12px', padding: '12px',
-              background: 'var(--owf-raised)',
-              border: '1px solid var(--owf-border)',
-            }}>
+            <div style={{ borderRadius: '12px', padding: '12px', background: 'var(--owf-raised)', border: '1px solid var(--owf-border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <div>
                   <p style={{ fontSize: '11px', fontWeight: 700, color: 'var(--owf-text)' }}>📋 Feed Summary</p>
@@ -464,12 +417,9 @@ export default function RightPanel() {
                 </button>
               </div>
               {summaryResult && (
-                <p style={{
-                  fontSize: '11px', lineHeight: 1.6, color: 'var(--owf-text-sub)',
-                  borderLeft: `2px solid ${T.horizon}`,
-                  paddingLeft: '8px', margin: 0,
-                  whiteSpace: 'pre-line',
-                }}>{summaryResult}</p>
+                <p style={{ fontSize: '11px', lineHeight: 1.6, color: 'var(--owf-text-sub)',
+                  borderLeft: `2px solid ${T.horizon}`, paddingLeft: '8px', margin: 0,
+                  whiteSpace: 'pre-line' }}>{summaryResult}</p>
               )}
             </div>
           </div>
@@ -485,13 +435,10 @@ export default function RightPanel() {
             <button key={item.tag} style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '10px 12px', borderRadius: '12px', cursor: 'pointer',
-              background: `${item.color}08`, border: 'none',
-              transition: 'background 0.15s',
+              background: `${item.color}08`, border: 'none', transition: 'background 0.15s',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '10px', fontWeight: 900, color: 'var(--owf-text-muted)', width: '14px', textAlign: 'right' }}>
-                  {i + 1}
-                </span>
+                <span style={{ fontSize: '10px', fontWeight: 900, color: 'var(--owf-text-muted)', width: '14px', textAlign: 'right' }}>{i + 1}</span>
                 <span style={{ fontSize: '13px', fontWeight: 700, color: item.color }}>{item.tag}</span>
               </div>
               <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--owf-text-muted)' }}>{item.count}</span>
@@ -540,15 +487,11 @@ export default function RightPanel() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                     <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--owf-text)' }}>{city.name}</span>
                     {city.name === homeCity && (
-                      <span style={{
-                        fontSize: '7px', fontWeight: 900, padding: '1px 5px', borderRadius: '99px',
-                        background: T.horizon, color: T.isDark ? '#000' : '#fff',
-                      }}>HOME</span>
+                      <span style={{ fontSize: '7px', fontWeight: 900, padding: '1px 5px', borderRadius: '99px',
+                        background: T.horizon, color: T.isDark ? '#000' : '#fff' }}>HOME</span>
                     )}
                   </div>
-                  <p style={{ fontSize: '10px', color: 'var(--owf-text-muted)', marginTop: '1px' }}>
-                    {times[city.name] || '--'}
-                  </p>
+                  <p style={{ fontSize: '10px', color: 'var(--owf-text-muted)', marginTop: '1px' }}>{times[city.name] || '--'}</p>
                 </div>
                 {city.name !== homeCity && (
                   <button onClick={() => toggleCity(city.name)} style={{
@@ -608,10 +551,8 @@ export default function RightPanel() {
                         }}>✓</div>
                       )}
                       <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--owf-text)' }}>{city.name}</span>
-                      {isHome && <span style={{
-                        fontSize: '7px', fontWeight: 900, padding: '1px 5px', borderRadius: '99px',
-                        background: T.horizon, color: T.isDark ? '#000' : '#fff',
-                      }}>HOME</span>}
+                      {isHome && <span style={{ fontSize: '7px', fontWeight: 900, padding: '1px 5px', borderRadius: '99px',
+                        background: T.horizon, color: T.isDark ? '#000' : '#fff' }}>HOME</span>}
                     </div>
                     <span style={{ fontSize: '9px', color: 'var(--owf-text-muted)' }}>{city.region}</span>
                   </button>
@@ -644,8 +585,7 @@ export default function RightPanel() {
               </div>
               <button style={{
                 fontSize: '11px', fontWeight: 700, padding: '6px 14px', borderRadius: '99px', cursor: 'pointer',
-                background: `${person.color}15`, color: person.color,
-                border: `1px solid ${person.color}30`,
+                background: `${person.color}15`, color: person.color, border: `1px solid ${person.color}30`,
               }}>Follow</button>
             </div>
           ))}
@@ -664,7 +604,7 @@ export default function RightPanel() {
             THEME — <span style={{ color: T.horizon }}>{T.emoji} {T.label}</span>
           </p>
         </div>
-        <ThemeSelector current={theme} onChange={handleTheme} />
+        <ThemeSelector current={themeId} onChange={setTheme} />
         <HorizonLine />
       </Panel>
 

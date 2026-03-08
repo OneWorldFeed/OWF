@@ -19,18 +19,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       >
         <ThemeProvider>
           <GlobalHeader />
-          {/* Left nav — desktop only */}
           <div className="hidden md:block">
             <LeftNav />
           </div>
-          {/* Main content */}
           <main
             className="mt-14 min-h-screen pb-20 md:pb-0 md:ml-56"
             style={{ backgroundColor: 'var(--owf-bg)' }}
           >
             {children}
           </main>
-          {/* Bottom nav — mobile only */}
           <div className="block md:hidden">
             <BottomNav />
           </div>
