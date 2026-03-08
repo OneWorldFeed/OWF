@@ -25,16 +25,12 @@ export default function Home() {
       width: '100%',
     }}>
 
-      {/* Feed — scrolls with page AND has its own internal scroll */}
+      {/* Feed — full natural height, page scroll is the only scroll */}
       <div style={{
         flex: 1,
         minWidth: 0,
         padding: '8px 24px 32px 20px',
         borderRight: '1px solid var(--owf-border)',
-        maxHeight: '100vh',
-        overflowY: 'auto',
-        scrollbarWidth: 'thin',
-        scrollbarColor: 'rgba(128,128,128,0.2) transparent',
       }}>
         <GlobalMomentsStrip />
         <FeedTabs posts={posts} />
