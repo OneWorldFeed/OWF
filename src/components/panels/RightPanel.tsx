@@ -207,13 +207,6 @@ const THEMES = [
   },
 ];
 
-const THEMES = [
-  { id: 'light',    label: 'Light',    gradient: 'linear-gradient(135deg, #F9FAFB, #FFFFFF)',   vars: { '--owf-bg': '#F9FAFB', '--owf-surface': '#FFFFFF', '--owf-border': '#E5E7EB', '--owf-text-primary': '#111827', '--owf-text-secondary': '#6B7280', '--owf-navy': '#0D1F35' } },
-  { id: 'dark',     label: 'Dark',     gradient: 'linear-gradient(135deg, #060E1A, #0D1F35)',   vars: { '--owf-bg': '#060E1A', '--owf-surface': '#0D1F35', '--owf-border': '#1E3A5F', '--owf-text-primary': '#F9FAFB', '--owf-text-secondary': '#9CA3AF', '--owf-navy': '#1E3A5F' } },
-  { id: 'midnight', label: 'Midnight', gradient: 'linear-gradient(135deg, #0A0A0F, #13131A)',   vars: { '--owf-bg': '#0A0A0F', '--owf-surface': '#13131A', '--owf-border': '#1F1F2E', '--owf-text-primary': '#E2E8F0', '--owf-text-secondary': '#718096', '--owf-navy': '#1F1F2E' } },
-  { id: 'warm',     label: 'Warm',     gradient: 'linear-gradient(135deg, #ffb36b, #ff6f91)',   vars: { '--owf-bg': '#FDFAF6', '--owf-surface': '#FFFBF5', '--owf-border': '#E8DDD0', '--owf-text-primary': '#2D1B0E', '--owf-text-secondary': '#7C6555', '--owf-navy': '#2D1B0E' } },
-  { id: 'forest',   label: 'Forest',   gradient: 'linear-gradient(135deg, #2d6a2d, #4a9e4a)',   vars: { '--owf-bg': '#F0F4F0', '--owf-surface': '#E8F0E8', '--owf-border': '#C8D8C8', '--owf-text-primary': '#1A2E1A', '--owf-text-secondary': '#4A6A4A', '--owf-navy': '#1A2E1A' } },
-];
 
 const TRENDING = [
   { tag: '+lagos',          count: '12.4k', color: '#D97706' },
