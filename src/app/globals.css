@@ -3,24 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --owf-bg: #F9FAFB;
+  --owf-bg: #F5F7FA;
   --owf-surface: #FFFFFF;
-  --owf-border: #E5E7EB;
-  --owf-text-primary: #111827;
-  --owf-text-secondary: #6B7280;
+  --owf-border: #E2E8F0;
+  --owf-text-primary: #0F172A;
+  --owf-text-secondary: #64748B;
   --owf-navy: #0D1F35;
   --owf-gold: #D97706;
   --owf-teal: #007A6E;
   --owf-purple: #5B54D6;
   --owf-orange: #F97316;
-}
-
-[data-theme="dark"] {
-  --owf-bg: #060E1A;
-  --owf-surface: #0D1F35;
-  --owf-border: #1E3A5F;
-  --owf-text-primary: #F9FAFB;
-  --owf-text-secondary: #6B7280;
+  --owf-accent: #D97706;
+  --owf-glow: rgba(217,119,6,0.25);
+  --owf-card-glow: rgba(217,119,6,0.08);
 }
 
 * {
@@ -33,10 +28,9 @@ body {
   background-color: var(--owf-bg);
   color: var(--owf-text-primary);
   font-family: Inter, system-ui, sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.4s ease, color 0.3s ease;
 }
 
-/* Hide scrollbar for horizontal scroll rows */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
