@@ -60,7 +60,7 @@ const ALL_CITIES = [
 ];
 
 const DEFAULT_PINNED = ['Lagos', 'Tokyo', 'London', 'New York'];
-const USER_HOME_CITY = 'Lagos';
+const DEFAULT_HOME = 'Lagos';
 
 function getLocalTime(timezone: string) {
   return new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: timezone });
@@ -86,6 +86,8 @@ export default function RightPanel() {
   const [showCityPicker, setShowCityPicker] = useState(false);
   const [citySearch, setCitySearch] = useState('');
   const [activeRegion, setActiveRegion] = useState('All');
+  const [homeCity, setHomeCity] = useState(DEFAULT_HOME);
+  const [settingHome, setSettingHome] = useState(false);
   const [aiOpen, setAiOpen] = useState(true);
   const [aiInput, setAiInput] = useState('');
   const [aiMessages, setAiMessages] = useState<{role: 'user'|'assistant'; text: string}[]>([]);
@@ -93,6 +95,8 @@ export default function RightPanel() {
 
   useEffect(() => {
     const saved = typeof window !== 'undefined' ? (localStorage.getItem('owf-theme') || 'noon') : 'noon';
+    const savedHome = typeof window !== 'undefined' ? localStorage.getItem('owf-home-city') : null;
+    if (savedHome) setHomeCity(savedHome);
     const savedCities = typeof window !== 'undefined' ? localStorage.getItem('owf-cities') : null;
     if (savedCities) try { setPinnedCities(JSON.parse(savedCities)); } catch {}
     setActiveTheme(saved);
@@ -121,7 +125,7 @@ export default function RightPanel() {
   }
 
   function toggleCity(cityName: string) {
-    if (cityName === USER_HOME_CITY) return;
+    if (cityName === homeCity) return;
     const next = pinnedCities.includes(cityName)
       ? pinnedCities.filter(c => c !== cityName)
       : pinnedCities.length < 4 ? [...pinnedCities, cityName] : pinnedCities;
@@ -146,6 +150,12 @@ export default function RightPanel() {
     setAiLoading(false);
   }
 
+  function setAsHome(cityName: string) {
+    setHomeCity(cityName);
+    setSettingHome(false);
+    if (typeof window !== 'undefined') localStorage.setItem('owf-home-city', cityName);
+  }
+
   const regions = ['All', 'Africa', 'Asia', 'Europe', 'Americas', 'Oceania'];
   const filteredCities = ALL_CITIES.filter(c => {
     const matchRegion = activeRegion === 'All' || c.region === activeRegion;
@@ -154,8 +164,8 @@ export default function RightPanel() {
   });
 
   const displayCities = [
-    ALL_CITIES.find(c => c.name === USER_HOME_CITY)!,
-    ...pinnedCities.filter(n => n !== USER_HOME_CITY).map(n => ALL_CITIES.find(c => c.name === n)!).filter(Boolean),
+    ALL_CITIES.find(c => c.name === homeCity)!,
+    ...pinnedCities.filter(n => n !== homeCity).map(n => ALL_CITIES.find(c => c.name === n)!).filter(Boolean),
   ];
 
   const spotlight = SPOTLIGHT[spotlightIdx];
@@ -204,11 +214,18 @@ export default function RightPanel() {
       <SectionCard>
         <div className="flex items-center justify-between mb-3">
           <SectionTitle>WORLD CLOCKS</SectionTitle>
-          <button onClick={() => setShowCityPicker(!showCityPicker)}
-            className="text-xs font-bold px-2 py-1 rounded-lg transition-all"
-            style={{ color: 'var(--owf-accent)', backgroundColor: 'var(--owf-card-glow)', border: '1px solid var(--owf-glow)' }}>
-            {showCityPicker ? 'Done' : '+ Cities'}
-          </button>
+          <div className="flex gap-1">
+            <button onClick={() => { setSettingHome(!settingHome); setShowCityPicker(false); }}
+              className="text-xs font-bold px-2 py-1 rounded-lg transition-all"
+              style={{ color: settingHome ? '#fff' : 'var(--owf-accent)', backgroundColor: settingHome ? 'var(--owf-accent)' : 'var(--owf-card-glow)', border: '1px solid var(--owf-glow)' }}>
+              🏠
+            </button>
+            <button onClick={() => { setShowCityPicker(!showCityPicker); setSettingHome(false); }}
+              className="text-xs font-bold px-2 py-1 rounded-lg transition-all"
+              style={{ color: showCityPicker ? '#fff' : 'var(--owf-accent)', backgroundColor: showCityPicker ? 'var(--owf-accent)' : 'var(--owf-card-glow)', border: '1px solid var(--owf-glow)' }}>
+              {showCityPicker ? 'Done' : '+ Cities'}
+            </button>
+          </div>
         </div>
         {!showCityPicker ? (
           <div className="space-y-2">
@@ -248,7 +265,7 @@ export default function RightPanel() {
             <div className="space-y-1 max-h-52 overflow-y-auto">
               {filteredCities.map(city => {
                 const pinned = pinnedCities.includes(city.name);
-                const isHome = city.name === USER_HOME_CITY;
+                const isHome = city.name === homeCity;
                 return (
                   <button key={city.name} onClick={() => toggleCity(city.name)}
                     className="w-full flex items-center justify-between py-1.5 px-2 rounded-xl transition-all"
@@ -265,6 +282,39 @@ export default function RightPanel() {
                   </button>
                 );
               })}
+            </div>
+          </div>
+        )}
+        {settingHome && (
+          <div className="mt-3">
+            <p className="text-xs mb-2 font-semibold" style={{ color: 'var(--owf-text-secondary)' }}>Tap a city to set as HOME</p>
+            <input type="text" value={citySearch} onChange={e => setCitySearch(e.target.value)}
+              placeholder="Search cities..."
+              className="w-full text-xs px-3 py-2 rounded-xl mb-2 focus:outline-none"
+              style={{ backgroundColor: 'var(--owf-bg)', border: '1px solid var(--owf-border)', color: 'var(--owf-text-primary)' }} />
+            <div className="flex gap-1 flex-wrap mb-2">
+              {regions.map(r => (
+                <button key={r} onClick={() => setActiveRegion(r)}
+                  className="text-[10px] font-bold px-2 py-1 rounded-lg"
+                  style={{ backgroundColor: activeRegion === r ? 'var(--owf-accent)' : 'var(--owf-bg)', color: activeRegion === r ? '#fff' : 'var(--owf-text-secondary)', border: '1px solid var(--owf-border)' }}>
+                  {r}
+                </button>
+              ))}
+            </div>
+            <div className="space-y-1 max-h-48 overflow-y-auto">
+              {filteredCities.map(city => (
+                <button key={city.name} onClick={() => setAsHome(city.name)}
+                  className="w-full flex items-center justify-between py-1.5 px-2 rounded-xl transition-all hover:scale-[1.01]"
+                  style={{ backgroundColor: city.name === homeCity ? 'var(--owf-accent)18' : 'transparent' }}>
+                  <div className="flex items-center gap-2">
+                    {city.name === homeCity && (
+                      <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full" style={{ backgroundColor: 'var(--owf-accent)', color: '#fff' }}>HOME</span>
+                    )}
+                    <span className="text-xs font-semibold" style={{ color: 'var(--owf-text-primary)' }}>{city.name}</span>
+                  </div>
+                  <span className="text-[10px]" style={{ color: 'var(--owf-text-secondary)' }}>{city.region}</span>
+                </button>
+              ))}
             </div>
           </div>
         )}
