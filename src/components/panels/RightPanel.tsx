@@ -70,7 +70,6 @@ function Panel({ children, glow }: { children: React.ReactNode; glow?: boolean }
       borderRadius: '20px',
       padding: '20px',
       position: 'relative',
-      overflow: 'hidden',
       boxShadow: glow
         ? `0 8px 32px rgba(var(--owf-horizon-rgb), 0.08), 0 1px 0 var(--owf-border) inset`
         : `0 4px 20px rgba(0,0,0,0.12), 0 1px 0 var(--owf-border) inset`,
@@ -95,11 +94,15 @@ function Label({ children }: { children: React.ReactNode }) {
 function HorizonLine({ color }: { color?: string }) {
   return (
     <div style={{
-      position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px',
+      marginTop: '16px',
+      marginLeft: '-20px',
+      marginRight: '-20px',
+      marginBottom: '-4px',
+      height: '1px',
       background: color
         ? `linear-gradient(90deg, transparent 0%, ${color}90 30%, ${color} 50%, ${color}90 70%, transparent 100%)`
         : `linear-gradient(90deg, transparent 0%, var(--owf-horizon) 40% 60%, transparent 100%)`,
-      opacity: 0.6,
+      opacity: 0.5,
     }} />
   );
 }
@@ -342,6 +345,7 @@ export default function RightPanel() {
       top: '16px',
       maxHeight: 'calc(100vh - 5rem)',
       overflowY: 'auto',
+      overflowX: 'visible',
       paddingBottom: '32px',
       scrollbarWidth: 'thin',
       scrollbarColor: 'rgba(255,255,255,0.15) transparent',
