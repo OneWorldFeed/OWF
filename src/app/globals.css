@@ -3,19 +3,27 @@
 @tailwind utilities;
 
 :root {
-  --owf-bg: #F5F7FA;
-  --owf-surface: #FFFFFF;
-  --owf-border: #E2E8F0;
-  --owf-text-primary: #0F172A;
-  --owf-text-secondary: #64748B;
-  --owf-navy: #0D1F35;
-  --owf-gold: #D97706;
+  --owf-bg: #F2F5F8;
+  --owf-surface: rgba(255,255,255,0.82);
+  --owf-surface-hover: rgba(255,255,255,0.95);
+  --owf-raised: rgba(255,255,255,0.98);
+  --owf-border: rgba(0,0,0,0.06);
+  --owf-border-strong: rgba(0,210,190,0.45);
+  --owf-text: #0F1924;
+  --owf-text-sub: #5A6E80;
+  --owf-text-muted: #9AAFBE;
+  --owf-horizon: rgba(0,210,190,0.8);
+  --owf-horizon-rgb: 0,210,190;
+  --owf-aurora: rgba(0,200,180,0.08);
+  --owf-glow: rgba(0,210,190,0.12);
+  --owf-gold: #F97316;
+  /* Legacy aliases */
+  --owf-text-primary: #0F1924;
+  --owf-text-secondary: #5A6E80;
+  --owf-navy: #060E1A;
+  --owf-orange: #F97316;
   --owf-teal: #007A6E;
   --owf-purple: #5B54D6;
-  --owf-orange: #F97316;
-  --owf-accent: #D97706;
-  --owf-glow: rgba(217,119,6,0.25);
-  --owf-card-glow: rgba(217,119,6,0.08);
 }
 
 * {
@@ -27,14 +35,30 @@
 body {
   background-color: var(--owf-bg);
   color: var(--owf-text-primary);
-  font-family: Inter, system-ui, sans-serif;
-  transition: background-color 0.4s ease, color 0.3s ease;
+  font-family: 'DM Sans', Inter, system-ui, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Hide scrollbar for horizontal scroll rows */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Feed center — always-visible thin scrollbar on the right edge */
+.feed-center::-webkit-scrollbar {
+  width: 4px;
+}
+.feed-center::-webkit-scrollbar-track {
+  background: transparent;
+}
+.feed-center::-webkit-scrollbar-thumb {
+  background: rgba(128,128,128,0.25);
+  border-radius: 99px;
+}
+.feed-center::-webkit-scrollbar-thumb:hover {
+  background: rgba(128,128,128,0.45);
 }

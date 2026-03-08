@@ -25,16 +25,17 @@ export default function Home() {
       width: '100%',
     }}>
 
-      {/* Feed — full natural height, page scroll + own scrollbar */}
+      {/* Feed — full natural height, page scroll + own always-visible scrollbar */}
       <div style={{
         flex: 1,
         minWidth: 0,
         padding: '8px 24px 32px 20px',
         borderRight: '1px solid var(--owf-border)',
-        overflowY: 'scroll',
         scrollbarWidth: 'thin',
         scrollbarColor: 'rgba(128,128,128,0.3) transparent',
-      }}>
+      }}
+      className="feed-center"
+      >
         <GlobalMomentsStrip />
         <FeedTabs posts={posts} />
       </div>
