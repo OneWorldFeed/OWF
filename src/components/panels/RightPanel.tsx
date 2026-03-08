@@ -335,8 +335,29 @@ export default function RightPanel() {
   const spot = SPOTLIGHT[spotIdx];
   const T = THEMES[theme] ?? THEMES['chalk'] ?? Object.values(THEMES)[0];
 
-  // Don't render on server — panel uses localStorage + window, causes hydration mismatch
-  if (!mounted) return null;
+  // Render a skeleton on server to hold layout space, swap to real panel on client
+  if (!mounted) return (
+    <aside style={{
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '12px',
+      width: '280px',
+      minWidth: '280px',
+      flexShrink: 0,
+      position: 'sticky',
+      top: '16px',
+      maxHeight: 'calc(100vh - 5rem)',
+    }}>
+      {[140, 60, 180, 200, 140, 320].map((h, i) => (
+        <div key={i} style={{
+          height: `${h}px`,
+          borderRadius: '20px',
+          background: 'rgba(0,0,0,0.04)',
+          border: '1px solid rgba(0,0,0,0.06)',
+        }} />
+      ))}
+    </aside>
+  );
 
   return (
     <aside style={{
