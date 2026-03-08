@@ -153,7 +153,7 @@ export default function RightPanel() {
   function handleTheme(id: string) {
     setTheme(id);
     applyTheme(id);
-    localStorage.setItem('owf-theme', id);
+    if (typeof window !== 'undefined') localStorage.setItem('owf-theme', id);
   }
 
   function toggleCity(name: string) {
@@ -161,7 +161,7 @@ export default function RightPanel() {
     if (pinned.includes(name)) {
       const next = pinned.filter(c => c !== name);
       setPinned(next);
-      localStorage.setItem('owf-cities', JSON.stringify(next));
+      if (typeof window !== 'undefined') localStorage.setItem('owf-cities', JSON.stringify(next));
     } else {
       const nonHome = pinned.filter(c => c !== homeCity);
       if (nonHome.length >= MAX_PINNED) return;
