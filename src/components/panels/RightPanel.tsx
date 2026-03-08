@@ -235,6 +235,7 @@ function ThemeSelector({ current, onChange }: { current: ThemeId; onChange: (id:
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function RightPanel() {
+  const [mounted, setMounted]           = useState(false);
   const [theme, setTheme]               = useState<ThemeId>('chalk');
   const [isDesktop, setIsDesktop]       = useState(false);
   const [times, setTimes]               = useState<Record<string, string>>({});
@@ -252,6 +253,7 @@ export default function RightPanel() {
   const [region, setRegion]             = useState('All');
 
   useEffect(() => {
+    setMounted(true);
     const stored = (localStorage.getItem('owf-theme') as ThemeId) || 'chalk';
     const c = localStorage.getItem('owf-cities');
     const h = localStorage.getItem('owf-home-city');
@@ -332,6 +334,9 @@ export default function RightPanel() {
   const nonHomePinned = pinned.filter(c => c !== homeCity).length;
   const spot = SPOTLIGHT[spotIdx];
   const T = THEMES[theme] ?? THEMES['chalk'] ?? Object.values(THEMES)[0];
+
+  // Don't render on server — panel uses localStorage + window, causes hydration mismatch
+  if (!mounted) return null;
 
   return (
     <aside style={{
