@@ -19,20 +19,17 @@ const posts = [
 
 export default function Home() {
   return (
-    // Full viewport height minus header, no page scroll — children manage their own scroll
     <div style={{
       display: 'flex',
-      height: 'calc(100vh - 56px)',
-      overflow: 'hidden',
+      alignItems: 'flex-start',
       width: '100%',
+      minHeight: 'calc(100vh - 56px)',
     }}>
 
-      {/* Feed — scrolls vertically, takes all remaining space */}
+      {/* Feed — normal flow, page scrolls with it */}
       <div style={{
         flex: 1,
         minWidth: 0,
-        overflowY: 'auto',
-        overflowX: 'hidden',
         padding: '8px 24px 32px 20px',
         borderRight: '1px solid var(--owf-border)',
       }}>
@@ -40,12 +37,14 @@ export default function Home() {
         <FeedTabs posts={posts} />
       </div>
 
-      {/* Right panel — locked, never scrolls with page */}
+      {/* Right panel — sticky to viewport, never scrolls with page */}
       <div style={{
         width: '300px',
         minWidth: '300px',
         flexShrink: 0,
-        height: '100%',
+        position: 'sticky',
+        top: '56px',
+        height: 'calc(100vh - 56px)',
         overflowY: 'auto',
         overflowX: 'hidden',
         padding: '12px 12px 32px 12px',
