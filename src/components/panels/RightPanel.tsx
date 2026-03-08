@@ -353,6 +353,11 @@ export default function RightPanel() {
       flexDirection: 'column',
       gap: '12px',
       width: '100%',
+      maxHeight: '85vh',
+      overflowY: 'auto',
+      overflowX: 'hidden',
+      scrollbarWidth: 'thin',
+      scrollbarColor: 'rgba(128,128,128,0.2) transparent',
     }}>
 
       {/* ── Spotlight ───────────────────────────────────────────────────── */}

@@ -26,7 +26,7 @@ export default function Home() {
       minHeight: 'calc(100vh - 56px)',
     }}>
 
-      {/* Feed — normal flow, page scrolls with it */}
+      {/* Feed — flows naturally with page scroll */}
       <div style={{
         flex: 1,
         minWidth: 0,
@@ -37,19 +37,12 @@ export default function Home() {
         <FeedTabs posts={posts} />
       </div>
 
-      {/* Right panel — sticky to viewport, never scrolls with page */}
+      {/* Right panel — scrolls with page, panels inside have their own scroll too */}
       <div style={{
         width: '300px',
         minWidth: '300px',
         flexShrink: 0,
-        position: 'sticky',
-        top: '56px',
-        height: 'calc(100vh - 56px)',
-        overflowY: 'auto',
-        overflowX: 'hidden',
         padding: '12px 12px 32px 12px',
-        scrollbarWidth: 'thin',
-        scrollbarColor: 'rgba(128,128,128,0.2) transparent',
       }}>
         <RightPanel />
       </div>
