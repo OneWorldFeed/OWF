@@ -22,7 +22,7 @@ const SUGGESTED_TAGS = [
   '+travel', '+nature', '+startups', '+culture', '+moment',
 ];
 
-const MAX_CHARS = 500;
+const MAX_CHARS = 280;
 const MAX_VIDEO_SECONDS = 90;
 
 interface ComposerProps {

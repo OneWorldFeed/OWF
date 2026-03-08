@@ -48,6 +48,12 @@ export default function FeedCard({
   const [likes, setLikes] = useState(likeCount);
   const [pulse, setPulse] = useState<null | 'like' | 'comment' | 'share' | 'save'>(null);
   const [glowIntensity, setGlowIntensity] = useState(0);
+  const [reposted, setReposted] = useState(false);
+  const [reposts, setReposts] = useState(0);
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [comments, setComments] = useState<{handle: string; text: string; time: string; color: string}[]>([]);
+  const [commentText, setCommentText] = useState('');
+  const [commentCount2, setCommentCount2] = useState(commentCount);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -86,6 +92,29 @@ export default function FeedCard({
     setSaved(next);
     if (next) triggerPulse('save');
     await recordInteraction(id, GUEST_ID, 'save', mood, city);
+  };
+
+  const handleRepost = () => {
+    const next = !reposted;
+    setReposted(next);
+    setReposts(prev => prev + (next ? 1 : -1));
+  };
+
+  const handleCommentToggle = () => {
+    setCommentsOpen(prev => !prev);
+  };
+
+  const handleCommentSubmit = () => {
+    const text = commentText.trim();
+    if (!text) return;
+    setComments(prev => [...prev, {
+      handle: 'you.feed',
+      text,
+      time: 'just now',
+      color: moodColor,
+    }]);
+    setCommentText('');
+    setCommentCount2(prev => prev + 1);
   };
 
   const currentIntensity = baseIntensity + glowIntensity * 0.6;
@@ -281,11 +310,25 @@ export default function FeedCard({
 
           {/* Comment */}
           <button
-            className="flex items-center gap-1.5 text-xs"
-            style={{ color: 'var(--owf-text-secondary)' }}
+            onClick={handleCommentToggle}
+            className="flex items-center gap-1.5 text-xs transition-all hover:scale-110"
+            style={{ color: commentsOpen ? moodColor : 'var(--owf-text-secondary)' }}
           >
-            <span className="text-base">◇</span>
-            <span>{commentCount}</span>
+            <span className="text-base">{commentsOpen ? '◆' : '◇'}</span>
+            <span>{commentCount2}</span>
+          </button>
+
+          {/* Repost */}
+          <button
+            onClick={handleRepost}
+            className="flex items-center gap-1.5 text-xs transition-all hover:scale-110"
+            style={{
+              color: reposted ? moodColor : 'var(--owf-text-secondary)',
+              transition: 'color 200ms ease, transform 200ms ease',
+            }}
+          >
+            <span className="text-base">⟳</span>
+            {reposts > 0 && <span>{reposts}</span>}
           </button>
 
           {/* Save */}
@@ -321,6 +364,57 @@ export default function FeedCard({
         </div>
 
       </div>
+
+      {/* Comments section */}
+      {commentsOpen && (
+        <div className="px-4 pb-4 pt-2" style={{ borderTop: `1px solid ${moodColor}22` }}>
+          {/* Existing comments */}
+          {comments.length > 0 && (
+            <div className="space-y-3 mb-3">
+              {comments.map((c, i) => (
+                <div key={i} className="flex gap-2.5">
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-black flex-shrink-0"
+                    style={{ backgroundColor: c.color }}>
+                    {c.handle.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-xs font-bold" style={{ color: 'var(--owf-text-primary)' }}>{c.handle}</span>
+                      <span className="text-[10px]" style={{ color: 'var(--owf-text-secondary)' }}>{c.time}</span>
+                    </div>
+                    <p className="text-xs leading-relaxed" style={{ color: 'var(--owf-text-primary)' }}>{c.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {comments.length === 0 && (
+            <p className="text-xs mb-3 text-center" style={{ color: 'var(--owf-text-secondary)' }}>Be the first to comment</p>
+          )}
+          {/* Comment input */}
+          <div className="flex gap-2 items-center">
+            <input
+              type="text"
+              value={commentText}
+              onChange={e => e.target.value.length <= 280 && setCommentText(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleCommentSubmit()}
+              placeholder="Add a comment..."
+              className="flex-1 text-xs px-3 py-2 rounded-xl focus:outline-none"
+              style={{ backgroundColor: 'var(--owf-bg)', border: `1px solid ${moodColor}33`, color: 'var(--owf-text-primary)' }}
+            />
+            <span className="text-[10px] flex-shrink-0" style={{ color: commentText.length > 250 ? '#EF4444' : 'var(--owf-text-secondary)' }}>
+              {280 - commentText.length}
+            </span>
+            <button
+              onClick={handleCommentSubmit}
+              disabled={!commentText.trim()}
+              className="text-xs font-bold px-3 py-2 rounded-xl transition-all hover:scale-105"
+              style={{ backgroundColor: commentText.trim() ? moodColor : 'var(--owf-border)', color: '#fff' }}>
+              Post
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Bottom mood line */}
       <div
