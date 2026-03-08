@@ -19,29 +19,42 @@ const posts = [
 
 export default function Home() {
   return (
-    <div style={{ padding: '8px 0 32px', width: '100%', boxSizing: 'border-box' }}>
-      <div style={{ display: 'flex', alignItems: 'flex-start', width: '100%' }}>
+    // Full viewport height minus header, no page scroll — children manage their own scroll
+    <div style={{
+      display: 'flex',
+      height: 'calc(100vh - 56px)',
+      overflow: 'hidden',
+      width: '100%',
+    }}>
 
-        {/* Feed */}
-        <div style={{ flex: 1, minWidth: 0, paddingLeft: '16px', paddingRight: '24px' }}>
-          <GlobalMomentsStrip />
-          <FeedTabs posts={posts} />
-        </div>
-
-        {/* Divider */}
-        <div style={{
-          width: '1px',
-          alignSelf: 'stretch',
-          background: 'var(--owf-border)',
-          flexShrink: 0,
-        }} />
-
-        {/* Right panel */}
-        <div style={{ paddingLeft: '24px', paddingRight: '16px', flexShrink: 0 }}>
-          <RightPanel />
-        </div>
-
+      {/* Feed — scrolls vertically, takes all remaining space */}
+      <div style={{
+        flex: 1,
+        minWidth: 0,
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        padding: '8px 24px 32px 20px',
+        borderRight: '1px solid var(--owf-border)',
+      }}>
+        <GlobalMomentsStrip />
+        <FeedTabs posts={posts} />
       </div>
+
+      {/* Right panel — locked, never scrolls with page */}
+      <div style={{
+        width: '300px',
+        minWidth: '300px',
+        flexShrink: 0,
+        height: '100%',
+        overflowY: 'auto',
+        overflowX: 'hidden',
+        padding: '12px 12px 32px 12px',
+        scrollbarWidth: 'thin',
+        scrollbarColor: 'rgba(128,128,128,0.2) transparent',
+      }}>
+        <RightPanel />
+      </div>
+
     </div>
   );
 }

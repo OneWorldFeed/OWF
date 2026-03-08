@@ -337,23 +337,11 @@ export default function RightPanel() {
 
   // Render a skeleton on server to hold layout space, swap to real panel on client
   if (!mounted) return (
-    <aside style={{
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '12px',
-      width: '280px',
-      minWidth: '280px',
-      flexShrink: 0,
-      position: 'sticky',
-      top: '16px',
-      maxHeight: 'calc(100vh - 5rem)',
-    }}>
+    <aside style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
       {[140, 60, 180, 200, 140, 320].map((h, i) => (
         <div key={i} style={{
-          height: `${h}px`,
-          borderRadius: '20px',
-          background: 'rgba(0,0,0,0.04)',
-          border: '1px solid rgba(0,0,0,0.06)',
+          height: `${h}px`, borderRadius: '20px',
+          background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.06)',
         }} />
       ))}
     </aside>
@@ -361,22 +349,11 @@ export default function RightPanel() {
 
   return (
     <aside style={{
-      display: isDesktop ? 'flex' : 'none',
+      display: 'flex',
       flexDirection: 'column',
       gap: '12px',
-      width: '280px',
-      minWidth: '280px',
-      flexShrink: 0,
-      position: 'sticky',
-      top: '16px',
-      maxHeight: 'calc(100vh - 5rem)',
-      overflowY: 'auto',
-      overflowX: 'visible',
-      paddingBottom: '32px',
-      scrollbarWidth: 'thin',
-      scrollbarColor: 'rgba(255,255,255,0.15) transparent',
-    }}
-    >
+      width: '100%',
+    }}>
 
       {/* ── Spotlight ───────────────────────────────────────────────────── */}
       <Panel>
