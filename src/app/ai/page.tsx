@@ -64,9 +64,28 @@ const AMBIENT_MESSAGES = [
   'The world is in motion today.\nWhat would you like to know?',
 ];
 
-const LANGUAGES = [
-  'Spanish', 'French', 'Arabic', 'Portuguese', 'Mandarin',
-  'Japanese', 'Swahili', 'Hindi', 'German', 'Korean',
+// MyMemory language codes: label → code
+const LANGUAGES: { label: string; code: string }[] = [
+  { label: 'Spanish',    code: 'es' },
+  { label: 'French',     code: 'fr' },
+  { label: 'Arabic',     code: 'ar' },
+  { label: 'Portuguese', code: 'pt' },
+  { label: 'Mandarin',   code: 'zh' },
+  { label: 'Japanese',   code: 'ja' },
+  { label: 'Swahili',    code: 'sw' },
+  { label: 'Hindi',      code: 'hi' },
+  { label: 'German',     code: 'de' },
+  { label: 'Korean',     code: 'ko' },
+  { label: 'Italian',    code: 'it' },
+  { label: 'Russian',    code: 'ru' },
+  { label: 'Turkish',    code: 'tr' },
+  { label: 'Dutch',      code: 'nl' },
+  { label: 'Polish',     code: 'pl' },
+  { label: 'Yoruba',     code: 'yo' },
+  { label: 'Igbo',       code: 'ig' },
+  { label: 'Hausa',      code: 'ha' },
+  { label: 'Amharic',    code: 'am' },
+  { label: 'Indonesian', code: 'id' },
 ];
 
 // ─── Tab types ───────────────────────────────────────────────────────────────
@@ -94,7 +113,7 @@ export default function AIPage() {
 
   // Translate
   const [translateInput, setTranslateInput]   = useState('');
-  const [translateLang, setTranslateLang]     = useState('Spanish');
+  const [translateLang, setTranslateLang]     = useState(LANGUAGES[0]);
   const [translateResult, setTranslateResult] = useState('');
   const [translateLoading, setTranslateLoading] = useState(false);
 
@@ -167,11 +186,18 @@ export default function AIPage() {
     setTranslateLoading(true);
     setTranslateResult('');
     try {
-      const res = await escalatingCall('ai_page',
-        `Translate the following text to ${translateLang}. Return only the translation, nothing else.\n\n"${translateInput}"`);
-      setTranslateResult(res.text);
+      // MyMemory free translation API — no key needed
+      const encoded = encodeURIComponent(translateInput.trim());
+      const url = `https://api.mymemory.translated.net/get?q=${encoded}&langpair=en|${translateLang.code}&de=owf@oneworldfeed.com`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.responseStatus === 200 && data.responseData?.translatedText) {
+        setTranslateResult(data.responseData.translatedText);
+      } else {
+        setTranslateResult('Translation unavailable right now. Try again in a moment.');
+      }
     } catch {
-      setTranslateResult('Translation unavailable right now.');
+      setTranslateResult('Translation unavailable right now. Check your connection.');
     }
     setTranslateLoading(false);
   }
@@ -387,14 +413,14 @@ export default function AIPage() {
 
               <div className="flex flex-wrap gap-2 mb-4">
                 {LANGUAGES.map(lang => (
-                  <button key={lang} onClick={() => setTranslateLang(lang)}
+                  <button key={lang.code} onClick={() => setTranslateLang(lang)}
                     className="px-3 py-1 rounded-full text-xs font-medium transition-all"
                     style={{
-                      background: translateLang === lang ? `rgba(${hRgb}, 0.2)` : 'rgba(255,255,255,0.05)',
-                      color: translateLang === lang ? h : 'rgba(255,255,255,0.45)',
-                      border: translateLang === lang ? `1px solid rgba(${hRgb}, 0.35)` : '1px solid rgba(255,255,255,0.08)',
+                      background: translateLang.code === lang.code ? `rgba(${hRgb}, 0.2)` : 'rgba(255,255,255,0.05)',
+                      color: translateLang.code === lang.code ? h : 'rgba(255,255,255,0.45)',
+                      border: translateLang.code === lang.code ? `1px solid rgba(${hRgb}, 0.35)` : '1px solid rgba(255,255,255,0.08)',
                     }}>
-                    {lang}
+                    {lang.label}
                   </button>
                 ))}
               </div>
@@ -406,14 +432,14 @@ export default function AIPage() {
                   color: !translateInput.trim() ? 'rgba(255,255,255,0.2)' : h,
                   border: `1px solid rgba(${hRgb}, ${!translateInput.trim() ? '0.1' : '0.25'})`,
                 }}>
-                {translateLoading ? <span className="animate-pulse">Translating...</span> : `Translate to ${translateLang} →`}
+                {translateLoading ? <span className="animate-pulse">Translating...</span> : `Translate to ${translateLang.label} →`}
               </button>
 
               {translateResult && (
                 <div className="mt-4 p-4 rounded-xl"
                   style={{ background: `rgba(${hRgb}, 0.08)`, border: `1px solid rgba(${hRgb}, 0.2)` }}>
                   <p className="text-xs font-semibold mb-2" style={{ color: `rgba(${hRgb.split(',').map(Number).join(', ')}, 0.7)` }}>
-                    {translateLang}
+                    {translateLang.label}
                   </p>
                   <p className="text-sm leading-relaxed" style={{ color: 'rgba(220,255,250,0.9)' }}>
                     {translateResult}
