@@ -15,7 +15,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body
         suppressHydrationWarning
-        style={{ backgroundColor: 'var(--owf-bg)', color: 'var(--owf-text-primary)' }}
+        style={{
+          backgroundColor: 'var(--owf-bg)',
+          color: 'var(--owf-text-primary)',
+        }}
       >
         <ThemeProvider>
           <GlobalHeader />
@@ -23,8 +26,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <LeftNav />
           </div>
           <main
-            className="mt-14 min-h-screen pb-20 md:pb-0 md:ml-56"
-            style={{ backgroundColor: 'var(--owf-bg)' }}
+            className="mt-14 pb-20 md:pb-0 md:ml-56"
+            style={{
+              backgroundColor: 'var(--owf-bg)',
+            }}
           >
             {children}
           </main>

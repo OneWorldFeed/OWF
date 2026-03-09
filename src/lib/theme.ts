@@ -325,6 +325,10 @@ export function themeToVars(t: OWFTheme): Record<string, string> {
     '--owf-aurora':        t.aurora,
     '--owf-glow':          t.glow,
     '--owf-gold':          t.gold,
+    // Feed cards — always white regardless of theme
+    '--owf-card':           '#ffffff',
+    '--owf-card-border':    t.isDark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.07)',
+    '--owf-card-glow':      t.horizon,
     // Legacy aliases so existing components don't break
     '--owf-text-primary':   t.text,
     '--owf-text-secondary': t.textSub,

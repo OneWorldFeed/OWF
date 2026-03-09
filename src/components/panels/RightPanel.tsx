@@ -1,11 +1,10 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { escalatingCall } from '@/lib/ai/escalation';
-import { THEMES, THEME_ORDER } from '@/lib/theme';
 import { useTheme } from '@/context/ThemeProvider';
-import type { ThemeId } from '@/lib/theme';
+import ThemeSelector from '@/components/ui/ThemeSelector';
 
-// ─── Data ────────────────────────────────────────────────────────────────────
+// ─── Data ─────────────────────────────────────────────────────────────────────
 
 const TRENDING = [
   { tag: '+lagos',          count: '12.4k', color: '#D97706' },
@@ -59,7 +58,7 @@ function getLocalTime(tz: string) {
   catch { return '--'; }
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
+// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function Panel({ children, glow }: { children: React.ReactNode; glow?: boolean }) {
   return (
@@ -72,8 +71,8 @@ function Panel({ children, glow }: { children: React.ReactNode; glow?: boolean }
       padding: '20px',
       position: 'relative',
       boxShadow: glow
-        ? `0 8px 32px rgba(var(--owf-horizon-rgb), 0.08), 0 1px 0 var(--owf-border) inset`
-        : `0 4px 20px rgba(0,0,0,0.12), 0 1px 0 var(--owf-border) inset`,
+        ? `0 8px 32px rgba(var(--owf-horizon-rgb), 0.08), inset 0 1px 0 var(--owf-border)`
+        : `0 4px 20px rgba(0,0,0,0.12), inset 0 1px 0 var(--owf-border)`,
     }}>
       {children}
     </div>
@@ -107,120 +106,12 @@ function HorizonLine({ color }: { color?: string }) {
   );
 }
 
-// ─── Theme Selector ──────────────────────────────────────────────────────────
-
-function ThemeSelector({ current, onChange }: { current: ThemeId; onChange: (id: ThemeId) => void }) {
-  const darkThemes  = THEME_ORDER.filter(id => THEMES[id].isDark);
-  const lightThemes = THEME_ORDER.filter(id => !THEMES[id].isDark);
-
-  return (
-    <div>
-      <p style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--owf-text-muted)', marginBottom: '10px' }}>
-        DARK
-      </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginBottom: '18px' }}>
-        {darkThemes.map(id => {
-          const t = THEMES[id];
-          const active = current === id;
-          return (
-            <button key={id} onClick={() => onChange(id)} title={t.label} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
-              background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0',
-            }}>
-              <div style={{
-                width: '52px', height: '52px', borderRadius: '16px',
-                background: t.swatch,
-                border: active ? `2px solid ${t.horizon}` : '2px solid rgba(255,255,255,0.08)',
-                boxShadow: active ? `0 0 0 3px ${t.horizon}35, 0 0 20px ${t.aurora}` : '0 2px 10px rgba(0,0,0,0.35)',
-                position: 'relative', overflow: 'hidden',
-                transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
-                transform: active ? 'scale(1.1)' : 'scale(1)',
-              }}>
-                <div style={{
-                  position: 'absolute', bottom: 0, left: 0, right: 0, height: '3px',
-                  background: t.horizon, opacity: active ? 1 : 0.4,
-                  boxShadow: `0 0 8px ${t.horizon}`,
-                  transition: 'opacity 0.2s',
-                }} />
-                {active && (
-                  <div style={{
-                    position: 'absolute', top: '5px', right: '5px',
-                    width: '11px', height: '11px', borderRadius: '50%',
-                    background: t.horizon, boxShadow: `0 0 8px ${t.horizon}`,
-                  }} />
-                )}
-              </div>
-              <span style={{
-                fontSize: '9px', fontWeight: active ? 800 : 500,
-                color: active ? t.horizon : 'var(--owf-text-muted)',
-                letterSpacing: '0.02em', transition: 'color 0.2s', whiteSpace: 'nowrap',
-              }}>
-                {t.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      <div style={{ height: '1px', background: 'var(--owf-border)', marginBottom: '18px' }} />
-
-      <p style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--owf-text-muted)', marginBottom: '10px' }}>
-        LIGHT
-      </p>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
-        {lightThemes.map(id => {
-          const t = THEMES[id];
-          const active = current === id;
-          return (
-            <button key={id} onClick={() => onChange(id)} title={t.label} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
-              background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0',
-            }}>
-              <div style={{
-                width: '52px', height: '52px', borderRadius: '16px',
-                background: t.swatch,
-                border: active ? `2px solid ${t.horizon}` : '2px solid rgba(0,0,0,0.10)',
-                boxShadow: active ? `0 0 0 3px ${t.horizon}35, 0 4px 20px ${t.aurora}` : '0 2px 10px rgba(0,0,0,0.10)',
-                position: 'relative', overflow: 'hidden',
-                transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
-                transform: active ? 'scale(1.1)' : 'scale(1)',
-              }}>
-                <div style={{
-                  position: 'absolute', bottom: 0, left: 0, right: 0, height: '3px',
-                  background: t.horizon, opacity: active ? 1 : 0.35,
-                  boxShadow: `0 0 8px ${t.horizon}`,
-                  transition: 'opacity 0.2s',
-                }} />
-                {active && (
-                  <div style={{
-                    position: 'absolute', top: '5px', right: '5px',
-                    width: '11px', height: '11px', borderRadius: '50%',
-                    background: t.horizon, boxShadow: `0 0 8px ${t.horizon}`,
-                  }} />
-                )}
-              </div>
-              <span style={{
-                fontSize: '9px', fontWeight: active ? 800 : 500,
-                color: active ? t.horizon : 'var(--owf-text-muted)',
-                letterSpacing: '0.02em', transition: 'color 0.2s', whiteSpace: 'nowrap',
-              }}>
-                {t.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function RightPanel() {
-  const { themeId, theme: T, setTheme } = useTheme();
+  const { theme: T } = useTheme();
 
   const [mounted, setMounted]               = useState(false);
-  const [isDesktop, setIsDesktop]           = useState(false);
   const [times, setTimes]                   = useState<Record<string, string>>({});
   const [aiOpen, setAiOpen]                 = useState(false);
   const [moodResult, setMoodResult]         = useState('');
@@ -241,12 +132,9 @@ export default function RightPanel() {
     const h = localStorage.getItem('owf-home-city');
     if (c) setPinned(JSON.parse(c));
     if (h) setHomeCity(h);
-    const checkDesktop = () => setIsDesktop(window.innerWidth >= 1024);
-    checkDesktop();
-    window.addEventListener('resize', checkDesktop);
     tick();
     const id = setInterval(tick, 30000);
-    return () => { clearInterval(id); window.removeEventListener('resize', checkDesktop); };
+    return () => clearInterval(id);
   }, []);
 
   function tick() {
@@ -322,7 +210,7 @@ export default function RightPanel() {
   return (
     <aside style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
 
-      {/* ── Spotlight ───────────────────────────────────────────────────── */}
+      {/* ── Spotlight ─────────────────────────────────────────────────────── */}
       <Panel>
         <Label>SPOTLIGHT</Label>
         <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', height: '130px', cursor: 'pointer' }}
@@ -348,7 +236,7 @@ export default function RightPanel() {
         <HorizonLine />
       </Panel>
 
-      {/* ── OWF AI ──────────────────────────────────────────────────────── */}
+      {/* ── OWF AI ────────────────────────────────────────────────────────── */}
       <Panel glow>
         <button onClick={() => setAiOpen(!aiOpen)} style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -362,14 +250,11 @@ export default function RightPanel() {
               border: `1px solid rgba(var(--owf-horizon-rgb), 0.3)`,
               fontSize: '14px', color: T.horizon,
             }}>◈</div>
-            <p style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '0.14em', color: 'var(--owf-text-muted)' }}>
-              OWF AI
-            </p>
+            <p style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '0.14em', color: 'var(--owf-text-muted)' }}>OWF AI</p>
             <span style={{
               fontSize: '8px', fontWeight: 700, padding: '2px 6px', borderRadius: '99px',
               background: `rgba(var(--owf-horizon-rgb), 0.12)`,
-              color: T.horizon,
-              border: `1px solid rgba(var(--owf-horizon-rgb), 0.2)`,
+              color: T.horizon, border: `1px solid rgba(var(--owf-horizon-rgb), 0.2)`,
             }}>LIVE</span>
           </div>
           <span style={{ fontSize: '10px', color: 'var(--owf-text-muted)', transition: 'transform 0.2s',
@@ -386,10 +271,8 @@ export default function RightPanel() {
                 </div>
                 <button onClick={handleMoodOfDay} disabled={moodLoading} style={{
                   fontSize: '9px', fontWeight: 800, padding: '5px 10px', borderRadius: '8px', cursor: 'pointer',
-                  background: `rgba(var(--owf-horizon-rgb), 0.15)`,
-                  color: T.horizon,
-                  border: `1px solid rgba(var(--owf-horizon-rgb), 0.3)`,
-                  opacity: moodLoading ? 0.5 : 1,
+                  background: `rgba(var(--owf-horizon-rgb), 0.15)`, color: T.horizon,
+                  border: `1px solid rgba(var(--owf-horizon-rgb), 0.3)`, opacity: moodLoading ? 0.5 : 1,
                 }}>
                   {moodLoading ? '···' : moodResult ? '↺' : 'Read'}
                 </button>
@@ -408,10 +291,8 @@ export default function RightPanel() {
                 </div>
                 <button onClick={handleFeedSummary} disabled={summaryLoading} style={{
                   fontSize: '9px', fontWeight: 800, padding: '5px 10px', borderRadius: '8px', cursor: 'pointer',
-                  background: `rgba(var(--owf-horizon-rgb), 0.15)`,
-                  color: T.horizon,
-                  border: `1px solid rgba(var(--owf-horizon-rgb), 0.3)`,
-                  opacity: summaryLoading ? 0.5 : 1,
+                  background: `rgba(var(--owf-horizon-rgb), 0.15)`, color: T.horizon,
+                  border: `1px solid rgba(var(--owf-horizon-rgb), 0.3)`, opacity: summaryLoading ? 0.5 : 1,
                 }}>
                   {summaryLoading ? '···' : summaryResult ? '↺' : 'Read'}
                 </button>
@@ -427,7 +308,7 @@ export default function RightPanel() {
         <HorizonLine />
       </Panel>
 
-      {/* ── Trending ─────────────────────────────────────────────────────── */}
+      {/* ── Trending ──────────────────────────────────────────────────────── */}
       <Panel>
         <Label>TRENDING NOW</Label>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -448,7 +329,7 @@ export default function RightPanel() {
         <HorizonLine />
       </Panel>
 
-      {/* ── World Clocks ─────────────────────────────────────────────────── */}
+      {/* ── World Clocks ──────────────────────────────────────────────────── */}
       <Panel>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
           <Label>WORLD CLOCKS</Label>
@@ -564,7 +445,7 @@ export default function RightPanel() {
         <HorizonLine />
       </Panel>
 
-      {/* ── Who to Follow ────────────────────────────────────────────────── */}
+      {/* ── Who to Follow ─────────────────────────────────────────────────── */}
       <Panel>
         <Label>WHO TO FOLLOW</Label>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -593,18 +474,9 @@ export default function RightPanel() {
         <HorizonLine />
       </Panel>
 
-      {/* ── Theme Selector ───────────────────────────────────────────────── */}
+      {/* ── Theme Selector ────────────────────────────────────────────────── */}
       <Panel>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '14px' }}>
-          <div style={{
-            width: '20px', height: '20px', borderRadius: '6px', flexShrink: 0,
-            background: T.swatch, border: `1px solid ${T.horizon}50`,
-          }} />
-          <p style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '0.14em', color: 'var(--owf-text-muted)' }}>
-            THEME — <span style={{ color: T.horizon }}>{T.emoji} {T.label}</span>
-          </p>
-        </div>
-        <ThemeSelector current={themeId} onChange={setTheme} />
+        <ThemeSelector />
         <HorizonLine />
       </Panel>
 

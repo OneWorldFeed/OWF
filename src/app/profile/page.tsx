@@ -2,6 +2,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { db } from '@/lib/firebase/config';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { useTheme } from '@/context/ThemeProvider';
+import ThemeSelector from '@/components/ui/ThemeSelector';
+import { getCountryInfo, detectUserLocation, searchTrack, getUpcomingHolidays, formatPopulation, type CountryInfo, type Holiday } from '@/lib/freeapis';
+import RadioPlayer from '@/components/ui/RadioPlayer';
 
 const GUEST_ID = 'guest_preview';
 const LANGUAGES = ['English','French','Arabic','Spanish','Portuguese','Swahili','Yoruba','Mandarin','Hindi','Japanese'];
@@ -18,8 +22,6 @@ const COVER_GRADIENTS = [
   {id:'twilight',g:'linear-gradient(160deg,#E0E7FF,#C7D2FE,#FDE68A)'},
 ];
 
-function isDarkAccent(hex:string){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return(0.299*r+0.587*g+0.114*b)<100;}
-function deriveTheme(accent:string){const dark=isDarkAccent(accent);return{bg:dark?'#080B14':'#FAFAF7',surface:dark?'rgba(255,255,255,0.06)':'rgba(255,255,255,0.82)',border:dark?'rgba(255,255,255,0.10)':'rgba(0,0,0,0.07)',text:dark?'#F0F4FF':'#18120A',textSub:dark?'rgba(240,244,255,0.55)':'#7A6E65',textMuted:dark?'rgba(240,244,255,0.30)':'#B8A898',isDark:dark};}
 function clockStyle(h:number,dark:boolean){if(h>=5&&h<8)return{bg:'linear-gradient(160deg,#92400E,#D97706,#F59E0B)',sub:'rgba(255,255,255,0.8)'};if(h>=8&&h<12)return{bg:dark?'linear-gradient(160deg,#1E3A5F,#0EA5E9,#38BDF8)':'linear-gradient(160deg,#0EA5E9,#38BDF8,#BAE6FD)',sub:'rgba(255,255,255,0.85)'};if(h>=12&&h<16)return{bg:'linear-gradient(160deg,#92400E,#F59E0B,#FCD34D)',sub:'rgba(255,255,255,0.9)'};if(h>=16&&h<19)return{bg:'linear-gradient(160deg,#7C2D12,#EA580C,#F97316)',sub:'rgba(255,255,255,0.85)'};if(h>=19&&h<21)return{bg:'linear-gradient(160deg,#3B0764,#7C3AED,#A78BFA)',sub:'rgba(255,255,255,0.8)'};return{bg:'linear-gradient(160deg,#020617,#0F172A,#1E3A5F)',sub:'rgba(255,255,255,0.55)'};}
 function clockIcon(h:number){return h>=5&&h<8?'🌅':h>=8&&h<18?'☀️':h>=18&&h<21?'🌇':'🌙';}
 
@@ -36,11 +38,12 @@ const BADGES=[
 ];
 const LOCKED=[{emoji:'📖',label:'Storyteller'},{emoji:'🌐',label:'Global Voice'},{emoji:'🎯',label:'Streak ×30'}];
 const SAMPLE_POSTS=[
-  {id:'1',mood:'Electric',city:'Lagos',time:'2h ago',text:'The energy in Lagos tonight is something else. The music never stops and neither do we. +lagos +nightlife',likes:24,comments:7,hasImage:false},
-  {id:'2',mood:'Reflective',city:'Tokyo',time:'5h ago',text:'Cherry blossom season begins today. Every year I forget how quickly it goes. +tokyo +cherryblossoms',likes:41,comments:12,hasImage:true},
-  {id:'3',mood:'Hopeful',city:'Berlin',time:'1d ago',text:'New chapter, new city. Berlin in spring hits different. +berlin +newbeginnings',likes:88,comments:31,hasImage:false},
-  {id:'4',mood:'Curious',city:'Paris',time:'2d ago',text:'The Louvre at midnight during a private event. Some spaces only reveal themselves in silence. +paris +art',likes:132,comments:44,hasImage:false},
-  {id:'5',mood:'Calm',city:'Nairobi',time:'3d ago',text:'Early morning run through Karura Forest. The mist, the birds, the absolute stillness. +nairobi +calm',likes:67,comments:18,hasImage:true},
+  {id:'1',mood:'Electric',city:'Lagos',time:'2h ago',text:'The energy in Lagos tonight is something else. The music never stops and neither do we. +lagos +nightlife',likes:24,comments:7,hasImage:false,hasVideo:false},
+  {id:'2',mood:'Reflective',city:'Tokyo',time:'5h ago',text:'Cherry blossom season begins today. Every year I forget how quickly it goes. +tokyo +cherryblossoms',likes:41,comments:12,hasImage:true,hasVideo:false},
+  {id:'3',mood:'Hopeful',city:'Berlin',time:'1d ago',text:'New chapter, new city. Berlin in spring hits different. +berlin +newbeginnings',likes:88,comments:31,hasImage:false,hasVideo:false},
+  {id:'4',mood:'Curious',city:'Paris',time:'2d ago',text:'The Louvre at midnight during a private event. Some spaces only reveal themselves in silence. +paris +art',likes:132,comments:44,hasImage:false,hasVideo:false},
+  {id:'5',mood:'Calm',city:'Nairobi',time:'3d ago',text:'Early morning run through Karura Forest. The mist, the birds, the absolute stillness. +nairobi +calm',likes:67,comments:18,hasImage:true,hasVideo:false},
+  {id:'6',mood:'Electric',city:'Lagos',time:'4d ago',text:'Live from the stage. The crowd was everything last night. +lagos +music +live',likes:103,comments:44,hasImage:false,hasVideo:true},
 ];
 const MOOD_COLORS:Record<string,string>={Electric:'#F59E0B',Reflective:'#6366F1',Hopeful:'#10B981',Curious:'#8B5CF6',Joyful:'#EF4444',Calm:'#06B6D4'};
 const MOOD_WEEK=[{day:'Mon',mood:'Calm',val:3},{day:'Tue',mood:'Hopeful',val:5},{day:'Wed',mood:'Electric',val:8},{day:'Thu',mood:'Reflective',val:4},{day:'Fri',mood:'Joyful',val:9},{day:'Sat',mood:'Curious',val:6},{day:'Sun',mood:'Hopeful',val:7}];
@@ -66,7 +69,7 @@ const WIDGET_BTNS = [
   {id:'moments',icon:'✦',label:'Moments'},
 ];
 
-interface NowPlaying{track:string;artist:string;playing:boolean;}
+interface NowPlaying{track:string;artist:string;playing:boolean;station?:string;}
 interface Profile{displayName:string;handle:string;bio:string;city:string;country:string;pronouns:string;languages:string[];website:string;joinDate:string;accentColor:string;coverStyle:string;coverImage:string;handleChangedAt:string;visitedCountries:string[];nowPlaying:NowPlaying;}
 interface Weather{temp:number;condition:string;city:string;}
 const DEFAULT:Profile={displayName:'Your Name',handle:'yourhandle.feed',bio:'',city:'Lagos',country:'Nigeria',pronouns:'',languages:[],website:'',joinDate:new Date().toISOString().split('T')[0],accentColor:'#D97706',coverStyle:'sand',coverImage:'',handleChangedAt:'',visitedCountries:['NG','JP','DE','FR','GB'],nowPlaying:{track:'Essence',artist:'Wizkid ft. Tems',playing:true}};
@@ -81,8 +84,10 @@ export default function ProfilePage(){
   const [editing,setEditing]=useState(false);
   const [saving,setSaving]=useState(false);
   const [saved,setSaved]=useState(false);
+  const [saveError,setSaveError]=useState('');
   const [loading,setLoading]=useState(true);
   const [tab,setTab]=useState('posts');
+  const [postTab,setPostTab]=useState<'all'|'text'|'images'|'video'>('all');
   const [clocks,setClocks]=useState<{name:string;time:string;hour:number}[]>([]);
   const [coverPrev,setCoverPrev]=useState('');
   const [weather,setWeather]=useState<Weather|null>(null);
@@ -97,6 +102,11 @@ export default function ProfilePage(){
   const touchStartX=useRef(0);
   const fileRef=useRef<HTMLInputElement>(null);
   const maxMood=Math.max(...MOOD_WEEK.map(m=>m.val));
+  // Free API enrichment state
+  const [countryInfo, setCountryInfo] = useState<CountryInfo|null>(null);
+  const [holidays, setHolidays] = useState<Holiday[]>([]);
+  const [npInfo, setNpInfo] = useState<{albumArt:string;album:string;url:string}|null>(null);
+  const [locationDetected, setLocationDetected] = useState(false);
 
   useEffect(()=>{
     load();
@@ -117,6 +127,43 @@ export default function ProfilePage(){
       .then(r=>r.json()).then(d=>{const temp=Math.round(d.current?.temperature_2m??0);const code=d.current?.weathercode??0;setWeather({temp,condition:WMO_ICONS[code]||'🌡',city});}).catch(()=>{});
   },[profile.city]);
 
+  // ── Free API: country info when country changes
+  useEffect(()=>{
+    const country = profile.country || 'Nigeria';
+    getCountryInfo(country).then(info => { if(info) setCountryInfo(info); });
+  },[profile.country]);
+
+  // ── Free API: upcoming holidays for user's country
+  useEffect(()=>{
+    const codeMap: Record<string,string> = {
+      'Nigeria':'NG','United States':'US','Japan':'JP','Germany':'DE','France':'FR',
+      'United Kingdom':'GB','Kenya':'KE','Ghana':'GH','South Africa':'ZA','Brazil':'BR',
+      'India':'IN','China':'CN','South Korea':'KR','Australia':'AU','Canada':'CA',
+      'Mexico':'MX','Argentina':'AR','Morocco':'MA','Italy':'IT','Netherlands':'NL',
+    };
+    const cc = codeMap[profile.country||'Nigeria'] || 'NG';
+    getUpcomingHolidays(cc).then(h => setHolidays(h));
+  },[profile.country, countryInfo]);
+
+  // ── Free API: auto-detect location on first load (only if no city saved)
+  useEffect(()=>{
+    if(locationDetected || profile.city !== DEFAULT.city) return;
+    detectUserLocation().then(loc => {
+      if(!loc) return;
+      setLocationDetected(true);
+      setProfile(p => ({...p, city: loc.city || p.city, country: loc.country || p.country}));
+    });
+  },[]);
+
+  // ── Free API: Last.fm track enrichment for Now Playing
+  useEffect(()=>{
+    const {track, artist} = profile.nowPlaying;
+    if(!track || !artist) return;
+    searchTrack(track, artist).then(info => {
+      if(info) setNpInfo({albumArt: info.albumArt, album: info.album, url: info.url});
+    });
+  },[profile.nowPlaying.track, profile.nowPlaying.artist]);
+
   // Swipe to open drawer
   function onTouchStart(e:React.TouchEvent){touchStartX.current=e.touches[0].clientX;}
   function onTouchEnd(e:React.TouchEvent){
@@ -125,22 +172,64 @@ export default function ProfilePage(){
     if(dx<-60)setDrawerOpen(false);
   }
 
-  async function load(){try{const s=await getDoc(doc(db,'users',GUEST_ID));if(s.exists())setProfile({...DEFAULT,...s.data() as Profile});}catch{}setLoading(false);}
+  async function load(){
+    // Try localStorage first for instant load
+    const local=localStorage.getItem('owf-profile');
+    if(local){try{setProfile({...DEFAULT,...JSON.parse(local)});}catch{}}
+    // Then sync from Firestore
+    try{
+      const s=await getDoc(doc(db,'users',GUEST_ID));
+      if(s.exists())setProfile({...DEFAULT,...s.data() as Profile});
+    }catch(err){
+      console.warn('Firestore load failed, using localStorage:',err);
+    }
+    setLoading(false);
+  }
   function startEdit(){setDraft({...profile});setCoverPrev(profile.coverImage||'');setEditing(true);setSaved(false);}
-  async function save(){setSaving(true);try{const d={...draft,coverImage:coverPrev};if(draft.handle!==profile.handle)d.handleChangedAt=new Date().toISOString();await setDoc(doc(db,'users',GUEST_ID),d,{merge:true});setProfile(d);setSaved(true);setTimeout(()=>{setEditing(false);setSaved(false);},900);}catch{}setSaving(false);}
+  async function save(){
+    setSaving(true);setSaveError('');
+    const d={...draft,coverImage:coverPrev};
+    if(draft.handle!==profile.handle)d.handleChangedAt=new Date().toISOString();
+    try{
+      await setDoc(doc(db,'users',GUEST_ID),d,{merge:true});
+      setProfile(d);
+      // Also persist to localStorage as fallback
+      localStorage.setItem('owf-profile',JSON.stringify(d));
+      setSaved(true);
+      setTimeout(()=>{setEditing(false);setSaved(false);},900);
+    }catch(err:unknown){
+      // Firebase failed — save to localStorage so changes aren't lost
+      localStorage.setItem('owf-profile',JSON.stringify(d));
+      setProfile(d);
+      setSaved(true);
+      setTimeout(()=>{setEditing(false);setSaved(false);},900);
+      console.warn('Firestore save failed, used localStorage fallback:',err);
+    }
+    setSaving(false);
+  }
   function onCoverFile(e:React.ChangeEvent<HTMLInputElement>){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=ev=>{if(ev.target?.result)setCoverPrev(ev.target.result as string);};r.readAsDataURL(f);}
   function toggleLang(l:string){setDraft(p=>({...p,languages:p.languages.includes(l)?p.languages.filter(x=>x!==l):[...p.languages,l]}));}
   function toggleCountry(code:string){setProfile(p=>({...p,visitedCountries:p.visitedCountries.includes(code)?p.visitedCountries.filter(x=>x!==code):[...p.visitedCountries,code]}));}
   function saveNowPlaying(){setProfile(p=>({...p,nowPlaying:{track:npDraft.track,artist:npDraft.artist,playing:true}}));setEditNP(false);}
   function toggleWidget(id:string){setActiveWidget(prev=>prev===id?null:id);}
 
+  const { theme: globalTheme } = useTheme();
   const accent=editing?draft.accentColor:profile.accentColor;
-  const T=deriveTheme(accent);
+  // T maps global OWFTheme vars to the shape profile page uses
+  const T = {
+    bg: globalTheme.bg,
+    surface: globalTheme.surface,
+    border: globalTheme.border,
+    text: globalTheme.text,
+    textSub: globalTheme.textSub,
+    textMuted: globalTheme.textMuted,
+    isDark: globalTheme.isDark,
+  };
   const coverGrad=COVER_GRADIENTS.find(c=>c.id===(editing?draft.coverStyle:profile.coverStyle))||COVER_GRADIENTS[6];
   const coverBg=(editing?coverPrev:profile.coverImage)||coverGrad.g;
   const isCoverImg=!!(editing?coverPrev:profile.coverImage);
 
-  if(loading)return(<div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh',background:T.bg}}><div style={{fontSize:'14px',color:accent}}>Loading…</div></div>);
+  if(loading)return(<div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh',background:'var(--owf-bg)'}}><div style={{fontSize:'14px',color:accent}}>Loading…</div></div>);
 
   const PC={background:T.surface,backdropFilter:'blur(28px) saturate(180%)',WebkitBackdropFilter:'blur(28px) saturate(180%)',border:`1px solid ${T.border}`,borderRadius:'20px',padding:'16px',boxShadow:T.isDark?`0 8px 32px rgba(0,0,0,0.4),0 0 0 1px ${accent}15`:`0 6px 24px rgba(0,0,0,0.05),0 0 0 1px ${accent}10`} as React.CSSProperties;
   const LS={color:T.textMuted,fontSize:'10px',fontWeight:900,letterSpacing:'0.12em'} as React.CSSProperties;
@@ -188,6 +277,23 @@ export default function ProfilePage(){
           </div>
         </div>
       );})}
+    </div>
+  );
+
+  const renderMusicWidget=()=>(
+    <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
+      <RadioPlayer onNowPlayingChange={(update)=>{
+        if(update){
+          setProfile(p=>({...p,nowPlaying:{track:update.track,artist:update.artist,playing:true}}));
+          setNpInfo(null);
+        } else {
+          setProfile(p=>({...p,nowPlaying:{...p.nowPlaying,playing:false}}));
+        }
+      }}/>
+      <div>
+        <p style={{fontSize:'10px',fontWeight:900,letterSpacing:'0.12em',color:T.textMuted,marginBottom:'8px'}}>NOW PLAYING</p>
+        {renderNowPlaying()}
+      </div>
     </div>
   );
 
@@ -263,7 +369,7 @@ export default function ProfilePage(){
   // ── BOTTOM SHEET CONTENT ──────────────────────────────
   const widgetContent:Record<string,{title:string;content:()=>React.ReactNode}>={
     clock:{title:'My World Clock',content:renderClock},
-    music:{title:'Now Playing',content:renderNowPlaying},
+    music:{title:'Radio & Now Playing',content:renderMusicWidget},
     mood:{title:'Mood This Week',content:renderMood},
     map:{title:'Countries Visited',content:renderCountries},
     moments:{title:'My Moments',content:renderMoments},
@@ -273,26 +379,27 @@ export default function ProfilePage(){
   const PostCard=({post}:{post:typeof SAMPLE_POSTS[0]})=>{
     const mc=MOOD_COLORS[post.mood]||accent;
     return(
-      <div style={{background:T.surface,backdropFilter:'blur(20px) saturate(180%)',WebkitBackdropFilter:'blur(20px)',border:`1px solid ${T.border}`,borderRadius:'20px',padding:'16px',position:'relative',overflow:'hidden',marginBottom:'12px',boxShadow:T.isDark?`0 4px 20px rgba(0,0,0,0.25),0 0 0 1px ${mc}12`:`0 2px 16px rgba(0,0,0,0.04),0 0 0 1px ${mc}10`}}>
-        <div style={{position:'absolute',top:'-40%',right:'-5%',width:'160px',height:'160px',borderRadius:'50%',background:`radial-gradient(ellipse,${mc}18 0%,transparent 70%)`,filter:'blur(24px)',pointerEvents:'none'}}/>
+      <div style={{background:'#ffffff',border:`1px solid ${mc}22`,borderRadius:'20px',padding:'16px',position:'relative',overflow:'hidden',marginBottom:'12px',boxShadow:`0 0 0 1px ${mc}10, 0 4px 20px rgba(0,0,0,0.06), 0 0 12px ${mc}18`}}>
+        <div style={{position:'absolute',top:'-40%',right:'-5%',width:'160px',height:'160px',borderRadius:'50%',background:`radial-gradient(ellipse,${mc}12 0%,transparent 70%)`,filter:'blur(24px)',pointerEvents:'none'}}/>
         <div style={{height:'2px',borderRadius:'99px',background:`linear-gradient(90deg,${mc},${mc}00)`,marginBottom:'12px'}}/>
         <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'10px'}}>
           <div style={{width:'34px',height:'34px',borderRadius:'11px',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:900,fontSize:'13px',fontFamily:"'Playfair Display',serif",background:accent,boxShadow:`0 3px 10px ${accent}40`}}>{ini(profile.displayName)}</div>
           <div style={{flex:1}}>
             <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
-              <span style={{fontSize:'13px',fontWeight:700,color:T.text}}>{profile.displayName}</span>
+              <span style={{fontSize:'13px',fontWeight:700,color:'#0F1924'}}>{profile.displayName}</span>
               <span style={{fontSize:'10px',fontWeight:600,padding:'2px 7px',borderRadius:'99px',background:`${mc}18`,color:mc}}>{post.mood}</span>
             </div>
-            <div style={{display:'flex',gap:'5px',fontSize:'11px',color:T.textMuted}}><span>{profile.handle}</span><span>·</span><span>{post.city}</span><span>·</span><span>{post.time}</span></div>
+            <div style={{display:'flex',gap:'5px',fontSize:'11px',color:'#5A6E80'}}><span>{profile.handle}</span><span>·</span><span>{post.city}</span><span>·</span><span>{post.time}</span></div>
           </div>
         </div>
         {post.hasImage&&<div style={{borderRadius:'14px',marginBottom:'10px',height:'180px',background:'linear-gradient(135deg,#BAE6FD,#60A5FA,#818CF8)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'48px'}}>🌸</div>}
-        <p style={{fontSize:'13px',lineHeight:1.65,color:T.text,position:'relative',zIndex:1}}>{post.text.split(' ').map((w,i)=>w.startsWith('+')?<span key={i} style={{fontWeight:600,color:mc}}>{w} </span>:w+' ')}</p>
-        <div style={{display:'flex',alignItems:'center',gap:'16px',marginTop:'12px',paddingTop:'10px',borderTop:`1px solid ${T.border}`,fontSize:'12px',color:T.textMuted}}>
-          <button style={{display:'flex',alignItems:'center',gap:'4px',background:'none',border:'none',cursor:'pointer',color:T.textMuted,fontSize:'12px'}}>♡ {post.likes}</button>
-          <button style={{display:'flex',alignItems:'center',gap:'4px',background:'none',border:'none',cursor:'pointer',color:T.textMuted,fontSize:'12px'}}>◇ {post.comments}</button>
-          <button style={{background:'none',border:'none',cursor:'pointer',color:T.textMuted,fontSize:'12px'}}>⟳</button>
-          <button style={{marginLeft:'auto',background:'none',border:'none',cursor:'pointer',color:T.textMuted,fontSize:'13px'}}>☆</button>
+        {post.hasVideo&&<div style={{borderRadius:'14px',marginBottom:'10px',height:'180px',background:'linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'8px',position:'relative',overflow:'hidden'}}><div style={{width:'52px',height:'52px',borderRadius:'50%',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',cursor:'pointer',border:'2px solid rgba(255,255,255,0.3)'}}>▶</div><span style={{fontSize:'11px',fontWeight:600,color:'rgba(255,255,255,0.7)'}}>Video</span></div>}
+        <p style={{fontSize:'13px',lineHeight:1.65,color:'#0F1924',position:'relative',zIndex:1}}>{post.text.split(' ').map((w,i)=>w.startsWith('+')?<span key={i} style={{fontWeight:600,color:mc}}>{w} </span>:w+' ')}</p>
+        <div style={{display:'flex',alignItems:'center',gap:'16px',marginTop:'12px',paddingTop:'10px',borderTop:'1px solid rgba(0,0,0,0.06)',fontSize:'12px',color:'#5A6E80'}}>
+          <button style={{display:'flex',alignItems:'center',gap:'4px',background:'none',border:'none',cursor:'pointer',color:'#5A6E80',fontSize:'12px'}}>♡ {post.likes}</button>
+          <button style={{display:'flex',alignItems:'center',gap:'4px',background:'none',border:'none',cursor:'pointer',color:'#5A6E80',fontSize:'12px'}}>◇ {post.comments}</button>
+          <button style={{background:'none',border:'none',cursor:'pointer',color:'#5A6E80',fontSize:'12px'}}>⟳</button>
+          <button style={{marginLeft:'auto',background:'none',border:'none',cursor:'pointer',color:'#5A6E80',fontSize:'13px'}}>☆</button>
         </div>
       </div>
     );
@@ -328,22 +435,8 @@ export default function ProfilePage(){
         .desktop-center{flex:1;}
         .three-col{display:flex !important;gap:16px;align-items:flex-start;}
         /* Feed scroll column */
-        .feed-col{height:calc(100vh - 220px);overflow-y:auto;padding-right:6px;}
-        .feed-col::-webkit-scrollbar{width:4px;}
-        .feed-col::-webkit-scrollbar-track{background:transparent;}
-        .feed-col::-webkit-scrollbar-thumb{border-radius:99px;background:rgba(180,160,140,0.35);}
-        .feed-col::-webkit-scrollbar-thumb:hover{background:rgba(180,160,140,0.6);}
-        /* Right panel scroll */
-        .rp-scroll{height:calc(100vh - 32px);overflow-y:auto;padding-right:4px;padding-bottom:32px;}
-        .rp-scroll::-webkit-scrollbar{width:4px;}
-        .rp-scroll::-webkit-scrollbar-track{background:transparent;}
-        .rp-scroll::-webkit-scrollbar-thumb{border-radius:99px;background:rgba(180,160,140,0.35);}
-        .rp-scroll::-webkit-scrollbar-thumb:hover{background:rgba(180,160,140,0.6);}
-        /* Left panel scroll */
-        .lp-scroll{height:calc(100vh - 32px);overflow-y:auto;padding-right:4px;padding-bottom:32px;}
-        .lp-scroll::-webkit-scrollbar{width:3px;}
-        .lp-scroll::-webkit-scrollbar-track{background:transparent;}
-        .lp-scroll::-webkit-scrollbar-thumb{border-radius:99px;background:rgba(180,160,140,0.25);}
+        .feed-col{min-height:200px;padding-right:6px;}
+        /* Side panels use position:fixed via inline styles */
       }
       @media(max-width:1023px){
         .desktop-left{display:none !important;}
@@ -352,7 +445,7 @@ export default function ProfilePage(){
       }
     `}</style>
 
-    <div className="pr grain" style={{minHeight:'100vh',background:T.bg,color:T.text,transition:'background 0.6s ease',overflowX:'hidden',position:'relative'}}
+    <div className="pr grain" style={{minHeight:'100vh',background:'var(--owf-bg)',color:'var(--owf-text)',position:'relative'}}
       onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
 
       {/* AURORA BG */}
@@ -440,7 +533,7 @@ export default function ProfilePage(){
         <div className="three-col" style={{display:'flex',gap:'16px',alignItems:'flex-start'}}>
 
           {/* ── DESKTOP LEFT PANEL ── */}
-          <div className="desktop-left lp-scroll" style={{display:'none',flexShrink:0,width:'200px',position:'sticky',top:'16px',flexDirection:'column',gap:'12px',marginTop:'-16px'}}>
+          <div className="desktop-left" style={{display:'none',flexShrink:0,width:'200px',flexDirection:'column',gap:'12px',paddingBottom:'32px'}}>
             <div style={PC}>
               <p style={{...LS,marginBottom:'10px'}}>MY CIRCLES</p>
               <div style={{display:'flex',flexDirection:'column',gap:'5px'}}>
@@ -476,7 +569,8 @@ export default function ProfilePage(){
                 </div>)}
               </div>
             </div>
-          </div>
+
+          </div>{/* /left panel */}
 
           {/* ── CENTER COLUMN ── */}
           <div className="desktop-center" style={{flex:1,minWidth:0,marginTop:'-16px'}}>
@@ -550,7 +644,37 @@ export default function ProfilePage(){
 
               {/* FEED */}
               <div className={!isMobile?'feed-col':'ns'} style={{paddingBottom:isMobile?'90px':'32px'}}>
-                {tab==='posts'&&SAMPLE_POSTS.map(p=><PostCard key={p.id} post={p}/>)}
+                {tab==='posts'&&(<>
+                  {/* Post sub-tabs */}
+                  <div style={{display:'flex',gap:'6px',marginBottom:'16px',flexWrap:'wrap'}}>
+                    {(['all','text','images','video'] as const).map(pt=>{
+                      const counts={all:SAMPLE_POSTS.length,text:SAMPLE_POSTS.filter(p=>!p.hasImage&&!p.hasVideo).length,images:SAMPLE_POSTS.filter(p=>p.hasImage).length,video:SAMPLE_POSTS.filter(p=>p.hasVideo).length};
+                      const labels={all:'All',text:'Text',images:'Images',video:'Video'};
+                      const active=postTab===pt;
+                      const mc=MOOD_COLORS[SAMPLE_POSTS[0]?.mood]||accent;
+                      return(<button key={pt} onClick={()=>setPostTab(pt)} style={{
+                        display:'flex',alignItems:'center',gap:'5px',
+                        padding:'6px 14px',borderRadius:'99px',cursor:'pointer',
+                        fontSize:'12px',fontWeight:active?700:500,
+                        background:active?accent:'transparent',
+                        color:active?'#fff':T.textMuted,
+                        border:active?'none':`1px solid ${T.border}`,
+                        transition:'all .15s',
+                      }}>
+                        {labels[pt]}
+                        {counts[pt]>0&&<span style={{
+                          fontSize:'10px',fontWeight:700,
+                          padding:'1px 6px',borderRadius:'99px',
+                          background:active?'rgba(255,255,255,0.25)':T.isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)',
+                          color:active?'#fff':T.textMuted,
+                        }}>{counts[pt]}</span>}
+                      </button>);
+                    })}
+                  </div>
+                  {/* Filtered posts */}
+                  {(postTab==='all'?SAMPLE_POSTS:postTab==='text'?SAMPLE_POSTS.filter(p=>!p.hasImage&&!p.hasVideo):postTab==='images'?SAMPLE_POSTS.filter(p=>p.hasImage):SAMPLE_POSTS.filter(p=>p.hasVideo)).map(p=><PostCard key={p.id} post={p}/>)}
+                  {(postTab==='text'&&SAMPLE_POSTS.filter(p=>!p.hasImage&&!p.hasVideo).length===0)||(postTab==='images'&&SAMPLE_POSTS.filter(p=>p.hasImage).length===0)||(postTab==='video'&&SAMPLE_POSTS.filter(p=>p.hasVideo).length===0)?(<div style={{textAlign:'center',padding:'40px 20px',color:T.textMuted}}><p style={{fontSize:'32px',marginBottom:'8px'}}>{postTab==='images'?'◎':postTab==='video'?'▶':'◎'}</p><p style={{fontSize:'13px'}}>No {postTab} posts yet</p></div>):null}
+                </>)}
                 {tab==='notebook'&&(<div>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}}><p style={LS}>YOUR CHAPTERS</p><button style={{fontSize:'12px',fontWeight:700,padding:'8px 16px',borderRadius:'99px',cursor:'pointer',background:accent,color:'#fff',border:'none',boxShadow:`0 4px 14px ${accent}50`}}>+ New</button></div>
                   <div style={{borderRadius:'22px',padding:'48px 24px',display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center',background:T.isDark?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.6)',backdropFilter:'blur(16px)',border:`2px dashed ${T.border}`}}>
@@ -605,10 +729,40 @@ export default function ProfilePage(){
           </div>
 
           {/* ── DESKTOP RIGHT PANEL ── */}
-          <div className="desktop-right rp-scroll" style={{display:'none',flexShrink:0,width:'220px',position:'sticky',top:'16px',flexDirection:'column',gap:'12px',marginTop:'-16px'}}>
+          <div className="desktop-right" style={{display:'none',flexShrink:0,width:'220px',flexDirection:'column',gap:'12px',paddingBottom:'32px'}}>
             <div style={PC}><p style={{...LS,marginBottom:'10px'}}>MY WORLD CLOCK</p><div style={{display:'flex',flexDirection:'column',gap:'7px'}}>{clocks.map(city=>{const {bg,sub}=clockStyle(city.hour,T.isDark);return(<div key={city.name} className="cc" style={{borderRadius:'14px',padding:'12px',cursor:'pointer',background:bg,boxShadow:'0 4px 14px rgba(0,0,0,0.16)'}}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}><div><p suppressHydrationWarning style={{fontSize:'18px',fontWeight:900,color:'#fff',lineHeight:1,letterSpacing:'-0.02em'}}>{city.time}</p><p style={{fontSize:'10px',fontWeight:600,marginTop:'2px',color:sub}}>{city.name}</p></div><span style={{fontSize:'18px'}}>{clockIcon(city.hour)}</span></div></div>);})}</div></div>
-            <div style={PC}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'10px'}}><p style={LS}>NOW PLAYING</p><button onClick={()=>{setNpDraft({track:profile.nowPlaying.track,artist:profile.nowPlaying.artist});setEditNP(true);}} style={{fontSize:'10px',fontWeight:600,color:accent,background:'none',border:'none',cursor:'pointer'}}>Edit</button></div>{editNP?(<div style={{display:'flex',flexDirection:'column',gap:'7px'}}><input value={npDraft.track} onChange={e=>setNpDraft(p=>({...p,track:e.target.value}))} placeholder="Track" style={{fontSize:'11px',padding:'7px 9px',borderRadius:'9px',outline:'none',background:T.isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.04)',border:`1px solid ${T.border}`,color:T.text}}/><input value={npDraft.artist} onChange={e=>setNpDraft(p=>({...p,artist:e.target.value}))} placeholder="Artist" style={{fontSize:'11px',padding:'7px 9px',borderRadius:'9px',outline:'none',background:T.isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.04)',border:`1px solid ${T.border}`,color:T.text}}/><div style={{display:'flex',gap:'5px'}}><button onClick={()=>setEditNP(false)} style={{flex:1,fontSize:'10px',fontWeight:600,padding:'6px',borderRadius:'8px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.05)',border:`1px solid ${T.border}`,color:T.textSub}}>Cancel</button><button onClick={saveNowPlaying} style={{flex:1,fontSize:'10px',fontWeight:700,padding:'6px',borderRadius:'8px',cursor:'pointer',background:accent,color:'#fff',border:'none'}}>Save</button></div></div>):(<div style={{display:'flex',alignItems:'center',gap:'10px',padding:'10px',borderRadius:'13px',background:T.isDark?`${accent}15`:`${accent}10`,border:`1px solid ${accent}22`}}><div style={{width:'36px',height:'36px',borderRadius:'10px',background:`linear-gradient(135deg,${accent},${accent}90)`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px',flexShrink:0}}>🎵</div><div style={{flex:1,minWidth:0}}><p style={{fontSize:'11px',fontWeight:700,color:T.text,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{profile.nowPlaying.track}</p><p style={{fontSize:'10px',color:T.textSub,marginTop:'2px'}}>{profile.nowPlaying.artist}</p></div>{profile.nowPlaying.playing&&<div style={{display:'flex',alignItems:'center',gap:'2px',flexShrink:0}}>{['w1','w2','w3','w4','w5'].map(w=><div key={w} className={w} style={{width:'2.5px',height:'14px',borderRadius:'99px',background:accent,transformOrigin:'bottom'}}/>)}</div>}</div>)}</div>
+            <RadioPlayer onNowPlayingChange={(update)=>{
+                if(update){
+                  setProfile(p=>({...p,nowPlaying:{track:update.track,artist:update.artist,playing:true}}));
+                  setNpInfo(null);
+                } else {
+                  setProfile(p=>({...p,nowPlaying:{...p.nowPlaying,playing:false}}));
+                }
+              }}/>
+            <div style={PC}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'10px'}}><p style={LS}>NOW PLAYING</p><button onClick={()=>{setNpDraft({track:profile.nowPlaying.track,artist:profile.nowPlaying.artist});setEditNP(true);}} style={{fontSize:'10px',fontWeight:600,color:accent,background:'none',border:'none',cursor:'pointer'}}>Edit</button></div>{editNP?(<div style={{display:'flex',flexDirection:'column',gap:'7px'}}><input value={npDraft.track} onChange={e=>setNpDraft(p=>({...p,track:e.target.value}))} placeholder="Track" style={{fontSize:'11px',padding:'7px 9px',borderRadius:'9px',outline:'none',background:T.isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.04)',border:`1px solid ${T.border}`,color:T.text}}/><input value={npDraft.artist} onChange={e=>setNpDraft(p=>({...p,artist:e.target.value}))} placeholder="Artist" style={{fontSize:'11px',padding:'7px 9px',borderRadius:'9px',outline:'none',background:T.isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.04)',border:`1px solid ${T.border}`,color:T.text}}/><div style={{display:'flex',gap:'5px'}}><button onClick={()=>setEditNP(false)} style={{flex:1,fontSize:'10px',fontWeight:600,padding:'6px',borderRadius:'8px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.05)',border:`1px solid ${T.border}`,color:T.textSub}}>Cancel</button><button onClick={saveNowPlaying} style={{flex:1,fontSize:'10px',fontWeight:700,padding:'6px',borderRadius:'8px',cursor:'pointer',background:accent,color:'#fff',border:'none'}}>Save</button></div></div>):(<div style={{display:'flex',alignItems:'center',gap:'10px',padding:'10px',borderRadius:'13px',background:T.isDark?`${accent}15`:`${accent}10`,border:`1px solid ${accent}22`}}>
+                <div style={{width:'40px',height:'40px',borderRadius:'10px',flexShrink:0,overflow:'hidden',background:`linear-gradient(135deg,${accent},${accent}90)`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px'}}>
+                  {npInfo?.albumArt ? <img src={npInfo.albumArt} alt="album" style={{width:'100%',height:'100%',objectFit:'cover'}}/> : '🎵'}
+                </div>
+                <div style={{flex:1,minWidth:0}}>
+                  <p style={{fontSize:'11px',fontWeight:700,color:T.text,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{profile.nowPlaying.track}</p>
+                  <p style={{fontSize:'10px',color:T.textSub,marginTop:'1px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{profile.nowPlaying.artist}</p>
+                  {npInfo?.album&&<p style={{fontSize:'9px',color:T.textMuted,marginTop:'1px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{npInfo.album}</p>}
+                </div>
+                {profile.nowPlaying.playing&&<div style={{display:'flex',alignItems:'center',gap:'2px',flexShrink:0}}>{['w1','w2','w3','w4','w5'].map(w=><div key={w} className={w} style={{width:'2.5px',height:'14px',borderRadius:'99px',background:accent,transformOrigin:'bottom'}}/>)}</div>}
+              </div>)}</div>
             <div style={PC}><p style={{...LS,marginBottom:'12px'}}>MOOD THIS WEEK</p><div style={{display:'flex',alignItems:'flex-end',gap:'4px',height:'52px'}}>{MOOD_WEEK.map(m=>{const mc=MOOD_COLORS[m.mood]||accent;const h=Math.round((m.val/maxMood)*100);return(<div key={m.day} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:'3px'}}><div className="lift" title={m.mood} style={{width:'100%',height:`${h}%`,minHeight:'5px',borderRadius:'5px',background:`linear-gradient(to top,${mc},${mc}90)`,boxShadow:`0 2px 6px ${mc}35`,cursor:'pointer'}}/><span style={{fontSize:'8px',fontWeight:700,color:T.textMuted}}>{m.day.slice(0,1)}</span></div>);})}</div><div style={{display:'flex',justifyContent:'space-between',marginTop:'8px'}}><span style={{fontSize:'10px',color:T.textSub}}>Best: <span style={{fontWeight:700,color:MOOD_COLORS['Joyful']}}>Joyful 😄</span></span><span style={{fontSize:'9px',color:T.textMuted}}>7 days</span></div></div>
+            {/* Country Info from restcountries */}
+            {countryInfo&&<div style={PC}>
+              <p style={{...LS,marginBottom:'10px'}}>YOUR COUNTRY</p>
+              <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'10px'}}>                {countryInfo.flagUrl?<img src={countryInfo.flagUrl} alt={countryInfo.name} style={{width:'36px',height:'24px',objectFit:'cover',borderRadius:'4px',border:`1px solid ${T.border}`}}/>:<span style={{fontSize:'24px'}}>{countryInfo.flag}</span>}
+                <div><p style={{fontSize:'14px',fontWeight:700,color:T.text}}>{countryInfo.name}</p><p style={{fontSize:'10px',color:T.textMuted}}>{countryInfo.capital} · {countryInfo.region}</p></div>
+              </div>
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'6px',marginBottom:'10px'}}>
+                <div style={{padding:'8px',borderRadius:'10px',background:T.isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.03)'}}><p style={{fontSize:'9px',color:T.textMuted,marginBottom:'2px'}}>POPULATION</p><p style={{fontSize:'12px',fontWeight:700,color:T.text}}>{formatPopulation(countryInfo.population)}</p></div>
+                <div style={{padding:'8px',borderRadius:'10px',background:T.isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.03)'}}><p style={{fontSize:'9px',color:T.textMuted,marginBottom:'2px'}}>CURRENCY</p><p style={{fontSize:'12px',fontWeight:700,color:T.text}}>{countryInfo.currency.symbol} {countryInfo.currency.code}</p></div>
+              </div>
+              {holidays.length>0&&<><p style={{...LS,marginBottom:'6px'}}>UPCOMING HOLIDAYS</p>{holidays.map(h=><div key={h.date} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'6px 0',borderBottom:`1px solid ${T.border}`}}><span style={{fontSize:'11px',color:T.text}}>{h.localName||h.name}</span><span style={{fontSize:'9px',fontWeight:700,color:accent}}>{new Date(h.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span></div>)}</>}
+            </div>}
             <div style={PC}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'9px'}}><p style={LS}>COUNTRIES</p><span style={{fontSize:'10px',fontWeight:700,color:accent}}>{profile.visitedCountries.length}</span></div>
               <div style={{position:'relative',width:'100%',paddingBottom:'50%',borderRadius:'10px',overflow:'hidden',background:T.isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.04)',border:`1px solid ${T.border}`}}>
                 <div style={{position:'absolute',inset:0}}>
@@ -626,8 +780,9 @@ export default function ProfilePage(){
               <p style={{fontSize:'9px',color:T.textMuted,marginTop:'6px',textAlign:'center'}}>Tap to add · {profile.visitedCountries.length}/{Object.keys(COUNTRY_REGIONS).length}</p>
             </div>
             <div style={PC}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'10px'}}><p style={LS}>MY MOMENTS</p><button style={{fontSize:'10px',fontWeight:600,color:accent,background:'none',border:'none',cursor:'pointer'}}>See all</button></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'7px'}}><div className="lift" style={{borderRadius:'13px',height:'72px',overflow:'hidden',cursor:'pointer',background:'linear-gradient(135deg,#3B82F6,#6366F1)',display:'flex',alignItems:'center',justifyContent:'center',position:'relative',boxShadow:'0 3px 12px rgba(59,130,246,0.32)'}}><span style={{fontSize:'22px'}}>🏙️</span><div style={{position:'absolute',bottom:'5px',left:'7px',fontSize:'9px',fontWeight:900,color:'rgba(255,255,255,0.9)'}}>7:15 AM</div></div><div className="lift" style={{borderRadius:'13px',height:'72px',cursor:'pointer',background:'linear-gradient(135deg,#F59E0B,#EF4444)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 3px 12px rgba(245,158,11,0.32)'}}><span style={{fontSize:'22px'}}>😄</span></div><div className="lift" style={{gridColumn:'span 2',borderRadius:'13px',padding:'10px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)',border:`1px solid ${T.border}`}}><p style={{fontSize:'11px',fontWeight:600,color:T.text,lineHeight:1.4}}>Just read something inspiring! ✨</p><p style={{fontSize:'9px',fontWeight:900,letterSpacing:'0.1em',color:T.textMuted,marginTop:'3px'}}>THU</p></div></div></div>
-            <div style={PC}><p style={{...LS,marginBottom:'10px'}}>MY THEMES</p><div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'7px'}}>{[{bg:'#DBEAFE',dot:'#3B82F6'},{bg:'#FEF3C7',dot:'#F97316'},{bg:'#EDE9FE',dot:'#7C3AED'},{bg:'#DCFCE7',dot:'#16A34A'}].map((sw,i)=><div key={i} className="lift" style={{borderRadius:'13px',display:'flex',alignItems:'center',justifyContent:'center',height:'44px',cursor:'pointer',background:sw.bg,border:'1px solid rgba(0,0,0,0.04)'}}><div style={{width:'20px',height:'20px',borderRadius:'50%',background:sw.dot,boxShadow:`0 2px 6px ${sw.dot}50`}}/></div>)}<div className="lift" style={{gridColumn:'span 2',borderRadius:'13px',height:'34px',cursor:'pointer',background:`linear-gradient(135deg,${accent}28,${accent}60)`,border:`1px solid ${accent}28`,boxShadow:`0 3px 12px ${accent}22`}}/></div></div>
-          </div>
+            <div style={PC}><ThemeSelector /></div>
+
+          </div>{/* /right panel */}
         </div>
       </div>
 
