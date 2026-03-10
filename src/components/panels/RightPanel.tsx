@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { escalatingCall } from '@/lib/ai/escalation';
 import { useTheme } from '@/context/ThemeProvider';
 import ThemeSelector from '@/components/ui/ThemeSelector';
+import RadioPlayer from '@/components/ui/RadioPlayer';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -60,20 +61,24 @@ function getLocalTime(tz: string) {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function Panel({ children, glow }: { children: React.ReactNode; glow?: boolean }) {
+function Panel({ children, glow, delay = 0 }: { children: React.ReactNode; glow?: boolean; delay?: number }) {
   return (
-    <div style={{
-      background: 'var(--owf-surface)',
-      backdropFilter: 'blur(24px) saturate(160%)',
-      WebkitBackdropFilter: 'blur(24px) saturate(160%)',
-      border: '1px solid var(--owf-border)',
-      borderRadius: '20px',
-      padding: '20px',
-      position: 'relative',
-      boxShadow: glow
-        ? `0 8px 32px rgba(var(--owf-horizon-rgb), 0.08), inset 0 1px 0 var(--owf-border)`
-        : `0 4px 20px rgba(0,0,0,0.12), inset 0 1px 0 var(--owf-border)`,
-    }}>
+    <div
+      className="owf-fade-up owf-profile-card"
+      style={{
+        background: 'var(--owf-surface)',
+        backdropFilter: 'blur(28px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(28px) saturate(180%)',
+        border: '1px solid var(--owf-border)',
+        borderRadius: '20px',
+        padding: '20px',
+        position: 'relative',
+        animationDelay: `${delay}s`,
+        boxShadow: glow
+          ? `0 8px 32px rgba(var(--owf-horizon-rgb), 0.08), inset 0 1px 0 var(--owf-border)`
+          : `0 4px 20px rgba(0,0,0,0.08), inset 0 1px 0 var(--owf-border)`,
+      }}
+    >
       {children}
     </div>
   );
@@ -93,15 +98,11 @@ function Label({ children }: { children: React.ReactNode }) {
 function HorizonLine({ color }: { color?: string }) {
   return (
     <div style={{
-      marginTop: '16px',
-      marginLeft: '-20px',
-      marginRight: '-20px',
-      marginBottom: '-4px',
-      height: '1px',
+      marginTop: '16px', marginLeft: '-20px', marginRight: '-20px', marginBottom: '-4px', height: '1px',
       background: color
         ? `linear-gradient(90deg, transparent 0%, ${color}90 30%, ${color} 50%, ${color}90 70%, transparent 100%)`
         : `linear-gradient(90deg, transparent 0%, var(--owf-horizon) 40% 60%, transparent 100%)`,
-      opacity: 0.5,
+      opacity: 0.45,
     }} />
   );
 }
@@ -147,39 +148,33 @@ export default function RightPanel() {
     if (name === homeCity) return;
     if (pinned.includes(name)) {
       const next = pinned.filter(c => c !== name);
-      setPinned(next);
-      localStorage.setItem('owf-cities', JSON.stringify(next));
+      setPinned(next); localStorage.setItem('owf-cities', JSON.stringify(next));
     } else {
       const nonHome = pinned.filter(c => c !== homeCity);
       if (nonHome.length >= MAX_PINNED) return;
       const next = [...pinned, name];
-      setPinned(next);
-      localStorage.setItem('owf-cities', JSON.stringify(next));
+      setPinned(next); localStorage.setItem('owf-cities', JSON.stringify(next));
     }
   }
 
   function setAsHome(name: string) {
     const oldHome = homeCity;
-    setHomeCity(name);
-    localStorage.setItem('owf-home-city', name);
+    setHomeCity(name); localStorage.setItem('owf-home-city', name);
     const next = pinned.filter(c => c !== name && c !== oldHome).slice(0, MAX_PINNED - 1);
-    setPinned(next);
-    localStorage.setItem('owf-cities', JSON.stringify(next));
+    setPinned(next); localStorage.setItem('owf-cities', JSON.stringify(next));
     setSettingHome(false);
   }
 
   async function handleMoodOfDay() {
     setMoodLoading(true); setMoodResult('');
     const res = await escalatingCall('right_panel', 'In 2 sentences, describe the overall emotional mood of the world today. Be poetic. Start with an emoji.');
-    setMoodResult(res.text);
-    setMoodLoading(false);
+    setMoodResult(res.text); setMoodLoading(false);
   }
 
   async function handleFeedSummary() {
     setSummaryLoading(true); setSummaryResult('');
     const res = await escalatingCall('right_panel', 'Give a TL;DR of what people around the world are talking about right now. 3 bullet points, one sentence each. Use city names.');
-    setSummaryResult(res.text);
-    setSummaryLoading(false);
+    setSummaryResult(res.text); setSummaryLoading(false);
   }
 
   const displayCities = [
@@ -201,7 +196,7 @@ export default function RightPanel() {
       {[140, 60, 180, 200, 140, 320].map((h, i) => (
         <div key={i} style={{
           height: `${h}px`, borderRadius: '20px',
-          background: 'rgba(0,0,0,0.04)', border: '1px solid rgba(0,0,0,0.06)',
+          background: 'var(--owf-surface)', border: '1px solid var(--owf-border)',
         }} />
       ))}
     </aside>
@@ -211,16 +206,20 @@ export default function RightPanel() {
     <aside style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
 
       {/* ── Spotlight ─────────────────────────────────────────────────────── */}
-      <Panel>
+      <Panel delay={0}>
         <Label>SPOTLIGHT</Label>
-        <div style={{ position: 'relative', borderRadius: '12px', overflow: 'hidden', height: '130px', cursor: 'pointer' }}
-          onClick={() => setSpotIdx((spotIdx + 1) % SPOTLIGHT.length)}>
+        <div
+          className="owf-card-lift"
+          style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', height: '130px', cursor: 'pointer' }}
+          onClick={() => setSpotIdx((spotIdx + 1) % SPOTLIGHT.length)}
+        >
           <img src={spot.image} alt={spot.title} draggable={false}
             onContextMenu={e => e.preventDefault()}
             style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none', display: 'block' }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent 50%)' }} />
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px',
-            background: `linear-gradient(90deg, transparent, ${T.horizon}80, transparent)` }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72), transparent 50%)' }} />
+          {/* Horizon shimmer on image */}
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px',
+            background: `linear-gradient(90deg, transparent, ${T.horizon}90, transparent)` }} />
           <div style={{ position: 'absolute', bottom: '12px', left: '12px', right: '12px' }}>
             <p style={{ color: '#fff', fontSize: '13px', fontWeight: 700, marginBottom: '2px' }}>{spot.title}</p>
             <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '11px' }}>{spot.subtitle}</p>
@@ -229,15 +228,23 @@ export default function RightPanel() {
             {SPOTLIGHT.map((_, i) => (
               <div key={i} style={{ width: '5px', height: '5px', borderRadius: '50%',
                 background: i === spotIdx ? T.horizon : 'rgba(255,255,255,0.35)',
-                boxShadow: i === spotIdx ? `0 0 6px ${T.horizon}` : 'none' }} />
+                boxShadow: i === spotIdx ? `0 0 6px ${T.horizon}` : 'none',
+                transition: 'background 0.3s ease, box-shadow 0.3s ease',
+              }} />
             ))}
           </div>
         </div>
         <HorizonLine />
       </Panel>
 
+      {/* ── OWF Radio ─────────────────────────────────────────────────────── */}
+      <Panel delay={0.05}>
+        <RadioPlayer />
+        <HorizonLine />
+      </Panel>
+
       {/* ── OWF AI ────────────────────────────────────────────────────────── */}
-      <Panel glow>
+      <Panel glow delay={0.1}>
         <button onClick={() => setAiOpen(!aiOpen)} style={{
           width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           background: 'none', border: 'none', cursor: 'pointer', padding: 0,
@@ -257,12 +264,13 @@ export default function RightPanel() {
               color: T.horizon, border: `1px solid rgba(var(--owf-horizon-rgb), 0.2)`,
             }}>LIVE</span>
           </div>
-          <span style={{ fontSize: '10px', color: 'var(--owf-text-muted)', transition: 'transform 0.2s',
+          <span style={{ fontSize: '10px', color: 'var(--owf-text-muted)', transition: 'transform 0.25s',
             transform: aiOpen ? 'rotate(180deg)' : 'rotate(0deg)', display: 'inline-block' }}>▾</span>
         </button>
 
         {aiOpen && (
           <div style={{ marginTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {/* Mood of day */}
             <div style={{ borderRadius: '12px', padding: '12px', background: 'var(--owf-raised)', border: '1px solid var(--owf-border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <div>
@@ -282,7 +290,7 @@ export default function RightPanel() {
                   borderLeft: `2px solid ${T.horizon}`, paddingLeft: '8px', margin: 0 }}>{moodResult}</p>
               )}
             </div>
-
+            {/* Feed summary */}
             <div style={{ borderRadius: '12px', padding: '12px', background: 'var(--owf-raised)', border: '1px solid var(--owf-border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <div>
@@ -309,14 +317,15 @@ export default function RightPanel() {
       </Panel>
 
       {/* ── Trending ──────────────────────────────────────────────────────── */}
-      <Panel>
+      <Panel delay={0.15}>
         <Label>TRENDING NOW</Label>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
           {TRENDING.map((item, i) => (
-            <button key={item.tag} style={{
+            <button key={item.tag} className="owf-collection-row" style={{
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '10px 12px', borderRadius: '12px', cursor: 'pointer',
-              background: `${item.color}08`, border: 'none', transition: 'background 0.15s',
+              background: `${item.color}08`, border: `1px solid ${item.color}15`,
+              width: '100%',
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ fontSize: '10px', fontWeight: 900, color: 'var(--owf-text-muted)', width: '14px', textAlign: 'right' }}>{i + 1}</span>
@@ -330,7 +339,7 @@ export default function RightPanel() {
       </Panel>
 
       {/* ── World Clocks ──────────────────────────────────────────────────── */}
-      <Panel>
+      <Panel delay={0.2}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
           <Label>WORLD CLOCKS</Label>
           <div style={{ display: 'flex', gap: '4px', marginTop: '-8px' }}>
@@ -358,7 +367,7 @@ export default function RightPanel() {
         {!showPicker && !settingHome && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
             {displayCities.map((city, i) => (
-              <div key={city.name} style={{
+              <div key={city.name} className="owf-mood-transition" style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '8px 10px', borderRadius: '11px',
                 background: i === 0 ? `rgba(var(--owf-horizon-rgb), 0.08)` : 'transparent',
@@ -446,13 +455,13 @@ export default function RightPanel() {
       </Panel>
 
       {/* ── Who to Follow ─────────────────────────────────────────────────── */}
-      <Panel>
+      <Panel delay={0.25}>
         <Label>WHO TO FOLLOW</Label>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {WHO_TO_FOLLOW.map(person => (
             <div key={person.handle} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{
+                <div className="owf-avatar-pulse" style={{
                   width: '42px', height: '42px', borderRadius: '14px', flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: '#fff', fontSize: '16px', fontWeight: 900,
@@ -464,7 +473,7 @@ export default function RightPanel() {
                   <p style={{ fontSize: '11px', color: 'var(--owf-text-muted)', marginTop: '2px' }}>{person.handle}</p>
                 </div>
               </div>
-              <button style={{
+              <button className="owf-card-lift" style={{
                 fontSize: '11px', fontWeight: 700, padding: '6px 14px', borderRadius: '99px', cursor: 'pointer',
                 background: `${person.color}15`, color: person.color, border: `1px solid ${person.color}30`,
               }}>Follow</button>
@@ -475,7 +484,7 @@ export default function RightPanel() {
       </Panel>
 
       {/* ── Theme Selector ────────────────────────────────────────────────── */}
-      <Panel>
+      <Panel delay={0.3}>
         <ThemeSelector />
         <HorizonLine />
       </Panel>

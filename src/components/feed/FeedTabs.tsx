@@ -1,6 +1,5 @@
 'use client';
-import React from 'react';
-import { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import FeedCard from '@/components/cards/FeedCard';
 import VideoCard from '@/components/cards/VideoCard';
 import type { MoodId } from '@/lib/theme';
@@ -31,36 +30,54 @@ type Tab = typeof TABS[number];
 
 export default function FeedTabs({ posts }: { posts: Post[] }) {
   const [activeTab, setActiveTab] = useState<Tab>('All');
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef  = useRef<HTMLDivElement>(null);
+  const tabRefs    = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [pill, setPill] = useState({ left: 0, width: 0 });
 
-  const textPosts = posts.filter(p => !p.imageUrl && !p.videoUrl);
+  const textPosts  = posts.filter(p => !p.imageUrl && !p.videoUrl);
   const mediaPosts = posts.filter(p => p.imageUrl && !p.videoUrl);
   const videoPosts = posts.filter(p => p.videoUrl !== undefined);
 
-  const scrollLeft = () => scrollRef.current?.scrollBy({ left: -340, behavior: 'smooth' });
-  const scrollRight = () => scrollRef.current?.scrollBy({ left: 340, behavior: 'smooth' });
+  // Sliding pill — update on tab change
+  useEffect(() => {
+    const el = tabRefs.current[activeTab];
+    if (el) setPill({ left: el.offsetLeft, width: el.offsetWidth });
+  }, [activeTab]);
+
+  // Init pill on mount
+  useEffect(() => {
+    const el = tabRefs.current['All'];
+    if (el) setPill({ left: el.offsetLeft, width: el.offsetWidth });
+  }, []);
+
+  const scrollLeft  = () => scrollRef.current?.scrollBy({ left: -340, behavior: 'smooth' });
+  const scrollRight = () => scrollRef.current?.scrollBy({ left:  340, behavior: 'smooth' });
 
   return (
-    <div>
-      {/* Tab bar */}
+    <div className="owf-fade-up-1">
+
+      {/* Tab bar with sliding pill */}
       <div
         className="flex items-center gap-1 mb-4 px-1 py-3"
-        style={{ backgroundColor: 'var(--owf-bg)' }}
+        style={{ backgroundColor: 'var(--owf-bg)', position: 'relative' }}
       >
         {TABS.map((tab) => {
           const active = activeTab === tab;
-          const count = tab === 'Media' ? mediaPosts.length
-                      : tab === 'Video' ? videoPosts.length
-                      : null;
+          const count  = tab === 'Media' ? mediaPosts.length
+                       : tab === 'Video' ? videoPosts.length
+                       : null;
           return (
             <button
               key={tab}
+              ref={(el: HTMLButtonElement | null) => { tabRefs.current[tab] = el; }}
               onClick={() => setActiveTab(tab)}
-              className="px-4 py-1.5 rounded-full text-sm font-semibold transition-all"
+              className="px-4 py-1.5 rounded-full text-sm font-semibold owf-mood-transition"
               style={{
                 backgroundColor: active ? 'var(--owf-navy)' : 'transparent',
                 color: active ? '#fff' : 'var(--owf-text-secondary)',
                 border: active ? 'none' : '1px solid var(--owf-border)',
+                boxShadow: active ? '0 0 12px var(--owf-glow)' : 'none',
+                position: 'relative', zIndex: 1,
               }}
             >
               {tab}
@@ -83,15 +100,12 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
       {/* ALL tab */}
       {activeTab === 'All' && (
         <div>
-          {/* Media strip */}
           {mediaPosts.length > 0 && (
             <div className="mb-5">
               <div className="flex items-center justify-between mb-2 px-1">
-                <p className="text-xs font-bold tracking-widest" style={{ color: 'var(--owf-text-secondary)' }}>
-                  PHOTOS
-                </p>
+                <p className="text-xs font-bold tracking-widest" style={{ color: 'var(--owf-text-secondary)' }}>PHOTOS</p>
                 <div className="hidden md:flex items-center gap-1">
-                  <ScrollBtn direction="left" onClick={scrollLeft} />
+                  <ScrollBtn direction="left"  onClick={scrollLeft}  />
                   <ScrollBtn direction="right" onClick={scrollRight} />
                 </div>
               </div>
@@ -104,12 +118,9 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
               </div>
             </div>
           )}
-          {/* Video strip */}
           {videoPosts.length > 0 && (
             <div className="mb-5">
-              <p className="text-xs font-bold tracking-widest mb-2 px-1" style={{ color: 'var(--owf-text-secondary)' }}>
-                VIDEOS
-              </p>
+              <p className="text-xs font-bold tracking-widest mb-2 px-1" style={{ color: 'var(--owf-text-secondary)' }}>VIDEOS</p>
               <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
                 {videoPosts.map(post => (
                   <div key={post.id} className="flex-shrink-0 w-80 snap-start">
@@ -119,52 +130,33 @@ export default function FeedTabs({ posts }: { posts: Post[] }) {
               </div>
             </div>
           )}
-          {/* Text posts */}
           <MixedGrid posts={textPosts} />
         </div>
       )}
 
-      {/* TEXT tab */}
-      {activeTab === 'Text' && <MixedGrid posts={textPosts} />}
+      {activeTab === 'Text'  && <MixedGrid posts={textPosts} />}
 
-      {/* MEDIA tab — images only */}
       {activeTab === 'Media' && (
         <div>
-          {mediaPosts.length === 0 ? (
-            <EmptyState icon="◎" label="No photos yet" />
-          ) : (
+          {mediaPosts.length === 0 ? <EmptyState icon="◎" label="No photos yet" /> : (
             <>
-              {/* Desktop — 2 col vertical grid */}
               <div className="hidden md:grid grid-cols-2 gap-4">
-                {mediaPosts.map(post => (
-                  <FeedCard key={post.id} {...post} />
-                ))}
+                {mediaPosts.map(post => <FeedCard key={post.id} {...post} />)}
               </div>
-              {/* Mobile — 2 col vertical */}
               <div className="grid md:hidden grid-cols-2 gap-3">
-                {mediaPosts.map(post => (
-                  <FeedCard key={post.id} {...post} compact />
-                ))}
+                {mediaPosts.map(post => <FeedCard key={post.id} {...post} compact />)}
               </div>
             </>
           )}
         </div>
       )}
 
-      {/* VIDEO tab */}
       {activeTab === 'Video' && (
         <div>
-          {videoPosts.length === 0 ? (
-            <EmptyState icon="▶" label="No videos yet" />
-          ) : (
-            <>
-              {/* Desktop + Mobile — vertical list */}
-              <div className="space-y-4">
-                {videoPosts.map(post => (
-                  <VideoCard key={post.id} {...post} featured />
-                ))}
-              </div>
-            </>
+          {videoPosts.length === 0 ? <EmptyState icon="▶" label="No videos yet" /> : (
+            <div className="space-y-4">
+              {videoPosts.map(post => <VideoCard key={post.id} {...post} featured />)}
+            </div>
           )}
         </div>
       )}
@@ -176,7 +168,7 @@ function ScrollBtn({ direction, onClick }: { direction: 'left' | 'right'; onClic
   return (
     <button
       onClick={onClick}
-      className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110"
+      className="w-8 h-8 rounded-full flex items-center justify-center owf-card-lift"
       style={{
         backgroundColor: 'var(--owf-surface)',
         border: '1px solid var(--owf-border)',
@@ -201,33 +193,40 @@ function EmptyState({ icon, label }: { icon: string; label: string }) {
 function MixedGrid({ posts }: { posts: Post[] }) {
   if (posts.length === 0) return <EmptyState icon="◎" label="No posts here yet" />;
   const rows: React.ReactElement[] = [];
-  let i = 0;
-  let rowIndex = 0;
+  let i = 0, rowIndex = 0;
   const patterns = ['featured', 'two', 'three', 'featured', 'two'] as const;
   while (i < posts.length) {
     const pattern = patterns[rowIndex % patterns.length];
     if (pattern === 'featured' && posts[i]) {
-      rows.push(<div key={i} className="mb-4"><FeedCard {...posts[i]} featured /></div>);
+      rows.push(
+        <div key={i} className="mb-4 owf-fade-up" style={{ animationDelay: `${rowIndex * 0.06}s` }}>
+          <FeedCard {...posts[i]} featured />
+        </div>
+      );
       i++;
     } else if (pattern === 'two' && posts[i]) {
       rows.push(
-        <div key={i} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-          {posts[i] && <FeedCard {...posts[i]} />}
+        <div key={i} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 owf-fade-up" style={{ animationDelay: `${rowIndex * 0.06}s` }}>
+          {posts[i]   && <FeedCard {...posts[i]} />}
           {posts[i+1] && <FeedCard {...posts[i+1]} />}
         </div>
       );
       i += 2;
     } else if (pattern === 'three' && posts[i]) {
       rows.push(
-        <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-          {posts[i] && <FeedCard {...posts[i]} compact />}
+        <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 owf-fade-up" style={{ animationDelay: `${rowIndex * 0.06}s` }}>
+          {posts[i]   && <FeedCard {...posts[i]}   compact />}
           {posts[i+1] && <FeedCard {...posts[i+1]} compact />}
           {posts[i+2] && <FeedCard {...posts[i+2]} compact />}
         </div>
       );
       i += 3;
     } else {
-      rows.push(<div key={i} className="mb-4"><FeedCard {...posts[i]} /></div>);
+      rows.push(
+        <div key={i} className="mb-4 owf-fade-up" style={{ animationDelay: `${rowIndex * 0.06}s` }}>
+          <FeedCard {...posts[i]} />
+        </div>
+      );
       i++;
     }
     rowIndex++;

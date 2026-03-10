@@ -1,4 +1,5 @@
 'use client';
+import ProfilePostCard from '@/components/cards/ProfilePostCard';
 import { useState, useEffect, useRef } from 'react';
 import { db } from '@/lib/firebase/config';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -90,6 +91,8 @@ export default function ProfilePage(){
   const [postTab,setPostTab]=useState<'all'|'text'|'images'|'video'>('all');
   const [clocks,setClocks]=useState<{name:string;time:string;hour:number}[]>([]);
   const [coverPrev,setCoverPrev]=useState('');
+  const [avatarPrev,setAvatarPrev]=useState('');
+  const avatarFileRef=useRef<HTMLInputElement>(null);
   const [weather,setWeather]=useState<Weather|null>(null);
   const [editNP,setEditNP]=useState(false);
   const [npDraft,setNpDraft]=useState({track:'',artist:''});
@@ -208,6 +211,7 @@ export default function ProfilePage(){
     setSaving(false);
   }
   function onCoverFile(e:React.ChangeEvent<HTMLInputElement>){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=ev=>{if(ev.target?.result)setCoverPrev(ev.target.result as string);};r.readAsDataURL(f);}
+  function onAvatarFile(e:React.ChangeEvent<HTMLInputElement>){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=ev=>{if(ev.target?.result)setAvatarPrev(ev.target.result as string);};r.readAsDataURL(f);}
   function toggleLang(l:string){setDraft(p=>({...p,languages:p.languages.includes(l)?p.languages.filter(x=>x!==l):[...p.languages,l]}));}
   function toggleCountry(code:string){setProfile(p=>({...p,visitedCountries:p.visitedCountries.includes(code)?p.visitedCountries.filter(x=>x!==code):[...p.visitedCountries,code]}));}
   function saveNowPlaying(){setProfile(p=>({...p,nowPlaying:{track:npDraft.track,artist:npDraft.artist,playing:true}}));setEditNP(false);}
@@ -383,35 +387,6 @@ export default function ProfilePage(){
     moments:{title:'My Moments',content:renderMoments},
   };
 
-  // ── POST CARD ─────────────────────────────────────────
-  const PostCard=({post, index=0}:{post:typeof SAMPLE_POSTS[0]; index?: number})=>{
-    const mc=MOOD_COLORS[post.mood]||accent;
-    return(
-      <div className="owf-card-lift" style={{background:'#ffffff',border:`1px solid ${mc}22`,borderLeft:`3px solid ${mc}`,borderRadius:'20px',padding:'16px',position:'relative',overflow:'hidden',marginBottom:'12px',boxShadow:`0 0 0 1px ${mc}10, 0 4px 20px rgba(0,0,0,0.06), 0 0 12px ${mc}18`,animationDelay:`${index * 0.07}s`}} className={`owf-card-lift owf-fade-up`}>
-        <div style={{position:'absolute',top:'-40%',right:'-5%',width:'160px',height:'160px',borderRadius:'50%',background:`radial-gradient(ellipse,${mc}12 0%,transparent 70%)`,filter:'blur(24px)',pointerEvents:'none'}}/>
-        <div style={{height:'2px',borderRadius:'99px',background:`linear-gradient(90deg,${mc},${mc}00)`,marginBottom:'12px'}}/>
-        <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'10px'}}>
-          <div style={{width:'34px',height:'34px',borderRadius:'11px',flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:900,fontSize:'13px',fontFamily:"'Playfair Display',serif",background:accent,boxShadow:`0 3px 10px ${accent}40`}}>{ini(profile.displayName)}</div>
-          <div style={{flex:1}}>
-            <div style={{display:'flex',alignItems:'center',gap:'7px'}}>
-              <span style={{fontSize:'13px',fontWeight:700,color:'#0F1924'}}>{profile.displayName}</span>
-              <span style={{fontSize:'10px',fontWeight:600,padding:'2px 7px',borderRadius:'99px',background:`${mc}18`,color:mc}}>{post.mood}</span>
-            </div>
-            <div style={{display:'flex',gap:'5px',fontSize:'11px',color:'#5A6E80'}}><span>{profile.handle}</span><span>·</span><span>{post.city}</span><span>·</span><span>{post.time}</span></div>
-          </div>
-        </div>
-        {post.hasImage&&<div style={{borderRadius:'14px',marginBottom:'10px',height:'180px',background:'linear-gradient(135deg,#BAE6FD,#60A5FA,#818CF8)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'48px'}}>🌸</div>}
-        {post.hasVideo&&<div style={{borderRadius:'14px',marginBottom:'10px',height:'180px',background:'linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'8px',position:'relative',overflow:'hidden'}}><div style={{width:'52px',height:'52px',borderRadius:'50%',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'22px',cursor:'pointer',border:'2px solid rgba(255,255,255,0.3)'}}>▶</div><span style={{fontSize:'11px',fontWeight:600,color:'rgba(255,255,255,0.7)'}}>Video</span></div>}
-        <p style={{fontSize:'13px',lineHeight:1.65,color:'#0F1924',position:'relative',zIndex:1}}>{post.text.split(' ').map((w,i)=>w.startsWith('+')?<span key={i} style={{fontWeight:600,color:mc}}>{w} </span>:w+' ')}</p>
-        <div style={{display:'flex',alignItems:'center',gap:'16px',marginTop:'12px',paddingTop:'10px',borderTop:'1px solid rgba(0,0,0,0.06)',fontSize:'12px',color:'#5A6E80'}}>
-          <button style={{display:'flex',alignItems:'center',gap:'4px',background:'none',border:'none',cursor:'pointer',color:'#5A6E80',fontSize:'12px'}}>♡ {post.likes}</button>
-          <button style={{display:'flex',alignItems:'center',gap:'4px',background:'none',border:'none',cursor:'pointer',color:'#5A6E80',fontSize:'12px'}}>◇ {post.comments}</button>
-          <button style={{background:'none',border:'none',cursor:'pointer',color:'#5A6E80',fontSize:'12px'}}>⟳</button>
-          <button style={{marginLeft:'auto',background:'none',border:'none',cursor:'pointer',color:'#5A6E80',fontSize:'13px'}}>☆</button>
-        </div>
-      </div>
-    );
-  };
 
   return(<>
     <style>{`
@@ -590,7 +565,21 @@ export default function ProfilePage(){
               <div style={{position:'absolute',inset:'-1px',borderRadius:'23px',pointerEvents:'none',background:`linear-gradient(135deg,${accent}40,transparent 50%,${accent}18)`,zIndex:-1,filter:'blur(1px)'}}/>
               <div style={{display:'flex',alignItems:'flex-start',gap:'14px'}}>
                 <div style={{flexShrink:0}}>
-                  <div className="owf-avatar-pulse owf-mood-transition" style={{width:isMobile?'64px':'72px',height:isMobile?'64px':'72px',borderRadius:'20px',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:900,fontSize:isMobile?'18px':'20px',fontFamily:"'Playfair Display',serif",backgroundColor:accent,boxShadow:`0 0 0 3px ${T.bg},0 0 0 5px ${accent}60,0 12px 32px ${accent}50`}}>{ini(editing?draft.displayName:profile.displayName)}</div>
+                  <div style={{position:'relative',width:isMobile?'64px':'72px',height:isMobile?'64px':'72px',flexShrink:0}}>
+                    <div className="owf-avatar-pulse owf-mood-transition" style={{width:'100%',height:'100%',borderRadius:'20px',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:900,fontSize:isMobile?'18px':'20px',fontFamily:"'Playfair Display',serif",backgroundColor:accent,boxShadow:`0 0 0 3px ${T.bg},0 0 0 5px ${accent}60,0 12px 32px ${accent}50`,overflow:'hidden'}}>
+                      {avatarPrev
+                        ? <img src={avatarPrev} alt="avatar" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'20px'}}/>
+                        : ini(editing?draft.displayName:profile.displayName)
+                      }
+                    </div>
+                    {editing&&(
+                      <button onClick={()=>avatarFileRef.current?.click()} style={{position:'absolute',inset:0,borderRadius:'20px',background:'rgba(0,0,0,0.45)',display:'flex',alignItems:'center',justifyContent:'center',border:'none',cursor:'pointer',fontSize:'18px',opacity:0,transition:'opacity 0.2s'}}
+                        onMouseEnter={e=>e.currentTarget.style.opacity='1'}
+                        onMouseLeave={e=>e.currentTarget.style.opacity='0'}
+                      >📷</button>
+                    )}
+                    <input ref={avatarFileRef} type="file" accept="image/*" style={{display:'none'}} onChange={onAvatarFile}/>
+                  </div>
                   {editing&&<div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginTop:'8px',width:isMobile?'64px':'72px'}}>{ACCENT_COLORS.map(c=><button key={c} onClick={()=>setDraft(p=>({...p,accentColor:c}))} style={{width:'17px',height:'17px',borderRadius:'50%',backgroundColor:c,cursor:'pointer',border:'none',outline:draft.accentColor===c?`3px solid ${c}`:'3px solid transparent',outlineOffset:'2px'}}/>)}</div>}
                 </div>
                 <div style={{flex:1,minWidth:0}}>
@@ -649,7 +638,7 @@ export default function ProfilePage(){
             {/* TABS */}
             {!editing&&<>
               <div className="ns" style={{display:'flex',marginBottom:'14px',borderBottom:`1.5px solid ${T.border}`,overflowX:'auto',position:'relative'}}>
-                {TABS.map(t=><button key={t} ref={el => tabRefs.current[t.toLowerCase()] = el} onClick={()=>setTab(t.toLowerCase())} style={{padding:'10px 16px',fontSize:'13px',whiteSpace:'nowrap',flexShrink:0,fontWeight:tab===t.toLowerCase()?700:400,color:tab===t.toLowerCase()?accent:T.textMuted,background:'none',border:'none',cursor:'pointer',borderBottom:'2.5px solid transparent',marginBottom:'-1.5px',transition:'color .2s'}}>{t}</button>)}
+                {TABS.map(t=><button key={t} ref={(el: HTMLButtonElement | null) => { tabRefs.current[t.toLowerCase()] = el; }} onClick={()=>setTab(t.toLowerCase())} style={{padding:'10px 16px',fontSize:'13px',whiteSpace:'nowrap',flexShrink:0,fontWeight:tab===t.toLowerCase()?700:400,color:tab===t.toLowerCase()?accent:T.textMuted,background:'none',border:'none',cursor:'pointer',borderBottom:'2.5px solid transparent',marginBottom:'-1.5px',transition:'color .2s'}}>{t}</button>)}
                   {/* Sliding pill indicator */}
                   <div className="owf-tab-pill" style={{position:'absolute',bottom:-1,height:'2.5px',borderRadius:'2px',background:accent,left:tabPill.left,width:tabPill.width}} />
               </div>
@@ -684,7 +673,7 @@ export default function ProfilePage(){
                     })}
                   </div>
                   {/* Filtered posts */}
-                  {(postTab==='all'?SAMPLE_POSTS:postTab==='text'?SAMPLE_POSTS.filter(p=>!p.hasImage&&!p.hasVideo):postTab==='images'?SAMPLE_POSTS.filter(p=>p.hasImage):SAMPLE_POSTS.filter(p=>p.hasVideo)).map(p=><PostCard key={p.id} post={p}/>)}
+                  {(postTab==='all'?SAMPLE_POSTS:postTab==='text'?SAMPLE_POSTS.filter(p=>!p.hasImage&&!p.hasVideo):postTab==='images'?SAMPLE_POSTS.filter(p=>p.hasImage):SAMPLE_POSTS.filter(p=>p.hasVideo)).map((p,i)=><ProfilePostCard key={p.id} post={p} index={i} accent={accent} displayName={profile.displayName} handle={profile.handle} ini={ini}/>)}
                   {(postTab==='text'&&SAMPLE_POSTS.filter(p=>!p.hasImage&&!p.hasVideo).length===0)||(postTab==='images'&&SAMPLE_POSTS.filter(p=>p.hasImage).length===0)||(postTab==='video'&&SAMPLE_POSTS.filter(p=>p.hasVideo).length===0)?(<div style={{textAlign:'center',padding:'40px 20px',color:T.textMuted}}><p style={{fontSize:'32px',marginBottom:'8px'}}>{postTab==='images'?'◎':postTab==='video'?'▶':'◎'}</p><p style={{fontSize:'13px'}}>No {postTab} posts yet</p></div>):null}
                 </>)}
                 {tab==='notebook'&&(<div>

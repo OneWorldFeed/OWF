@@ -97,7 +97,7 @@ export default function VideoCard({
   const preventContext = (e: React.MouseEvent) => e.preventDefault();
 
   const cardStyle: React.CSSProperties = {
-    backgroundColor: 'var(--owf-surface)',
+    backgroundColor: '#ffffff',
     border: '1px solid ' + moodColor + '55',
     boxShadow: '0 2px 16px rgba(' + moodRgb + ', ' + intensity * 0.15 + ')',
     userSelect: 'none',

@@ -6,8 +6,13 @@ import { usePathname } from 'next/navigation';
 const navItems = [
   { label: 'Home',     href: '/',         icon: '/icons/home.svg'     },
   { label: 'Social',   href: '/social',   icon: '/icons/social.svg'   },
-  { label: 'AI',       href: '/ai',       icon: '/icons/ai.svg'       },
   { label: 'Discover', href: '/discover', icon: '/icons/discover.svg' },
+  { label: 'Live',     href: '/live',     icon: '/icons/live.svg'     },
+  { label: 'News',     href: '/news',     icon: '/icons/news.svg'     },
+  { label: 'Podcast',  href: '/podcast',  icon: '/icons/podcast.svg'  },
+  { label: 'Music',    href: '/music',    icon: '/icons/music.svg'    },
+  { label: 'AI',       href: '/ai',       icon: '/icons/ai.svg'       },
+  { label: 'DM',       href: '/dm',       icon: '/icons/social.svg'   },
   { label: 'Profile',  href: '/profile',  icon: '/icons/profile.svg'  },
   { label: 'Settings', href: '/settings', icon: '/icons/settings.svg' },
 ];
@@ -17,7 +22,7 @@ export default function LeftNav() {
 
   return (
     <nav
-      className="fixed left-0 top-14 bottom-0 w-56 flex flex-col py-4 px-3"
+      className="fixed left-0 top-14 bottom-0 w-56 flex flex-col py-4 px-3 overflow-y-auto"
       style={{
         backgroundColor: 'var(--owf-surface)',
         borderRight: '1px solid var(--owf-border)',
