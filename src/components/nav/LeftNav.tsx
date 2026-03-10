@@ -7,7 +7,7 @@ const navItems = [
   { label: 'Home',     href: '/',         icon: '/icons/home.svg'     },
   { label: 'Social',   href: '/social',   icon: '/icons/social.svg'   },
   { label: 'Discover', href: '/discover', icon: '/icons/discover.svg' },
-  { label: 'Live',     href: '/live',     icon: '/icons/live.svg'     },
+  { label: 'The Feed',     href: '/the-feed',     icon: '/icons/live.svg'     },
   { label: 'News',     href: '/news',     icon: '/icons/news.svg'     },
   { label: 'Podcast',  href: '/podcast',  icon: '/icons/podcast.svg'  },
   { label: 'Music',    href: '/music',    icon: '/icons/music.svg'    },
