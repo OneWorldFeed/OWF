@@ -32,6 +32,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const setTheme = (id: ThemeId) => {
     setThemeId(id);
     applyTheme(id);
+    // Update cursor glow color when theme changes
+    const el = document.getElementById('owf-cursor-glow');
+    if (el) {
+      const t = THEMES[id];
+      el.style.background = `radial-gradient(circle, ${t.glow} 0%, transparent 70%)`;
+    }
   };
 
   const theme = THEMES[themeId] ?? THEMES['chalk'];

@@ -173,13 +173,12 @@ export default function RadioPlayer({ onNowPlayingChange }: RadioPlayerProps = {
           {/* Live visualizer */}
           {playing && (
             <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', height: '20px' }}>
-              {visualizer.map((h, i) => (
-                <div key={i} style={{
+              {[1,2,3,4,5].map((_, i) => (
+                <div key={i} className={`owf-viz-bar-${i+1}`} style={{
                   width: '3px', borderRadius: '99px',
-                  height: `${h * 2}px`,
+                  height: '20px',
                   background: T.horizon,
                   opacity: 0.7 + (i % 3) * 0.1,
-                  transition: 'height 0.3s ease',
                 }} />
               ))}
             </div>
@@ -218,16 +217,17 @@ export default function RadioPlayer({ onNowPlayingChange }: RadioPlayerProps = {
           borderBottom: `1px solid ${T.border}`,
           display: 'flex', alignItems: 'center', gap: '10px',
         }}>
-          {/* Station favicon */}
+          {/* Station favicon — vinyl spin when playing */}
           <div style={{
-            width: '36px', height: '36px', borderRadius: '10px', flexShrink: 0,
-            background: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+            width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0,
+            background: `radial-gradient(circle, ${isDark ? '#1a1a2a' : '#e8e8f0'} 30%, rgba(${T.horizonRgb},0.4) 100%)`,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            overflow: 'hidden', border: `1px solid ${T.border}`,
-          }}>
+            overflow: 'hidden', border: `2px solid rgba(${T.horizonRgb},0.3)`,
+            boxShadow: playing ? `0 0 12px rgba(${T.horizonRgb},0.4)` : 'none',
+          }} className={playing ? 'owf-vinyl-spin' : ''}>
             {currentStation.favicon
-              ? <img src={currentStation.favicon} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-              : <span style={{ fontSize: '16px' }}>📻</span>
+              ? <img src={currentStation.favicon} alt="" style={{ width: '60%', height: '60%', objectFit: 'cover', borderRadius: '50%' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              : <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: isDark ? '#08090f' : '#fff' }} />
             }
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
@@ -325,11 +325,11 @@ export default function RadioPlayer({ onNowPlayingChange }: RadioPlayerProps = {
                 </div>
                 {isActive && playing && (
                   <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1.5px', height: '14px', flexShrink: 0 }}>
-                    {visualizer.slice(0, 5).map((hv, vi) => (
-                      <div key={vi} style={{
+                    {[1,2,3,4,5].map((_, vi) => (
+                      <div key={vi} className={`owf-viz-bar-${vi+1}`} style={{
                         width: '2.5px', borderRadius: '99px',
-                        height: `${hv * 1.2}px`, maxHeight: '14px',
-                        background: h, transition: 'height 0.3s ease',
+                        height: '14px',
+                        background: T.horizon,
                       }} />
                     ))}
                   </div>

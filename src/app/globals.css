@@ -3,6 +3,162 @@
 @tailwind utilities;
 
 /* ============================================================
+   OWF PREMIUM MOTION & EFFECTS SYSTEM
+   ============================================================ */
+
+/* ── Noise texture overlay ─────────────────────────────────── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.032;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+}
+
+/* ── Cursor glow ───────────────────────────────────────────── */
+#owf-cursor-glow {
+  position: fixed;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9997;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, var(--owf-glow) 0%, transparent 70%);
+  transition: left 0.08s linear, top 0.08s linear, background 0.4s ease;
+}
+@media (hover: none) {
+  #owf-cursor-glow { display: none; }
+}
+
+/* ── Avatar mood pulse ring ────────────────────────────────── */
+@keyframes owf-pulse-ring {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--owf-glow), 0 0 18px var(--owf-glow);
+  }
+  50% {
+    box-shadow: 0 0 0 8px transparent, 0 0 28px var(--owf-glow);
+  }
+}
+.owf-avatar-pulse {
+  animation: owf-pulse-ring 2.5s ease-in-out infinite;
+}
+
+/* ── Banner light sweep ────────────────────────────────────── */
+@keyframes owf-sweep {
+  0%   { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+.owf-banner-sweep {
+  animation: owf-sweep 5s ease-in-out infinite;
+}
+
+/* ── Count-up / fade-up entrance ──────────────────────────── */
+@keyframes owf-fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.owf-fade-up {
+  animation: owf-fade-up 0.5s ease both;
+}
+.owf-fade-up-1 { animation: owf-fade-up 0.5s ease 0.06s both; }
+.owf-fade-up-2 { animation: owf-fade-up 0.5s ease 0.12s both; }
+.owf-fade-up-3 { animation: owf-fade-up 0.5s ease 0.18s both; }
+
+/* ── Sliding tab pill ──────────────────────────────────────── */
+.owf-tab-pill {
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              background 0.4s ease;
+}
+
+/* ── Vinyl spin ────────────────────────────────────────────── */
+@keyframes owf-vinyl-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.owf-vinyl-spin {
+  animation: owf-vinyl-spin 3s linear infinite;
+}
+.owf-vinyl-paused {
+  animation-play-state: paused;
+}
+
+/* ── Audio visualizer bars ─────────────────────────────────── */
+@keyframes owf-viz-1 { 0%,100%{height:20%} 50%{height:100%} }
+@keyframes owf-viz-2 { 0%,100%{height:55%} 50%{height:75%}  }
+@keyframes owf-viz-3 { 0%,100%{height:30%} 50%{height:95%}  }
+@keyframes owf-viz-4 { 0%,100%{height:65%} 50%{height:40%}  }
+@keyframes owf-viz-5 { 0%,100%{height:20%} 50%{height:80%}  }
+.owf-viz-bar-1 { animation: owf-viz-1 0.55s ease-in-out infinite; }
+.owf-viz-bar-2 { animation: owf-viz-2 0.60s ease-in-out infinite; }
+.owf-viz-bar-3 { animation: owf-viz-3 0.65s ease-in-out infinite; }
+.owf-viz-bar-4 { animation: owf-viz-4 0.50s ease-in-out infinite; }
+.owf-viz-bar-5 { animation: owf-viz-5 0.70s ease-in-out infinite; }
+
+/* ── Card hover scale ──────────────────────────────────────── */
+.owf-card-lift {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.owf-card-lift:hover {
+  transform: scale(1.005) translateY(-1px);
+}
+
+/* ── Badge hover lift ──────────────────────────────────────── */
+.owf-badge-lift {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.owf-badge-lift:hover {
+  transform: translateY(-3px);
+}
+
+/* ── Collection row hover ──────────────────────────────────── */
+.owf-collection-row {
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+/* ── Profile card glass border glow ───────────────────────── */
+.owf-profile-card {
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* ── Mood color transitions ────────────────────────────────── */
+.owf-mood-transition {
+  transition: color 0.4s ease, background-color 0.4s ease,
+              border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* ── Reduce motion support ─────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .owf-avatar-pulse,
+  .owf-banner-sweep,
+  .owf-vinyl-spin,
+  .owf-viz-bar-1,
+  .owf-viz-bar-2,
+  .owf-viz-bar-3,
+  .owf-viz-bar-4,
+  .owf-viz-bar-5,
+  .owf-fade-up,
+  .owf-fade-up-1,
+  .owf-fade-up-2,
+  .owf-fade-up-3 {
+    animation: none !important;
+  }
+  .owf-tab-pill,
+  .owf-card-lift,
+  .owf-badge-lift,
+  .owf-collection-row,
+  .owf-profile-card,
+  .owf-mood-transition {
+    transition: none !important;
+  }
+}
+
+/* ============================================================
    OWF DESIGN SYSTEM — SKY OS THEMES
    13 themes: 1 light default + 12 sky moment dark themes
    Card backgrounds always white across all dark themes

@@ -1,13 +1,25 @@
+'use client';
 import type { Metadata } from 'next'
 import './globals.css'
 import GlobalHeader from '@/components/header/GlobalHeader'
 import LeftNav from '@/components/nav/LeftNav'
 import BottomNav from '@/components/nav/BottomNav'
 import { ThemeProvider } from '@/context/ThemeProvider'
+import { useEffect } from 'react'
 
-export const metadata: Metadata = {
-  title: 'OneWorldFeed',
-  description: 'A cinematic, emotionally intelligent global platform',
+// Cursor glow — desktop only, disabled on touch devices via CSS
+function CursorGlow() {
+  useEffect(() => {
+    const el = document.getElementById('owf-cursor-glow');
+    if (!el) return;
+    const move = (e: MouseEvent) => {
+      el.style.left = `${e.clientX}px`;
+      el.style.top  = `${e.clientY}px`;
+    };
+    window.addEventListener('mousemove', move, { passive: true });
+    return () => window.removeEventListener('mousemove', move);
+  }, []);
+  return <div id="owf-cursor-glow" aria-hidden="true" />;
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -21,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         }}
       >
         <ThemeProvider>
+          <CursorGlow />
           <GlobalHeader />
           <div className="hidden md:block">
             <LeftNav />

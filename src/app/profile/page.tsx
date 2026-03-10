@@ -215,6 +215,14 @@ export default function ProfilePage(){
 
   const { theme: globalTheme } = useTheme();
   const accent=editing?draft.accentColor:profile.accentColor;
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const [tabPill, setTabPill] = useState({ left: 0, width: 0 });
+
+  // Update sliding pill position when tab changes
+  useEffect(() => {
+    const el = tabRefs.current[tab];
+    if (el) setTabPill({ left: el.offsetLeft, width: el.offsetWidth });
+  }, [tab]);
   // T maps global OWFTheme vars to the shape profile page uses
   const T = {
     bg: globalTheme.bg,
@@ -376,10 +384,10 @@ export default function ProfilePage(){
   };
 
   // ── POST CARD ─────────────────────────────────────────
-  const PostCard=({post}:{post:typeof SAMPLE_POSTS[0]})=>{
+  const PostCard=({post, index=0}:{post:typeof SAMPLE_POSTS[0]; index?: number})=>{
     const mc=MOOD_COLORS[post.mood]||accent;
     return(
-      <div style={{background:'#ffffff',border:`1px solid ${mc}22`,borderRadius:'20px',padding:'16px',position:'relative',overflow:'hidden',marginBottom:'12px',boxShadow:`0 0 0 1px ${mc}10, 0 4px 20px rgba(0,0,0,0.06), 0 0 12px ${mc}18`}}>
+      <div className="owf-card-lift" style={{background:'#ffffff',border:`1px solid ${mc}22`,borderLeft:`3px solid ${mc}`,borderRadius:'20px',padding:'16px',position:'relative',overflow:'hidden',marginBottom:'12px',boxShadow:`0 0 0 1px ${mc}10, 0 4px 20px rgba(0,0,0,0.06), 0 0 12px ${mc}18`,animationDelay:`${index * 0.07}s`}} className={`owf-card-lift owf-fade-up`}>
         <div style={{position:'absolute',top:'-40%',right:'-5%',width:'160px',height:'160px',borderRadius:'50%',background:`radial-gradient(ellipse,${mc}12 0%,transparent 70%)`,filter:'blur(24px)',pointerEvents:'none'}}/>
         <div style={{height:'2px',borderRadius:'99px',background:`linear-gradient(90deg,${mc},${mc}00)`,marginBottom:'12px'}}/>
         <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'10px'}}>
@@ -514,6 +522,8 @@ export default function ProfilePage(){
 
       {/* COVER */}
       <div style={{position:'relative',zIndex:1,height:'160px',overflow:'hidden',background:isCoverImg?`url(${coverBg}) center/cover no-repeat`:coverBg}}>
+        {/* Light sweep animation */}
+        <div className="owf-banner-sweep" style={{position:'absolute',inset:0,background:`linear-gradient(108deg, transparent 25%, ${accent}09 50%, transparent 75%)`,pointerEvents:'none',zIndex:2}} />
         <div style={{position:'absolute',inset:0,background:T.isDark?'linear-gradient(to bottom,transparent 25%,rgba(8,11,20,0.97) 100%)':'linear-gradient(to bottom,transparent 25%,rgba(250,250,247,0.97) 100%)',zIndex:1}}/>
         {/* Mobile: hamburger to open drawer */}
         {isMobile&&!editing&&(
@@ -537,7 +547,7 @@ export default function ProfilePage(){
             <div style={PC}>
               <p style={{...LS,marginBottom:'10px'}}>MY CIRCLES</p>
               <div style={{display:'flex',flexDirection:'column',gap:'5px'}}>
-                {CIRCLES.map(c=><div key={c.name} className="lift" style={{display:'flex',alignItems:'center',gap:'9px',padding:'7px 9px',borderRadius:'12px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.03)'}}>
+                {CIRCLES.map(c=><div key={c.name} className="owf-card-lift" style={{display:'flex',alignItems:'center',gap:'9px',padding:'7px 9px',borderRadius:'12px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.03)'}}>
                   <div style={{width:'30px',height:'30px',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'15px',background:`${c.color}22`,flexShrink:0}}>{c.icon}</div>
                   <span style={{fontSize:'12px',fontWeight:600,color:T.text}}>{c.name}</span>
                 </div>)}
@@ -549,7 +559,7 @@ export default function ProfilePage(){
                 <button style={{fontSize:'10px',fontWeight:600,color:accent,background:'none',border:'none',cursor:'pointer'}}>All</button>
               </div>
               <div style={{display:'flex',flexDirection:'column',gap:'4px'}}>
-                {COLLECTIONS.map(c=><div key={c} className="lift" style={{display:'flex',alignItems:'center',gap:'8px',padding:'6px 8px',borderRadius:'10px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.03)'}}>
+                {COLLECTIONS.map(c=><div key={c} className="owf-card-lift" style={{display:'flex',alignItems:'center',gap:'8px',padding:'6px 8px',borderRadius:'10px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.03)'}}>
                   <span style={{fontSize:'12px'}}>📁</span>
                   <span style={{fontSize:'11px',fontWeight:500,color:T.text,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{c}</span>
                 </div>)}
@@ -562,7 +572,7 @@ export default function ProfilePage(){
                 <button style={{fontSize:'10px',fontWeight:600,color:accent,background:'none',border:'none',cursor:'pointer'}}>All</button>
               </div>
               <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'6px'}}>
-                {BADGES.map(b=><div key={b.label} className="lift" style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:'4px',padding:'8px 4px',borderRadius:'12px',cursor:'pointer',overflow:'hidden',background:`${b.color}12`,border:`1px solid ${b.color}22`}}>
+                {BADGES.map(b=><div key={b.label} className="owf-card-lift" style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:'4px',padding:'8px 4px',borderRadius:'12px',cursor:'pointer',overflow:'hidden',background:`${b.color}12`,border:`1px solid ${b.color}22`}}>
                   {b.shimmer&&<div className="shim"/>}
                   <span className="bglow" style={{fontSize:'20px',position:'relative',zIndex:1,color:b.color}}>{b.emoji}</span>
                   <span style={{fontSize:'8px',fontWeight:900,textAlign:'center',lineHeight:1.2,color:b.color,position:'relative',zIndex:1,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',width:'100%',paddingInline:'2px'}}>{b.label}</span>
@@ -576,11 +586,11 @@ export default function ProfilePage(){
           <div className="desktop-center" style={{flex:1,minWidth:0,marginTop:'-16px'}}>
 
             {/* IDENTITY CARD */}
-            <div style={{...PC,marginBottom:'14px',position:'relative',overflow:'visible',borderRadius:'22px',padding:'18px',boxShadow:T.isDark?`0 8px 40px rgba(0,0,0,0.4),0 0 0 1px ${accent}20,inset 0 1px 0 rgba(255,255,255,0.06)`:`0 8px 40px rgba(0,0,0,0.06),0 0 0 1px ${accent}15,inset 0 1px 0 rgba(255,255,255,0.95)`}}>
+            <div className="owf-fade-up owf-profile-card" style={{...PC,marginBottom:'14px',position:'relative',overflow:'visible',borderRadius:'22px',padding:'18px',boxShadow:T.isDark?`0 8px 40px rgba(0,0,0,0.4),0 0 0 1px ${accent}20,inset 0 1px 0 rgba(255,255,255,0.06)`:`0 8px 40px rgba(0,0,0,0.06),0 0 0 1px ${accent}15,inset 0 1px 0 rgba(255,255,255,0.95)`}}>
               <div style={{position:'absolute',inset:'-1px',borderRadius:'23px',pointerEvents:'none',background:`linear-gradient(135deg,${accent}40,transparent 50%,${accent}18)`,zIndex:-1,filter:'blur(1px)'}}/>
               <div style={{display:'flex',alignItems:'flex-start',gap:'14px'}}>
                 <div style={{flexShrink:0}}>
-                  <div style={{width:isMobile?'64px':'72px',height:isMobile?'64px':'72px',borderRadius:'20px',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:900,fontSize:isMobile?'18px':'20px',fontFamily:"'Playfair Display',serif",backgroundColor:accent,boxShadow:`0 0 0 3px ${T.bg},0 0 0 5px ${accent}60,0 12px 32px ${accent}50`}}>{ini(editing?draft.displayName:profile.displayName)}</div>
+                  <div className="owf-avatar-pulse owf-mood-transition" style={{width:isMobile?'64px':'72px',height:isMobile?'64px':'72px',borderRadius:'20px',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:900,fontSize:isMobile?'18px':'20px',fontFamily:"'Playfair Display',serif",backgroundColor:accent,boxShadow:`0 0 0 3px ${T.bg},0 0 0 5px ${accent}60,0 12px 32px ${accent}50`}}>{ini(editing?draft.displayName:profile.displayName)}</div>
                   {editing&&<div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginTop:'8px',width:isMobile?'64px':'72px'}}>{ACCENT_COLORS.map(c=><button key={c} onClick={()=>setDraft(p=>({...p,accentColor:c}))} style={{width:'17px',height:'17px',borderRadius:'50%',backgroundColor:c,cursor:'pointer',border:'none',outline:draft.accentColor===c?`3px solid ${c}`:'3px solid transparent',outlineOffset:'2px'}}/>)}</div>}
                 </div>
                 <div style={{flex:1,minWidth:0}}>
@@ -608,7 +618,7 @@ export default function ProfilePage(){
                   </div>)}
                 </div>
                 <div style={{flexShrink:0}}>
-                  {!editing?(<button onClick={startEdit} className="lift" style={{fontSize:'11px',fontWeight:600,padding:'7px 14px',borderRadius:'99px',cursor:'pointer',background:T.surface,border:`1.5px solid ${T.border}`,color:T.text,whiteSpace:'nowrap'}}>Edit</button>):(<div style={{display:'flex',gap:'5px'}}><button onClick={()=>setEditing(false)} style={{fontSize:'11px',fontWeight:600,padding:'7px 10px',borderRadius:'99px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.05)',border:`1px solid ${T.border}`,color:T.textSub}}>✕</button><button onClick={save} disabled={saving} style={{fontSize:'11px',fontWeight:700,padding:'7px 14px',borderRadius:'99px',cursor:'pointer',background:saved?'#16A34A':accent,color:'#fff',border:'none',boxShadow:`0 4px 14px ${accent}50`,whiteSpace:'nowrap'}}>{saved?'✓':saving?'…':'Save'}</button></div>)}
+                  {!editing?(<button onClick={startEdit} className="owf-card-lift" style={{fontSize:'11px',fontWeight:600,padding:'7px 14px',borderRadius:'99px',cursor:'pointer',background:T.surface,border:`1.5px solid ${T.border}`,color:T.text,whiteSpace:'nowrap'}}>Edit</button>):(<div style={{display:'flex',gap:'5px'}}><button onClick={()=>setEditing(false)} style={{fontSize:'11px',fontWeight:600,padding:'7px 10px',borderRadius:'99px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.05)',border:`1px solid ${T.border}`,color:T.textSub}}>✕</button><button onClick={save} disabled={saving} style={{fontSize:'11px',fontWeight:700,padding:'7px 14px',borderRadius:'99px',cursor:'pointer',background:saved?'#16A34A':accent,color:'#fff',border:'none',boxShadow:`0 4px 14px ${accent}50`,whiteSpace:'nowrap'}}>{saved?'✓':saving?'…':'Save'}</button></div>)}
                 </div>
               </div>
               {editing&&(<div style={{marginTop:'14px',paddingTop:'14px',borderTop:`1px solid ${T.border}`,display:'flex',flexDirection:'column',gap:'10px'}}>
@@ -616,7 +626,7 @@ export default function ProfilePage(){
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'7px'}}>{(['city','country','website'] as const).map(f=><input key={f} value={draft[f]} onChange={e=>setDraft(p=>({...p,[f]:e.target.value}))} placeholder={f.charAt(0).toUpperCase()+f.slice(1)} style={{fontSize:'12px',padding:'9px 11px',borderRadius:'11px',outline:'none',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',border:`1.5px solid ${T.border}`,color:T.text}}/>)}<select value={draft.pronouns} onChange={e=>setDraft(p=>({...p,pronouns:e.target.value}))} style={{fontSize:'12px',padding:'9px 11px',borderRadius:'11px',outline:'none',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',border:`1.5px solid ${T.border}`,color:T.text}}><option value="">Pronouns</option>{PRONOUNS.map(pr=><option key={pr} value={pr}>{pr}</option>)}</select></div>
                 <div><p style={{...LS,marginBottom:'7px'}}>LANGUAGES</p><div style={{display:'flex',flexWrap:'wrap',gap:'5px'}}>{LANGUAGES.map(l=><button key={l} onClick={()=>toggleLang(l)} style={{fontSize:'11px',padding:'4px 10px',borderRadius:'99px',cursor:'pointer',background:draft.languages.includes(l)?`${accent}20`:T.isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.04)',border:`1.5px solid ${draft.languages.includes(l)?accent:T.border}`,color:draft.languages.includes(l)?accent:T.textSub,fontWeight:draft.languages.includes(l)?600:400}}>{l}</button>)}</div></div>
               </div>)}
-              {!editing&&(<div style={{display:'flex',gap:isMobile?'16px':'20px',marginTop:'12px',paddingTop:'12px',borderTop:`1px solid ${T.border}`}}>{[['12','Posts'],['0','Followers'],['0','Following'],['0','Chapters']].map(([n,l])=>(<div key={l} className="lift" style={{cursor:'pointer'}}><span className="sf" style={{fontSize:isMobile?'16px':'18px',fontWeight:900,color:T.text}}>{n}</span><span style={{fontSize:'9px',fontWeight:600,marginLeft:'4px',letterSpacing:'0.08em',color:T.textMuted}}>{l.toUpperCase()}</span></div>))}</div>)}
+              {!editing&&(<div style={{display:'flex',gap:isMobile?'16px':'20px',marginTop:'12px',paddingTop:'12px',borderTop:`1px solid ${T.border}`}}>{[['12','Posts'],['0','Followers'],['0','Following'],['0','Chapters']].map(([n,l])=>(<div key={l} className="owf-card-lift" style={{cursor:'pointer'}}><span className="sf" style={{fontSize:isMobile?'16px':'18px',fontWeight:900,color:T.text}}>{n}</span><span style={{fontSize:'9px',fontWeight:600,marginLeft:'4px',letterSpacing:'0.08em',color:T.textMuted}}>{l.toUpperCase()}</span></div>))}</div>)}
             </div>
 
             {/* MOBILE: Widget icon row */}
@@ -638,8 +648,10 @@ export default function ProfilePage(){
 
             {/* TABS */}
             {!editing&&<>
-              <div className="ns" style={{display:'flex',marginBottom:'14px',borderBottom:`1.5px solid ${T.border}`,overflowX:'auto'}}>
-                {TABS.map(t=><button key={t} onClick={()=>setTab(t.toLowerCase())} style={{padding:'10px 16px',fontSize:'13px',whiteSpace:'nowrap',flexShrink:0,fontWeight:tab===t.toLowerCase()?700:400,color:tab===t.toLowerCase()?accent:T.textMuted,background:'none',border:'none',cursor:'pointer',borderBottom:tab===t.toLowerCase()?`2.5px solid ${accent}`:'2.5px solid transparent',marginBottom:'-1.5px',transition:'color .2s'}}>{t}</button>)}
+              <div className="ns" style={{display:'flex',marginBottom:'14px',borderBottom:`1.5px solid ${T.border}`,overflowX:'auto',position:'relative'}}>
+                {TABS.map(t=><button key={t} ref={el => tabRefs.current[t.toLowerCase()] = el} onClick={()=>setTab(t.toLowerCase())} style={{padding:'10px 16px',fontSize:'13px',whiteSpace:'nowrap',flexShrink:0,fontWeight:tab===t.toLowerCase()?700:400,color:tab===t.toLowerCase()?accent:T.textMuted,background:'none',border:'none',cursor:'pointer',borderBottom:'2.5px solid transparent',marginBottom:'-1.5px',transition:'color .2s'}}>{t}</button>)}
+                  {/* Sliding pill indicator */}
+                  <div className="owf-tab-pill" style={{position:'absolute',bottom:-1,height:'2.5px',borderRadius:'2px',background:accent,left:tabPill.left,width:tabPill.width}} />
               </div>
 
               {/* FEED */}
@@ -687,7 +699,7 @@ export default function ProfilePage(){
                 {tab==='badges'&&(<div>
                   <p style={{...LS,marginBottom:'12px'}}>EARNED</p>
                   <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'10px',marginBottom:'18px'}}>
-                    {BADGES.map(b=><div key={b.label} className="lift" style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:'8px',padding:'16px 8px',borderRadius:'18px',cursor:'pointer',overflow:'hidden',background:T.isDark?`${b.color}12`:`${b.color}10`,border:`1.5px solid ${b.color}28`,boxShadow:`0 4px 16px ${b.color}18`}}>
+                    {BADGES.map(b=><div key={b.label} className="owf-card-lift" style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:'8px',padding:'16px 8px',borderRadius:'18px',cursor:'pointer',overflow:'hidden',background:T.isDark?`${b.color}12`:`${b.color}10`,border:`1.5px solid ${b.color}28`,boxShadow:`0 4px 16px ${b.color}18`}}>
                       {b.shimmer&&<div className="shim"/>}
                       <span className="bglow" style={{fontSize:'32px',position:'relative',zIndex:1,color:b.color}}>{b.emoji}</span>
                       <span style={{fontSize:'10px',fontWeight:900,textAlign:'center',lineHeight:1.3,color:b.color,position:'relative',zIndex:1}}>{b.label}</span>
@@ -706,7 +718,7 @@ export default function ProfilePage(){
                 {tab==='collections'&&(<div>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}}><p style={LS}>MY COLLECTIONS</p><button style={{fontSize:'12px',fontWeight:700,padding:'6px 13px',borderRadius:'99px',cursor:'pointer',background:`${accent}18`,border:`1.5px dashed ${accent}55`,color:accent}}>+ New</button></div>
                   <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'10px'}}>
-                    {COLLECTIONS.map(c=><div key={c} className="lift" style={{padding:'14px',borderRadius:'16px',cursor:'pointer',display:'flex',alignItems:'center',gap:'10px',background:T.surface,backdropFilter:'blur(16px)',border:`1px solid ${T.border}`}}>
+                    {COLLECTIONS.map(c=><div key={c} className="owf-card-lift" style={{padding:'14px',borderRadius:'16px',cursor:'pointer',display:'flex',alignItems:'center',gap:'10px',background:T.surface,backdropFilter:'blur(16px)',border:`1px solid ${T.border}`}}>
                       <div style={{width:'36px',height:'36px',borderRadius:'12px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px',background:`${accent}18`,flexShrink:0}}>📁</div>
                       <span style={{fontSize:'12px',fontWeight:600,color:T.text}}>{c}</span>
                     </div>)}
@@ -715,7 +727,7 @@ export default function ProfilePage(){
                 {tab==='circles'&&(<div>
                   <p style={{...LS,marginBottom:'12px'}}>MY CIRCLES</p>
                   <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
-                    {CIRCLES.map(c=><div key={c.name} className="lift" style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 16px',borderRadius:'16px',cursor:'pointer',background:T.surface,backdropFilter:'blur(16px)',border:`1px solid ${T.border}`}}>
+                    {CIRCLES.map(c=><div key={c.name} className="owf-card-lift" style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 16px',borderRadius:'16px',cursor:'pointer',background:T.surface,backdropFilter:'blur(16px)',border:`1px solid ${T.border}`}}>
                       <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
                         <div style={{width:'40px',height:'40px',borderRadius:'13px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',background:`${c.color}20`,border:`1px solid ${c.color}28`}}>{c.icon}</div>
                         <span style={{fontSize:'13px',fontWeight:600,color:T.text}}>{c.name}</span>
@@ -750,7 +762,7 @@ export default function ProfilePage(){
                 </div>
                 {profile.nowPlaying.playing&&<div style={{display:'flex',alignItems:'center',gap:'2px',flexShrink:0}}>{['w1','w2','w3','w4','w5'].map(w=><div key={w} className={w} style={{width:'2.5px',height:'14px',borderRadius:'99px',background:accent,transformOrigin:'bottom'}}/>)}</div>}
               </div>)}</div>
-            <div style={PC}><p style={{...LS,marginBottom:'12px'}}>MOOD THIS WEEK</p><div style={{display:'flex',alignItems:'flex-end',gap:'4px',height:'52px'}}>{MOOD_WEEK.map(m=>{const mc=MOOD_COLORS[m.mood]||accent;const h=Math.round((m.val/maxMood)*100);return(<div key={m.day} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:'3px'}}><div className="lift" title={m.mood} style={{width:'100%',height:`${h}%`,minHeight:'5px',borderRadius:'5px',background:`linear-gradient(to top,${mc},${mc}90)`,boxShadow:`0 2px 6px ${mc}35`,cursor:'pointer'}}/><span style={{fontSize:'8px',fontWeight:700,color:T.textMuted}}>{m.day.slice(0,1)}</span></div>);})}</div><div style={{display:'flex',justifyContent:'space-between',marginTop:'8px'}}><span style={{fontSize:'10px',color:T.textSub}}>Best: <span style={{fontWeight:700,color:MOOD_COLORS['Joyful']}}>Joyful 😄</span></span><span style={{fontSize:'9px',color:T.textMuted}}>7 days</span></div></div>
+            <div style={PC}><p style={{...LS,marginBottom:'12px'}}>MOOD THIS WEEK</p><div style={{display:'flex',alignItems:'flex-end',gap:'4px',height:'52px'}}>{MOOD_WEEK.map(m=>{const mc=MOOD_COLORS[m.mood]||accent;const h=Math.round((m.val/maxMood)*100);return(<div key={m.day} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:'3px'}}><div className="owf-card-lift" title={m.mood} style={{width:'100%',height:`${h}%`,minHeight:'5px',borderRadius:'5px',background:`linear-gradient(to top,${mc},${mc}90)`,boxShadow:`0 2px 6px ${mc}35`,cursor:'pointer'}}/><span style={{fontSize:'8px',fontWeight:700,color:T.textMuted}}>{m.day.slice(0,1)}</span></div>);})}</div><div style={{display:'flex',justifyContent:'space-between',marginTop:'8px'}}><span style={{fontSize:'10px',color:T.textSub}}>Best: <span style={{fontWeight:700,color:MOOD_COLORS['Joyful']}}>Joyful 😄</span></span><span style={{fontSize:'9px',color:T.textMuted}}>7 days</span></div></div>
             {/* Country Info from restcountries */}
             {countryInfo&&<div style={PC}>
               <p style={{...LS,marginBottom:'10px'}}>YOUR COUNTRY</p>
@@ -779,7 +791,7 @@ export default function ProfilePage(){
               </div>
               <p style={{fontSize:'9px',color:T.textMuted,marginTop:'6px',textAlign:'center'}}>Tap to add · {profile.visitedCountries.length}/{Object.keys(COUNTRY_REGIONS).length}</p>
             </div>
-            <div style={PC}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'10px'}}><p style={LS}>MY MOMENTS</p><button style={{fontSize:'10px',fontWeight:600,color:accent,background:'none',border:'none',cursor:'pointer'}}>See all</button></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'7px'}}><div className="lift" style={{borderRadius:'13px',height:'72px',overflow:'hidden',cursor:'pointer',background:'linear-gradient(135deg,#3B82F6,#6366F1)',display:'flex',alignItems:'center',justifyContent:'center',position:'relative',boxShadow:'0 3px 12px rgba(59,130,246,0.32)'}}><span style={{fontSize:'22px'}}>🏙️</span><div style={{position:'absolute',bottom:'5px',left:'7px',fontSize:'9px',fontWeight:900,color:'rgba(255,255,255,0.9)'}}>7:15 AM</div></div><div className="lift" style={{borderRadius:'13px',height:'72px',cursor:'pointer',background:'linear-gradient(135deg,#F59E0B,#EF4444)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 3px 12px rgba(245,158,11,0.32)'}}><span style={{fontSize:'22px'}}>😄</span></div><div className="lift" style={{gridColumn:'span 2',borderRadius:'13px',padding:'10px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)',border:`1px solid ${T.border}`}}><p style={{fontSize:'11px',fontWeight:600,color:T.text,lineHeight:1.4}}>Just read something inspiring! ✨</p><p style={{fontSize:'9px',fontWeight:900,letterSpacing:'0.1em',color:T.textMuted,marginTop:'3px'}}>THU</p></div></div></div>
+            <div style={PC}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'10px'}}><p style={LS}>MY MOMENTS</p><button style={{fontSize:'10px',fontWeight:600,color:accent,background:'none',border:'none',cursor:'pointer'}}>See all</button></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'7px'}}><div className="owf-card-lift" style={{borderRadius:'13px',height:'72px',overflow:'hidden',cursor:'pointer',background:'linear-gradient(135deg,#3B82F6,#6366F1)',display:'flex',alignItems:'center',justifyContent:'center',position:'relative',boxShadow:'0 3px 12px rgba(59,130,246,0.32)'}}><span style={{fontSize:'22px'}}>🏙️</span><div style={{position:'absolute',bottom:'5px',left:'7px',fontSize:'9px',fontWeight:900,color:'rgba(255,255,255,0.9)'}}>7:15 AM</div></div><div className="owf-card-lift" style={{borderRadius:'13px',height:'72px',cursor:'pointer',background:'linear-gradient(135deg,#F59E0B,#EF4444)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 3px 12px rgba(245,158,11,0.32)'}}><span style={{fontSize:'22px'}}>😄</span></div><div className="owf-card-lift" style={{gridColumn:'span 2',borderRadius:'13px',padding:'10px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)',border:`1px solid ${T.border}`}}><p style={{fontSize:'11px',fontWeight:600,color:T.text,lineHeight:1.4}}>Just read something inspiring! ✨</p><p style={{fontSize:'9px',fontWeight:900,letterSpacing:'0.1em',color:T.textMuted,marginTop:'3px'}}>THU</p></div></div></div>
             <div style={PC}><ThemeSelector /></div>
 
           </div>{/* /right panel */}
