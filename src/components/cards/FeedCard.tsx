@@ -123,10 +123,11 @@ export default function FeedCard({
 
   return (
     <article
-      className="relative rounded-2xl overflow-hidden cursor-pointer"
+      className="relative rounded-2xl overflow-hidden cursor-pointer owf-card-lift"
       style={{
         backgroundColor: 'var(--owf-card)',
         border: '1px solid var(--owf-card-border)',
+        borderLeft: `3px solid ${moodColor}`,
         boxShadow: mounted
           ? `0 0 12px var(--owf-card-glow),
              0 2px 16px rgba(${moodRgb}, ${currentIntensity * 0.1}),
