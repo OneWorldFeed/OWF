@@ -2,57 +2,78 @@
 import type { Conversation } from "@/types/dm";
 import OwlBadge from "./OwlBadge";
 
-const C = { bg:"#07090D", raised:"#111827", border:"#1A2535", text:"#E2EAF2", muted:"#3D5268", horizon:"#1A6EFF", violet:"#8B5CF6", green:"#22C55E" };
+const C = {
+  border: "#1A2535", text: "#E2EAF2", sub: "#7A95AE",
+  muted: "#3D5268", surface: "#0D1219",
+};
 
 interface Props {
-  convo: Conversation;
-  active: boolean;
-  onClick: () => void;
-  onOwlClick: () => void;
+  convo:    Conversation;
+  active:   boolean;
+  onSelect: (id: string) => void;
+  onOwlClick: (id: string) => void;
 }
 
-export default function ConvoRow({ convo: c, active, onClick, onOwlClick }: Props) {
+export default function ConvoRow({ convo, active, onSelect, onOwlClick }: Props) {
   return (
     <div
-      onClick={onClick}
+      onClick={() => onSelect(convo.id)}
       style={{
-        display:"flex", alignItems:"center", gap:10,
-        padding:"10px 12px", cursor:"pointer", borderRadius:12,
-        background: active ? "rgba(26,110,255,0.09)" : "transparent",
-        border: active ? "1px solid rgba(26,110,255,0.22)" : "1px solid transparent",
-        transition:"all 0.15s", marginBottom:2,
+        display: "flex", alignItems: "center", gap: 12,
+        padding: "10px 16px",
+        background: active ? "rgba(26,101,255,0.08)" : "transparent",
+        borderLeft: active ? "2px solid #1A65FF" : "2px solid transparent",
+        cursor: "pointer", transition: "background 0.15s",
       }}
-      onMouseEnter={e => { if (!active) e.currentTarget.style.background = C.raised; }}
+      onMouseEnter={e => { if (!active) e.currentTarget.style.background = "rgba(255,255,255,0.03)"; }}
       onMouseLeave={e => { if (!active) e.currentTarget.style.background = "transparent"; }}
     >
       {/* Avatar */}
-      <div style={{ position:"relative", flexShrink:0 }}>
+      <div style={{ position: "relative", flexShrink: 0 }}>
         <div style={{
-          width:44, height:44, borderRadius:"50%",
-          background:`linear-gradient(135deg,${C.violet},${C.horizon})`,
-          display:"flex", alignItems:"center", justifyContent:"center",
-          fontSize:21, border:`2px solid ${active ? C.horizon+"50" : C.border}`,
-        }}>{c.emoji}</div>
-        {c.online && <div style={{ position:"absolute", bottom:1, right:1, width:11, height:11, borderRadius:"50%", background:C.green, border:`2px solid ${C.bg}` }}/>}
+          width: 42, height: 42, borderRadius: "50%",
+          background: "linear-gradient(135deg,#1A2535,#0D1219)",
+          border: `1.5px solid ${C.border}`,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 14, fontWeight: 700, color: C.sub,
+        }}>{convo.avatar}</div>
+        {convo.online && (
+          <div style={{
+            position: "absolute", bottom: 1, right: 1,
+            width: 9, height: 9, borderRadius: "50%",
+            background: "#00D4AA", border: "1.5px solid #07090D",
+          }}/>
+        )}
       </div>
 
-      {/* Text */}
-      <div style={{ flex:1, minWidth:0 }}>
-        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:3 }}>
-          <span style={{ fontSize:13.5, fontWeight:700, color:C.text, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:140 }}>{c.name}</span>
-          <span style={{ fontSize:10, color:C.muted, flexShrink:0, marginLeft:6 }}>{c.time}</span>
+      {/* Content */}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+          <span style={{ fontSize: 13.5, fontWeight: 600, color: C.text, truncate: "ellipsis" }}>
+            {convo.name}
+          </span>
+          <span style={{ fontSize: 11, color: C.muted, whiteSpace: "nowrap", flexShrink: 0 }}>{convo.ts}</span>
         </div>
-        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:6 }}>
-          <span style={{ fontSize:12, color:C.muted, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", flex:1 }}>{c.last}</span>
-          <OwlBadge convo={c} onClick={onOwlClick} />
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2 }}>
+          <span style={{
+            fontSize: 12, color: C.muted,
+            overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+            maxWidth: 140,
+          }}>{convo.lastMsg}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+            <OwlBadge convo={convo} onClick={() => onOwlClick(convo.id)}/>
+            {convo.unread ? (
+              <div style={{
+                minWidth: 18, height: 18, borderRadius: 9,
+                background: "#1A65FF", color: "#fff",
+                fontSize: 10, fontWeight: 700,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                padding: "0 4px",
+              }}>{convo.unread}</div>
+            ) : null}
+          </div>
         </div>
       </div>
-
-      {c.unread > 0 && (
-        <div style={{ width:20, height:20, borderRadius:"50%", background:C.horizon, color:"#fff", fontSize:11, fontWeight:700, flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", marginLeft:4 }}>
-          {c.unread}
-        </div>
-      )}
     </div>
   );
 }

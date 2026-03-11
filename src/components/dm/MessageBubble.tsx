@@ -2,93 +2,80 @@
 import { useState } from "react";
 import type { Message } from "@/types/dm";
 
-const C = { raised:"#111827", border:"#1A2535", text:"#E2EAF2", muted:"#3D5268", sub:"#7A95AE", violet:"#8B5CF6" };
-const QUICK_REACTIONS = ["💜","🔥","🌟","🌍","😂","👏"];
+const REACTIONS = ["❤️","😂","🔥","👏","😮","😢"];
 
-interface Props {
-  msg: Message;
-  pickerOpen: string | null;
-  setPicker: (id: string | null) => void;
-}
+interface Props { msg: Message; isMe: boolean; }
 
-export default function MessageBubble({ msg, pickerOpen, setPicker }: Props) {
-  const isMe = msg.from === "me";
-  const [reactions, setReactions] = useState(msg.reactions);
-  const [hov, setHov] = useState(false);
+export default function MessageBubble({ msg, isMe }: Props) {
+  const [showPicker, setShowPicker] = useState(false);
+  const [reactions,  setReactions]  = useState<string[]>(msg.reactions ?? []);
 
   const addReaction = (emoji: string) => {
-    setReactions(r => {
-      const ex = r.find(x => x.emoji === emoji);
-      if (ex) return r.map(x => x.emoji===emoji ? {...x, count:x.count+1, mine:true} : x);
-      return [...r, { emoji, count:1, mine:true }];
-    });
-    setPicker(null);
+    setReactions(r => r.includes(emoji) ? r.filter(e => e !== emoji) : [...r, emoji]);
+    setShowPicker(false);
   };
 
   return (
-    <div
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{ display:"flex", flexDirection:"column", alignItems:isMe?"flex-end":"flex-start", marginBottom:14, position:"relative" }}
-    >
-      <div style={{ position:"relative" }}>
-        {hov && (
-          <button
-            onClick={() => setPicker(pickerOpen===msg.id ? null : msg.id)}
-            style={{
-              position:"absolute", top:-10, [isMe?"left":"right"]:-34,
-              background:C.raised, border:`1px solid ${C.border}`,
-              borderRadius:"50%", width:26, height:26, cursor:"pointer",
-              fontSize:13, color:C.muted, display:"flex", alignItems:"center",
-              justifyContent:"center", zIndex:5, fontFamily:"inherit",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor=C.violet+"60"; e.currentTarget.style.color=C.text; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor=C.border; e.currentTarget.style.color=C.muted; }}
-          >☺</button>
-        )}
+    <div style={{
+      display: "flex",
+      flexDirection: isMe ? "row-reverse" : "row",
+      gap: 6, marginBottom: 8, position: "relative",
+      alignItems: "flex-end",
+    }}>
+      <div style={{ position: "relative" }}>
+        {/* Bubble */}
+        <div
+          onClick={() => setShowPicker(s => !s)}
+          style={{
+            maxWidth: 260, padding: "9px 13px",
+            borderRadius: isMe ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+            background: isMe
+              ? "linear-gradient(135deg,#1A65FF,#1040C0)"
+              : "#0D1219",
+            border: isMe ? "none" : "1px solid #1A2535",
+            fontSize: 13.5, color: "#E2EAF2", lineHeight: 1.55,
+            cursor: "pointer",
+            boxShadow: isMe ? "0 2px 12px rgba(26,101,255,0.25)" : "none",
+          }}
+        >
+          {msg.text}
+        </div>
 
-        {pickerOpen===msg.id && (
+        {/* Reactions */}
+        {reactions.length > 0 && (
           <div style={{
-            position:"absolute", top:-46, [isMe?"right":"left"]:0,
-            background:"#0D1219", border:`1px solid ${C.border}`,
-            borderRadius:28, padding:"6px 10px",
-            display:"flex", gap:4, zIndex:20,
-            boxShadow:"0 8px 24px rgba(0,0,0,0.5)",
-            animation:"owfFadeIn 0.15s ease",
+            marginTop: 3, display: "flex", gap: 4,
+            justifyContent: isMe ? "flex-end" : "flex-start",
           }}>
-            {QUICK_REACTIONS.map(e => (
-              <button key={e} onClick={() => addReaction(e)}
-                style={{ background:"none", border:"none", cursor:"pointer", fontSize:20, padding:"2px 3px", borderRadius:6, fontFamily:"inherit" }}
-                onMouseEnter={el => el.currentTarget.style.transform="scale(1.35)"}
-                onMouseLeave={el => el.currentTarget.style.transform="scale(1)"}
-              >{e}</button>
+            {reactions.map((r, i) => (
+              <span key={i} style={{ fontSize: 14, cursor: "pointer" }}
+                onClick={() => addReaction(r)}>{r}</span>
             ))}
           </div>
         )}
 
-        <div style={{
-          maxWidth:300, padding:"10px 14px",
-          background: isMe ? "linear-gradient(135deg,rgba(26,110,255,0.2),rgba(26,110,255,0.1))" : C.raised,
-          border:`1px solid ${isMe?"rgba(26,110,255,0.3)":C.border}`,
-          borderRadius: isMe?"18px 18px 4px 18px":"18px 18px 18px 4px",
-          color:C.text, fontSize:14, lineHeight:1.55,
-        }}>{msg.text}</div>
-        <div style={{ fontSize:10, color:C.muted, marginTop:3, textAlign:isMe?"right":"left" }}>{msg.time}</div>
+        {/* Reaction picker */}
+        {showPicker && (
+          <div style={{
+            position: "absolute", bottom: "110%",
+            [isMe ? "right" : "left"]: 0,
+            background: "#0D1219", border: "1px solid #1A2535",
+            borderRadius: 24, padding: "6px 10px",
+            display: "flex", gap: 6, zIndex: 100,
+            boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
+            animation: "owfFadeIn 0.15s ease",
+          }}>
+            {REACTIONS.map(e => (
+              <span key={e} style={{ fontSize: 18, cursor: "pointer", padding: "2px 1px" }}
+                onClick={() => addReaction(e)}>{e}</span>
+            ))}
+          </div>
+        )}
       </div>
 
-      {reactions.length > 0 && (
-        <div style={{ display:"flex", gap:5, marginTop:5 }}>
-          {reactions.map(r => (
-            <button key={r.emoji} onClick={() => addReaction(r.emoji)} style={{
-              background:r.mine?"rgba(139,92,246,0.12)":C.raised,
-              border:`1px solid ${r.mine?C.violet+"40":C.border}`,
-              borderRadius:20, padding:"2px 8px", fontSize:13, cursor:"pointer",
-              display:"flex", alignItems:"center", gap:4,
-              color:r.mine?C.violet:C.sub, fontWeight:r.mine?700:500, fontFamily:"inherit",
-            }}>{r.emoji} <span style={{fontSize:11}}>{r.count}</span></button>
-          ))}
-        </div>
-      )}
+      <span style={{ fontSize: 10, color: "#3D5268", paddingBottom: 2, whiteSpace: "nowrap" }}>
+        {msg.ts}
+      </span>
     </div>
   );
 }

@@ -1,32 +1,47 @@
-// src/lib/streak.ts
-import type { StreakTier, OwlColors, StreakLabel } from "@/types/dm";
+export type StreakTier = "none" | "low" | "mid" | "high" | "fire" | "legendary";
 
-export function getStreakTier(days: number | null): StreakTier {
-  if (!days || days === 0) return "none";
-  if (days >= 10) return "high";
-  if (days >= 4)  return "mid";
-  return "low";
+export function getStreakTier(days?: number): StreakTier {
+  if (!days || days <= 0) return "none";
+  if (days < 4)   return "low";
+  if (days < 10)  return "mid";
+  if (days < 30)  return "high";
+  if (days < 100) return "fire";
+  return "legendary";
 }
 
-export function getOwlColors(tier: StreakTier, atRisk: boolean, broken: boolean): OwlColors {
-  if (broken)  return { body:"#2A3040", eye:"#3D5268", halo:"rgba(61,82,104,0.15)",   haloStrong:"rgba(61,82,104,0.08)"   };
-  if (atRisk)  return { body:"#6B5020", eye:"#E8B84B", halo:"rgba(232,184,75,0.22)",  haloStrong:"rgba(232,184,75,0.12)"  };
+export function getOwlColors(
+  tier: StreakTier,
+  atRisk?: boolean,
+  broken?: boolean,
+): { halo: string; haloStrong: string; text: string } {
+  if (broken)  return { halo: "rgba(61,82,104,0.15)",  haloStrong: "rgba(61,82,104,0.25)",  text: "#3D5268" };
+  if (atRisk)  return { halo: "rgba(245,158,11,0.12)", haloStrong: "rgba(245,158,11,0.22)", text: "#F59E0B" };
   switch (tier) {
-    case "high": return { body:"#7C5C2A", eye:"#FFD97A", halo:"rgba(232,184,75,0.35)", haloStrong:"rgba(232,184,75,0.18)" };
-    case "mid":  return { body:"#5C4420", eye:"#E8B84B", halo:"rgba(232,184,75,0.25)", haloStrong:"rgba(232,184,75,0.12)" };
-    case "low":  return { body:"#3D3020", eye:"#B89040", halo:"rgba(184,144,64,0.15)", haloStrong:"rgba(184,144,64,0.07)" };
-    default:     return { body:"#1E2535", eye:"#3D5268", halo:"rgba(0,0,0,0)",          haloStrong:"rgba(0,0,0,0)"          };
+    case "legendary": return { halo: "rgba(0,194,199,0.14)",  haloStrong: "rgba(0,194,199,0.24)",  text: "#00C2C7" };
+    case "fire":      return { halo: "rgba(255,106,0,0.14)",  haloStrong: "rgba(255,106,0,0.24)",  text: "#FF6A00" };
+    case "high":      return { halo: "rgba(232,184,75,0.12)", haloStrong: "rgba(232,184,75,0.22)", text: "#E8B84B" };
+    case "mid":       return { halo: "rgba(106,157,255,0.1)", haloStrong: "rgba(106,157,255,0.2)", text: "#6A9DFF" };
+    default:          return { halo: "rgba(0,212,170,0.08)",  haloStrong: "rgba(0,212,170,0.14)",  text: "#00D4AA" };
   }
 }
 
 export function getStreakLabel(
-  days: number | null, atRisk: boolean, broken: boolean, lastStreak: number | null
-): StreakLabel | null {
-  if (broken)    return { short:`Ended at ${lastStreak}d`, long:`Your streak ended at ${lastStreak} days.` };
-  if (!days)     return null;
-  if (atRisk)    return { short:"Ends today", long:"Your streak ends today if you both don't send a message." };
-  if (days>=100) return { short:`${days} days`, long:`100 days in a row. That's an archive of trust.` };
-  if (days>=30)  return { short:`${days} days`, long:`30 days of daily conversation. This owl remembers.` };
-  if (days>=10)  return { short:`${days} days`, long:`You've kept a ${days}-day streak. The owl's getting brighter.` };
-  return           { short:`${days} days`, long:`You've been talking every day for ${days} days.` };
+  streak?: number,
+  atRisk?: boolean,
+  broken?: boolean,
+  lastStreak?: number,
+): { short: string; long: string } | null {
+  if (broken && lastStreak) return {
+    short: `${lastStreak}d ended`,
+    long:  `Your ${lastStreak}-day streak ended.`,
+  };
+  if (!streak || streak <= 0) return null;
+  if (atRisk) return {
+    short: `${streak}d ⚠`,
+    long:  `${streak}-day streak — ends today!`,
+  };
+  return {
+    short: `${streak}d 🔥`,
+    long:  `${streak} days of daily conversation.`,
+  };
 }
