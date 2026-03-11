@@ -1,33 +1,33 @@
 "use client";
-import { getStreakTier, getOwlColors, getStreakLabel } from "@/lib/streak";
+import { getStreakTier, getStreakLabel } from "@/lib/streak";
 import type { Conversation } from "@/types/dm";
-import OwlSVG from "./OwlSVG";
+import OWFOwl, { type OwlCycle, type OwlMood } from "./OWFOwl";
 
-interface Props {
-  convo: Conversation;
-  onClick?: () => void;
+function getProps(c: Conversation): { cycle: OwlCycle; mood: OwlMood } {
+  if (c.broken)                         return { cycle:"default", mood:"broken"  };
+  if (c.atRisk)                         return { cycle:"solar",   mood:"atRisk"  };
+  const t = getStreakTier(c.streak);
+  if (t === "high")                     return { cycle:"solar",   mood:"happy"   };
+  if (t === "mid")                      return { cycle:"default", mood:"happy"   };
+  return                                       { cycle:"default", mood:"calm"    };
 }
+
+interface Props { convo: Conversation; onClick?: () => void; }
 
 export default function OwlBadge({ convo, onClick }: Props) {
   if (!convo.streak && !convo.broken) return null;
-  const tier  = getStreakTier(convo.streak);
   const label = getStreakLabel(convo.streak, convo.atRisk, convo.broken, convo.lastStreak);
   if (!label) return null;
-
-  const labelColor = convo.broken ? "#3D5268" : convo.atRisk ? "#F59E0B" : "#E8B84B";
-
+  const { cycle, mood } = getProps(convo);
+  const col = convo.broken ? "#3D5268" : convo.atRisk ? "#F59E0B" : "#E8B84B";
   return (
-    <div
-      onClick={e => { e.stopPropagation(); onClick?.(); }}
-      title={label.long}
-      style={{ display:"flex", alignItems:"center", gap:4, cursor:"pointer", padding:"2px 4px", borderRadius:6, transition:"background 0.15s" }}
-      onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,255,255,0.04)")}
-      onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+    <div onClick={e=>{e.stopPropagation();onClick?.();}} title={label.long}
+      style={{display:"flex",alignItems:"center",gap:4,cursor:"pointer",padding:"2px 4px",borderRadius:6,transition:"background 0.15s"}}
+      onMouseEnter={e=>(e.currentTarget.style.background="rgba(255,255,255,0.05)")}
+      onMouseLeave={e=>(e.currentTarget.style.background="transparent")}
     >
-      <OwlSVG size={22} tier={tier} atRisk={convo.atRisk} broken={convo.broken} pulse />
-      <span style={{ fontSize:11, fontWeight:700, color:labelColor, whiteSpace:"nowrap" }}>
-        {label.short}
-      </span>
+      <OWFOwl size={26} cycle={cycle} mood={mood} animate={convo.atRisk} streakDays={convo.streak??0} />
+      <span style={{fontSize:11,fontWeight:700,color:col,whiteSpace:"nowrap"}}>{label.short}</span>
     </div>
   );
 }
