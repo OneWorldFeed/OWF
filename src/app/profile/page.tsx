@@ -7,6 +7,9 @@ import { useTheme } from '@/context/ThemeProvider';
 import ThemeSelector from '@/components/ui/ThemeSelector';
 import { getCountryInfo, detectUserLocation, searchTrack, getUpcomingHolidays, formatPopulation, type CountryInfo, type Holiday } from '@/lib/freeapis';
 import RadioPlayer from '@/components/ui/RadioPlayer';
+import ImageRepositionModal from '@/components/ui/ImageRepositionModal';
+import OWFOwl, { type OwlCycle } from '@/components/dm/OWFOwl';
+import { getStreakLabel } from '@/lib/streak';
 
 const GUEST_ID = 'guest_preview';
 const LANGUAGES = ['English','French','Arabic','Spanish','Portuguese','Swahili','Yoruba','Mandarin','Hindi','Japanese'];
@@ -38,6 +41,22 @@ const BADGES=[
   {emoji:'🗺️',label:'Globe',color:'#0891B2',rarity:'Epic',shimmer:true},
 ];
 const LOCKED=[{emoji:'📖',label:'Storyteller'},{emoji:'🌐',label:'Global Voice'},{emoji:'🎯',label:'Streak ×30'}];
+
+// Mock streak value — replace with real user data when available
+const MOCK_STREAK_DAYS = 35;
+
+const OWL_CYCLES: {cycle:OwlCycle;label:string;days:number;color:string;rarity:string}[] = [
+  {cycle:'city',   label:'City Owl',   days:0,   color:'#D4956A', rarity:'Starter'},
+  {cycle:'lunar',  label:'Lunar Owl',  days:4,   color:'#2A6AAA', rarity:'Common'},
+  {cycle:'frost',  label:'Frost Owl',  days:10,  color:'#80B8D8', rarity:'Uncommon'},
+  {cycle:'forest', label:'Forest Owl', days:20,  color:'#2E7D32', rarity:'Uncommon'},
+  {cycle:'fire',   label:'Fire Owl',   days:30,  color:'#9B1800', rarity:'Rare'},
+  {cycle:'solar',  label:'Solar Owl',  days:50,  color:'#E89A00', rarity:'Rare'},
+  {cycle:'storm',  label:'Storm Owl',  days:70,  color:'#2F3E46', rarity:'Epic'},
+  {cycle:'aurora', label:'Aurora Owl', days:100, color:'#1A2A60', rarity:'Epic'},
+  {cycle:'cosmic', label:'Cosmic Owl', days:200, color:'#1A1A5A', rarity:'Legendary'},
+  {cycle:'mythic', label:'Mythic Owl', days:365, color:'#006868', rarity:'Mythic'},
+];
 const SAMPLE_POSTS=[
   {id:'1',mood:'Electric',city:'Lagos',time:'2h ago',text:'The energy in Lagos tonight is something else. The music never stops and neither do we. +lagos +nightlife',likes:24,comments:7,hasImage:false,hasVideo:false},
   {id:'2',mood:'Reflective',city:'Tokyo',time:'5h ago',text:'Cherry blossom season begins today. Every year I forget how quickly it goes. +tokyo +cherryblossoms',likes:41,comments:12,hasImage:true,hasVideo:false},
@@ -50,7 +69,7 @@ const MOOD_COLORS:Record<string,string>={Electric:'#F59E0B',Reflective:'#6366F1'
 const MOOD_WEEK=[{day:'Mon',mood:'Calm',val:3},{day:'Tue',mood:'Hopeful',val:5},{day:'Wed',mood:'Electric',val:8},{day:'Thu',mood:'Reflective',val:4},{day:'Fri',mood:'Joyful',val:9},{day:'Sat',mood:'Curious',val:6},{day:'Sun',mood:'Hopeful',val:7}];
 const COUNTRY_REGIONS:Record<string,{label:string;x:number;y:number}>={US:{label:'🇺🇸',x:18,y:36},NG:{label:'🇳🇬',x:48,y:52},JP:{label:'🇯🇵',x:80,y:34},DE:{label:'🇩🇪',x:50,y:26},BR:{label:'🇧🇷',x:28,y:62},IN:{label:'🇮🇳',x:67,y:44},FR:{label:'🇫🇷',x:48,y:27},ZA:{label:'🇿🇦',x:52,y:68},CN:{label:'🇨🇳',x:74,y:36},GB:{label:'🇬🇧',x:47,y:23},AU:{label:'🇦🇺',x:78,y:68},MX:{label:'🇲🇽',x:17,y:44},EG:{label:'🇪🇬',x:54,y:40},KE:{label:'🇰🇪',x:56,y:54},AR:{label:'🇦🇷',x:26,y:72},TH:{label:'🇹🇭',x:73,y:46},GH:{label:'🇬🇭',x:46,y:52},IT:{label:'🇮🇹',x:51,y:30},CA:{label:'🇨🇦',x:16,y:24},MA:{label:'🇲🇦',x:45,y:36}};
 const WMO_ICONS:Record<number,string>={0:'☀️',1:'🌤',2:'⛅',3:'☁️',45:'🌫',51:'🌦',53:'🌧',61:'🌧',71:'🌨',80:'🌦',95:'⛈'};
-const CITY_COORDS:Record<string,{lat:number;lon:number}>={Lagos:{lat:6.5244,lon:3.3792},London:{lat:51.5074,lon:-0.1278},'New York':{lat:40.7128,lon:-74.006},Tokyo:{lat:35.6762,lon:139.6503},Nairobi:{lat:-1.2921,lon:36.8219},Paris:{lat:48.8566,lon:2.3522},Berlin:{lat:52.52,lon:13.405},Dubai:{lat:25.2048,lon:55.2708},Mumbai:{lat:19.076,lon:72.8777},Sydney:{lat:-33.8688,lon:151.2093}};
+const CITY_COORDS:Record<string,{lat:number;lon:number}>={'Los Angeles':{lat:34.0522,lon:-118.2437},'New York':{lat:40.7128,lon:-74.006},Chicago:{lat:41.8781,lon:-87.6298},Houston:{lat:29.7604,lon:-95.3698},Toronto:{lat:43.6532,lon:-79.3832},Vancouver:{lat:49.2827,lon:-123.1207},Montreal:{lat:45.5017,lon:-73.5673},'Mexico City':{lat:19.4326,lon:-99.1332},London:{lat:51.5074,lon:-0.1278},Tokyo:{lat:35.6762,lon:139.6503},Paris:{lat:48.8566,lon:2.3522},Berlin:{lat:52.52,lon:13.405},Sydney:{lat:-33.8688,lon:151.2093}};
 
 // Bottom nav tabs
 const BOTTOM_NAV = [
@@ -71,9 +90,9 @@ const WIDGET_BTNS = [
 ];
 
 interface NowPlaying{track:string;artist:string;playing:boolean;station?:string;}
-interface Profile{displayName:string;handle:string;bio:string;city:string;country:string;pronouns:string;languages:string[];website:string;joinDate:string;accentColor:string;coverStyle:string;coverImage:string;handleChangedAt:string;visitedCountries:string[];nowPlaying:NowPlaying;}
+interface Profile{displayName:string;handle:string;bio:string;city:string;country:string;pronouns:string;languages:string[];website:string;joinDate:string;accentColor:string;coverStyle:string;coverImage:string;coverImagePosition:{x:number;y:number};handleChangedAt:string;visitedCountries:string[];nowPlaying:NowPlaying;}
 interface Weather{temp:number;condition:string;city:string;}
-const DEFAULT:Profile={displayName:'Your Name',handle:'yourhandle.feed',bio:'',city:'Lagos',country:'Nigeria',pronouns:'',languages:[],website:'',joinDate:new Date().toISOString().split('T')[0],accentColor:'#D97706',coverStyle:'sand',coverImage:'',handleChangedAt:'',visitedCountries:['NG','JP','DE','FR','GB'],nowPlaying:{track:'Essence',artist:'Wizkid ft. Tems',playing:true}};
+const DEFAULT:Profile={displayName:'Your Name',handle:'yourhandle.feed',bio:'',city:'Los Angeles',country:'United States',pronouns:'',languages:[],website:'',joinDate:new Date().toISOString().split('T')[0],accentColor:'#D97706',coverStyle:'sand',coverImage:'',coverImagePosition:{x:50,y:50},handleChangedAt:'',visitedCountries:['US','CA','MX'],nowPlaying:{track:'',artist:'',playing:false}};
 function ini(n:string){return n.split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2)||'?';}
 function fmtDate(d:string){try{return new Date(d).toLocaleDateString('en-US',{month:'long',year:'numeric'});}catch{return '';}}
 function canChangeHandle(at:string){return !at||Date.now()-new Date(at).getTime()>365*24*60*60*1000;}
@@ -93,6 +112,10 @@ export default function ProfilePage(){
   const [coverPrev,setCoverPrev]=useState('');
   const [avatarPrev,setAvatarPrev]=useState('');
   const avatarFileRef=useRef<HTMLInputElement>(null);
+  const [coverPosition,setCoverPosition]=useState<{x:number;y:number}>({x:50,y:50});
+  const [avatarPosition,setAvatarPosition]=useState<{x:number;y:number}>({x:50,y:50});
+  const [repositionTarget,setRepositionTarget]=useState<'banner'|'avatar'|null>(null);
+  const [repositionSrc,setRepositionSrc]=useState('');
   const [weather,setWeather]=useState<Weather|null>(null);
   const [editNP,setEditNP]=useState(false);
   const [npDraft,setNpDraft]=useState({track:'',artist:''});
@@ -125,14 +148,14 @@ export default function ProfilePage(){
   },[]);
 
   useEffect(()=>{
-    const city=profile.city||'Lagos';const coords=CITY_COORDS[city]||CITY_COORDS['Lagos'];
+    const city=profile.city||'Los Angeles';const coords=CITY_COORDS[city]||CITY_COORDS['Los Angeles'];
     fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lon}&current=temperature_2m,weathercode&temperature_unit=celsius`)
       .then(r=>r.json()).then(d=>{const temp=Math.round(d.current?.temperature_2m??0);const code=d.current?.weathercode??0;setWeather({temp,condition:WMO_ICONS[code]||'🌡',city});}).catch(()=>{});
   },[profile.city]);
 
   // ── Free API: country info when country changes
   useEffect(()=>{
-    const country = profile.country || 'Nigeria';
+    const country = profile.country || 'United States';
     getCountryInfo(country).then(info => { if(info) setCountryInfo(info); });
   },[profile.country]);
 
@@ -144,7 +167,7 @@ export default function ProfilePage(){
       'India':'IN','China':'CN','South Korea':'KR','Australia':'AU','Canada':'CA',
       'Mexico':'MX','Argentina':'AR','Morocco':'MA','Italy':'IT','Netherlands':'NL',
     };
-    const cc = codeMap[profile.country||'Nigeria'] || 'NG';
+    const cc = codeMap[profile.country||'United States'] || 'US';
     getUpcomingHolidays(cc).then(h => setHolidays(h));
   },[profile.country, countryInfo]);
 
@@ -188,10 +211,10 @@ export default function ProfilePage(){
     }
     setLoading(false);
   }
-  function startEdit(){setDraft({...profile});setCoverPrev(profile.coverImage||'');setEditing(true);setSaved(false);}
+  function startEdit(){setDraft({...profile});setCoverPrev(profile.coverImage||'');setCoverPosition(profile.coverImagePosition||{x:50,y:50});setEditing(true);setSaved(false);}
   async function save(){
     setSaving(true);setSaveError('');
-    const d={...draft,coverImage:coverPrev};
+    const d={...draft,coverImage:coverPrev,coverImagePosition:coverPosition};
     if(draft.handle!==profile.handle)d.handleChangedAt=new Date().toISOString();
     try{
       await setDoc(doc(db,'users',GUEST_ID),d,{merge:true});
@@ -210,8 +233,14 @@ export default function ProfilePage(){
     }
     setSaving(false);
   }
-  function onCoverFile(e:React.ChangeEvent<HTMLInputElement>){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=ev=>{if(ev.target?.result)setCoverPrev(ev.target.result as string);};r.readAsDataURL(f);}
-  function onAvatarFile(e:React.ChangeEvent<HTMLInputElement>){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=ev=>{if(ev.target?.result)setAvatarPrev(ev.target.result as string);};r.readAsDataURL(f);}
+  function onCoverFile(e:React.ChangeEvent<HTMLInputElement>){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=ev=>{if(ev.target?.result){setRepositionSrc(ev.target.result as string);setRepositionTarget('banner');}};r.readAsDataURL(f);e.target.value='';}
+  function onAvatarFile(e:React.ChangeEvent<HTMLInputElement>){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=ev=>{if(ev.target?.result){setRepositionSrc(ev.target.result as string);setRepositionTarget('avatar');}};r.readAsDataURL(f);e.target.value='';}
+  function onRepositionApply(pos:{x:number;y:number}){
+    if(repositionTarget==='banner'){setCoverPrev(repositionSrc);setCoverPosition(pos);}
+    else if(repositionTarget==='avatar'){setAvatarPrev(repositionSrc);setAvatarPosition(pos);}
+    setRepositionTarget(null);setRepositionSrc('');
+  }
+  function onRepositionCancel(){setRepositionTarget(null);setRepositionSrc('');}
   function toggleLang(l:string){setDraft(p=>({...p,languages:p.languages.includes(l)?p.languages.filter(x=>x!==l):[...p.languages,l]}));}
   function toggleCountry(code:string){setProfile(p=>({...p,visitedCountries:p.visitedCountries.includes(code)?p.visitedCountries.filter(x=>x!==code):[...p.visitedCountries,code]}));}
   function saveNowPlaying(){setProfile(p=>({...p,nowPlaying:{track:npDraft.track,artist:npDraft.artist,playing:true}}));setEditNP(false);}
@@ -389,6 +418,7 @@ export default function ProfilePage(){
 
 
   return(<>
+    {repositionTarget&&<ImageRepositionModal src={repositionSrc} variant={repositionTarget==='banner'?'banner':'avatar'} onApply={onRepositionApply} onCancel={onRepositionCancel} accent={accent}/>}
     <style>{`
       @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap');
       *{box-sizing:border-box;margin:0;padding:0;}
@@ -496,7 +526,7 @@ export default function ProfilePage(){
       )}
 
       {/* COVER */}
-      <div style={{position:'relative',zIndex:1,height:'160px',overflow:'hidden',background:isCoverImg?`url(${coverBg}) center/cover no-repeat`:coverBg}}>
+      <div style={{position:'relative',zIndex:1,height:'160px',overflow:'hidden',background:isCoverImg?`url(${coverBg}) ${(editing?coverPosition:profile.coverImagePosition??{x:50,y:50}).x}% ${(editing?coverPosition:profile.coverImagePosition??{x:50,y:50}).y}% / cover no-repeat`:coverBg}}>
         {/* Light sweep animation */}
         <div className="owf-banner-sweep" style={{position:'absolute',inset:0,background:`linear-gradient(108deg, transparent 25%, ${accent}09 50%, transparent 75%)`,pointerEvents:'none',zIndex:2}} />
         <div style={{position:'absolute',inset:0,background:T.isDark?'linear-gradient(to bottom,transparent 25%,rgba(8,11,20,0.97) 100%)':'linear-gradient(to bottom,transparent 25%,rgba(250,250,247,0.97) 100%)',zIndex:1}}/>
@@ -568,7 +598,7 @@ export default function ProfilePage(){
                   <div style={{position:'relative',width:isMobile?'64px':'72px',height:isMobile?'64px':'72px',flexShrink:0}}>
                     <div className="owf-avatar-pulse owf-mood-transition" style={{width:'100%',height:'100%',borderRadius:'20px',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:900,fontSize:isMobile?'18px':'20px',fontFamily:"'Playfair Display',serif",backgroundColor:accent,boxShadow:`0 0 0 3px ${T.bg},0 0 0 5px ${accent}60,0 12px 32px ${accent}50`,overflow:'hidden'}}>
                       {avatarPrev
-                        ? <img src={avatarPrev} alt="avatar" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'20px'}}/>
+                        ? <img src={avatarPrev} alt="avatar" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'20px',objectPosition:`${avatarPosition.x}% ${avatarPosition.y}%`}}/>
                         : ini(editing?draft.displayName:profile.displayName)
                       }
                     </div>
@@ -685,25 +715,68 @@ export default function ProfilePage(){
                     <button style={{fontSize:'13px',fontWeight:700,padding:'10px 22px',borderRadius:'99px',background:accent,color:'#fff',border:'none',cursor:'pointer',boxShadow:`0 5px 18px ${accent}55`}}>Create First Chapter</button>
                   </div>
                 </div>)}
-                {tab==='badges'&&(<div>
-                  <p style={{...LS,marginBottom:'12px'}}>EARNED</p>
-                  <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'10px',marginBottom:'18px'}}>
-                    {BADGES.map(b=><div key={b.label} className="owf-card-lift" style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:'8px',padding:'16px 8px',borderRadius:'18px',cursor:'pointer',overflow:'hidden',background:T.isDark?`${b.color}12`:`${b.color}10`,border:`1.5px solid ${b.color}28`,boxShadow:`0 4px 16px ${b.color}18`}}>
-                      {b.shimmer&&<div className="shim"/>}
-                      <span className="bglow" style={{fontSize:'32px',position:'relative',zIndex:1,color:b.color}}>{b.emoji}</span>
-                      <span style={{fontSize:'10px',fontWeight:900,textAlign:'center',lineHeight:1.3,color:b.color,position:'relative',zIndex:1}}>{b.label}</span>
-                      <span style={{fontSize:'9px',fontWeight:700,padding:'2px 8px',borderRadius:'99px',background:`${b.color}22`,color:b.color,position:'relative',zIndex:1}}>{b.rarity}</span>
-                    </div>)}
-                  </div>
-                  <p style={{...LS,marginBottom:'10px'}}>LOCKED</p>
-                  <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'10px'}}>
-                    {LOCKED.map(b=><div key={b.label} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'8px',padding:'16px 8px',borderRadius:'18px',background:T.isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.03)',border:`1.5px dashed ${T.border}`,opacity:0.55}}>
-                      <span style={{fontSize:'32px',filter:'grayscale(1)'}}>{b.emoji}</span>
-                      <span style={{fontSize:'10px',fontWeight:900,textAlign:'center',color:T.textMuted}}>{b.label}</span>
-                      <span style={{fontSize:'9px',padding:'2px 8px',borderRadius:'99px',background:T.isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.05)',color:T.textMuted}}>Locked</span>
-                    </div>)}
-                  </div>
-                </div>)}
+                {tab==='badges'&&(()=>{
+                  const streakLabel=getStreakLabel(MOCK_STREAK_DAYS);
+                  const earnedCycles=OWL_CYCLES.filter(c=>MOCK_STREAK_DAYS>=c.days);
+                  const lockedCycles=OWL_CYCLES.filter(c=>MOCK_STREAK_DAYS<c.days);
+                  // current active cycle is the highest earned
+                  const activeCycle=earnedCycles[earnedCycles.length-1];
+                  return(<div>
+                    <p style={{...LS,marginBottom:'12px'}}>EARNED</p>
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'10px',marginBottom:'18px'}}>
+                      {BADGES.map(b=><div key={b.label} className="owf-card-lift" style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:'8px',padding:'16px 8px',borderRadius:'18px',cursor:'pointer',overflow:'hidden',background:T.isDark?`${b.color}12`:`${b.color}10`,border:`1.5px solid ${b.color}28`,boxShadow:`0 4px 16px ${b.color}18`}}>
+                        {b.shimmer&&<div className="shim"/>}
+                        <span className="bglow" style={{fontSize:'32px',position:'relative',zIndex:1,color:b.color}}>{b.emoji}</span>
+                        <span style={{fontSize:'10px',fontWeight:900,textAlign:'center',lineHeight:1.3,color:b.color,position:'relative',zIndex:1}}>{b.label}</span>
+                        <span style={{fontSize:'9px',fontWeight:700,padding:'2px 8px',borderRadius:'99px',background:`${b.color}22`,color:b.color,position:'relative',zIndex:1}}>{b.rarity}</span>
+                      </div>)}
+                    </div>
+                    <p style={{...LS,marginBottom:'10px'}}>LOCKED</p>
+                    <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'10px',marginBottom:'24px'}}>
+                      {LOCKED.map(b=><div key={b.label} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'8px',padding:'16px 8px',borderRadius:'18px',background:T.isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.03)',border:`1.5px dashed ${T.border}`,opacity:0.55}}>
+                        <span style={{fontSize:'32px',filter:'grayscale(1)'}}>{b.emoji}</span>
+                        <span style={{fontSize:'10px',fontWeight:900,textAlign:'center',color:T.textMuted}}>{b.label}</span>
+                        <span style={{fontSize:'9px',padding:'2px 8px',borderRadius:'99px',background:T.isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.05)',color:T.textMuted}}>Locked</span>
+                      </div>)}
+                    </div>
+                    {/* ── OWL CYCLES ── */}
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'10px'}}>
+                      <p style={LS}>OWL CYCLES</p>
+                      {streakLabel&&<span style={{fontSize:'10px',fontWeight:700,padding:'2px 9px',borderRadius:'99px',background:activeCycle?`${activeCycle.color}22`:'transparent',color:activeCycle?.color??accent}}>{streakLabel.short}</span>}
+                    </div>
+                    {/* Earned cycles */}
+                    {earnedCycles.length>0&&(
+                      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'10px',marginBottom:'12px'}}>
+                        {earnedCycles.map(c=>{
+                          const isActive=c===activeCycle;
+                          return(
+                            <div key={c.cycle} className="owf-card-lift" style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:'6px',padding:'14px 6px 10px',borderRadius:'18px',cursor:'pointer',overflow:'hidden',background:T.isDark?`${c.color}14`:`${c.color}10`,border:`1.5px solid ${isActive?c.color+'80':c.color+'28'}`,boxShadow:isActive?`0 4px 20px ${c.color}30`:`0 2px 8px ${c.color}14`}}>
+                              {isActive&&<div style={{position:'absolute',top:'6px',right:'6px',width:'6px',height:'6px',borderRadius:'50%',background:c.color,boxShadow:`0 0 6px ${c.color}`}}/>}
+                              <OWFOwl cycle={c.cycle} size="sm" mood="happy" animate={isActive}/>
+                              <span style={{fontSize:'10px',fontWeight:900,textAlign:'center',lineHeight:1.2,color:c.color}}>{c.label}</span>
+                              <span style={{fontSize:'9px',fontWeight:700,padding:'1px 7px',borderRadius:'99px',background:`${c.color}22`,color:c.color}}>{c.rarity}</span>
+                              <span style={{fontSize:'8px',color:T.textMuted}}>{c.days===0?'Day 1':`${c.days}d`}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                    {/* Locked cycles */}
+                    {lockedCycles.length>0&&(
+                      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'10px'}}>
+                        {lockedCycles.map(c=>(
+                          <div key={c.cycle} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'6px',padding:'14px 6px 10px',borderRadius:'18px',background:T.isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.03)',border:`1.5px dashed ${T.border}`,opacity:0.45}}>
+                            <div style={{filter:'grayscale(1) brightness(0.6)'}}>
+                              <OWFOwl cycle={c.cycle} size="sm" mood="calm"/>
+                            </div>
+                            <span style={{fontSize:'10px',fontWeight:900,textAlign:'center',lineHeight:1.2,color:T.textMuted}}>{c.label}</span>
+                            <span style={{fontSize:'8px',color:T.textMuted}}>🔒 {c.days}d streak</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>);
+                })()}
                 {tab==='collections'&&(<div>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}}><p style={LS}>MY COLLECTIONS</p><button style={{fontSize:'12px',fontWeight:700,padding:'6px 13px',borderRadius:'99px',cursor:'pointer',background:`${accent}18`,border:`1.5px dashed ${accent}55`,color:accent}}>+ New</button></div>
                   <div style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'10px'}}>

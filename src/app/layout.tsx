@@ -5,6 +5,7 @@ import GlobalHeader from '@/components/header/GlobalHeader'
 import LeftNav from '@/components/nav/LeftNav'
 import BottomNav from '@/components/nav/BottomNav'
 import { ThemeProvider } from '@/context/ThemeProvider'
+import { AudioProvider } from '@/context/AudioProvider'
 import { useEffect } from 'react'
 
 // Cursor glow — desktop only, disabled on touch devices via CSS
@@ -32,6 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           color: 'var(--owf-text-primary)',
         }}
       >
+        <AudioProvider>
         <ThemeProvider>
           <CursorGlow />
           <GlobalHeader />
@@ -50,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <BottomNav />
           </div>
         </ThemeProvider>
+        </AudioProvider>
       </body>
     </html>
   )

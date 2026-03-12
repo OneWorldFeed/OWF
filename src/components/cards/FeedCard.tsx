@@ -1,8 +1,10 @@
 'use client';
 import { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { getMood, getMoodIntensity } from '@/lib/theme';
 import { toggleLike, recordInteraction, GLOW_PULSE } from '@/lib/firebase/interactions';
 import type { MoodId } from '@/lib/theme';
+import ImageLightbox from '@/components/ui/ImageLightbox';
 
 export interface FeedCardProps {
   id: string;
@@ -54,6 +56,7 @@ export default function FeedCard({
   const [comments, setComments] = useState<{handle: string; text: string; time: string; color: string}[]>([]);
   const [commentText, setCommentText] = useState('');
   const [commentCount2, setCommentCount2] = useState(commentCount);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
@@ -276,19 +279,66 @@ export default function FeedCard({
         {imageUrl && (
           <div
             className="rounded-xl overflow-hidden mb-3"
+            onClick={() => setLightboxOpen(true)}
             style={{
               backgroundColor: '#f0f0f0',
               height: featured ? '200px' : '160px',
+              cursor: 'zoom-in',
+              position: 'relative',
             }}
           >
             <img
               src={imageUrl}
               alt=""
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', userSelect: 'none', WebkitUserSelect: 'none', pointerEvents: 'none' }}
-              onContextMenu={(e) => e.preventDefault()}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', userSelect: 'none', WebkitUserSelect: 'none' }}
               draggable={false}
             />
+            {/* Hover hint */}
+            <div
+              style={{
+                position: 'absolute', inset: 0,
+                background: 'rgba(0,0,0,0)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'background 0.2s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = 'rgba(0,0,0,0.22)';
+                const icon = e.currentTarget.querySelector('span') as HTMLElement | null;
+                if (icon) icon.style.opacity = '1';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'rgba(0,0,0,0)';
+                const icon = e.currentTarget.querySelector('span') as HTMLElement | null;
+                if (icon) icon.style.opacity = '0';
+              }}
+            >
+              <span style={{ fontSize: '22px', opacity: 0, transition: 'opacity 0.2s', pointerEvents: 'none' }}>🔍</span>
+            </div>
           </div>
+        )}
+
+        {/* Lightbox — rendered via portal so it sits on document.body, outside the article's
+            CSS transform context (transform:scale() breaks position:fixed containment). */}
+        {lightboxOpen && imageUrl && mounted && createPortal(
+          <ImageLightbox
+            src={imageUrl}
+            authorName={authorName}
+            authorHandle={authorHandle}
+            city={city}
+            timeAgo={timeAgo}
+            moodColor={moodColor}
+            moodLabel={moodLabel}
+            content={content}
+            initialComments={comments}
+            initialCommentCount={likes}
+            onClose={() => setLightboxOpen(false)}
+            onCommentAdd={(text) => {
+              const newComment = { handle: 'you.feed', text, time: 'just now', color: moodColor };
+              setComments(prev => [...prev, newComment]);
+              setCommentCount2(prev => prev + 1);
+            }}
+          />,
+          document.body,
         )}
 
         {/* Engagement row */}
