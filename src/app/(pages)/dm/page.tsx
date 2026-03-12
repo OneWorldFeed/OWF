@@ -7,6 +7,8 @@ import MessageBubble from "@/components/dm/MessageBubble";
 import ThreadStreakBar from "@/components/dm/ThreadStreakBar";
 import AtRiskBanner from "@/components/dm/AtRiskBanner";
 import StreakSheet from "@/components/dm/StreakSheet";
+import BadgeUnlockModal from "@/components/ui/BadgeUnlockModal";
+import { justUnlockedCycle, type OwlCycle } from "@/lib/streak";
 
 const C = {
   bg: "#07090D", surface: "#0D1219", raised: "#121A24",
@@ -18,7 +20,8 @@ export default function DMPage() {
   const [activeId,    setActiveId]    = useState<string>("c1");
   const [messages,    setMessages]    = useState<Record<string, Message[]>>(MESSAGES);
   const [input,       setInput]       = useState("");
-  const [streakSheet, setStreakSheet] = useState<Conversation | null>(null);
+  const [streakSheet,  setStreakSheet]  = useState<Conversation | null>(null);
+  const [unlockCycle,  setUnlockCycle]  = useState<OwlCycle | null>(null);
   const [dismissed,   setDismissed]   = useState<Set<string>>(new Set());
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -38,7 +41,14 @@ export default function DMPage() {
       ts: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
     setMessages(prev => ({ ...prev, [activeId]: [...(prev[activeId] ?? []), msg] }));
-    setConvos(prev => prev.map(c => c.id === activeId ? { ...c, lastMsg: msg.text, ts: "Now" } : c));
+    setConvos(prev => prev.map(c => {
+      if (c.id !== activeId) return c;
+      const prevStreak = c.streak ?? 0;
+      const newStreak  = c.streak ?? 0; // streak is server-driven; detect crossing on update
+      const newCycle   = justUnlockedCycle(prevStreak, newStreak);
+      if (newCycle) setUnlockCycle(newCycle);
+      return { ...c, lastMsg: msg.text, ts: "Now" };
+    }));
     setInput("");
   };
 
@@ -195,6 +205,11 @@ export default function DMPage() {
       {/* ── STREAK SHEET MODAL ── */}
       {streakSheet && (
         <StreakSheet convo={streakSheet} onClose={() => setStreakSheet(null)}/>
+      )}
+
+      {/* ── BADGE UNLOCK MODAL ── */}
+      {unlockCycle && (
+        <BadgeUnlockModal cycle={unlockCycle} onClose={() => setUnlockCycle(null)}/>
       )}
     </div>
   );

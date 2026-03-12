@@ -8,8 +8,12 @@ import ThemeSelector from '@/components/ui/ThemeSelector';
 import { getCountryInfo, detectUserLocation, searchTrack, getUpcomingHolidays, formatPopulation, type CountryInfo, type Holiday } from '@/lib/freeapis';
 import RadioPlayer from '@/components/ui/RadioPlayer';
 import ImageRepositionModal from '@/components/ui/ImageRepositionModal';
-import OWFOwl, { type OwlCycle } from '@/components/dm/OWFOwl';
+import { type OwlCycle } from '@/components/dm/OWFOwl';
+import OwlImage from '@/components/dm/OwlImage';
 import { getStreakLabel } from '@/lib/streak';
+import { CIRCLES } from '@/data/circles';
+import type { Circle } from '@/data/circles';
+import CircleDetail from '@/components/circles/CircleDetail';
 
 const GUEST_ID = 'guest_preview';
 const LANGUAGES = ['English','French','Arabic','Spanish','Portuguese','Swahili','Yoruba','Mandarin','Hindi','Japanese'];
@@ -30,7 +34,6 @@ function clockStyle(h:number,dark:boolean){if(h>=5&&h<8)return{bg:'linear-gradie
 function clockIcon(h:number){return h>=5&&h<8?'🌅':h>=8&&h<18?'☀️':h>=18&&h<21?'🌇':'🌙';}
 
 const CLOCK_CITIES=[{name:'New York',tz:'America/New_York'},{name:'Tokyo',tz:'Asia/Tokyo'},{name:'Nairobi',tz:'Africa/Nairobi'}];
-const CIRCLES=[{name:'Family',color:'#34D399',icon:'😊'},{name:'Friends',color:'#60A5FA',icon:'😄'},{name:'Creative',color:'#A78BFA',icon:'🎨'},{name:'Work',color:'#64748B',icon:'💼'}];
 const COLLECTIONS=['Amsterdam','City Views','🎵 NHK','Street Food','Portraits'];
 const BADGES=[
   {emoji:'🌍',label:'Pioneer',color:'#D97706',rarity:'Legendary',shimmer:true},
@@ -107,6 +110,7 @@ export default function ProfilePage(){
   const [saveError,setSaveError]=useState('');
   const [loading,setLoading]=useState(true);
   const [tab,setTab]=useState('posts');
+  const [openCircle, setOpenCircle] = useState<string | null>(null);
   const [postTab,setPostTab]=useState<'all'|'text'|'images'|'video'>('all');
   const [clocks,setClocks]=useState<{name:string;time:string;hour:number}[]>([]);
   const [coverPrev,setCoverPrev]=useState('');
@@ -278,12 +282,32 @@ export default function ProfilePage(){
   // ── SHARED PANEL CONTENT RENDERERS ──────────────────────
 
   const renderCircles=()=>(
-    <div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
-      {CIRCLES.map(c=><div key={c.name} style={{display:'flex',alignItems:'center',gap:'10px',padding:'9px 12px',borderRadius:'13px',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',cursor:'pointer'}}>
-        <div style={{width:'32px',height:'32px',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px',background:`${c.color}22`,flexShrink:0}}>{c.icon}</div>
-        <div style={{flex:1}}><span style={{fontSize:'13px',fontWeight:600,color:T.text}}>{c.name}</span></div>
-        <span style={{fontSize:'11px',color:T.textMuted}}>→</span>
-      </div>)}
+    <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
+      {CIRCLES.map(c=>(
+        <div key={c.id}
+          onClick={()=>setOpenCircle(c.id)}
+          onMouseEnter={e=>{(e.currentTarget as HTMLDivElement).style.background=`${c.color}14`;(e.currentTarget as HTMLDivElement).style.borderLeftColor=c.color;}}
+          onMouseLeave={e=>{(e.currentTarget as HTMLDivElement).style.background=`${c.color}08`;(e.currentTarget as HTMLDivElement).style.borderLeftColor=c.color;}}
+          style={{display:'flex',alignItems:'center',gap:'12px',padding:'14px 14px',borderRadius:'16px',cursor:'pointer',height:'72px',
+            background:`${c.color}08`,borderLeft:`3px solid ${c.color}`,border:`1px solid ${c.color}18`,
+            transition:'all 0.15s'}}>
+          <div style={{width:'40px',height:'40px',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',background:`${c.color}18`,border:`1.5px solid ${c.color}40`,flexShrink:0}}>{c.emoji}</div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:'14px',fontWeight:700,color:T.text}}>{c.name}</div>
+            <div style={{fontSize:'11px',color:T.textMuted,marginTop:'2px'}}>{c.memberCount} members · {c.lastActive}</div>
+          </div>
+          <div style={{textAlign:'right',flexShrink:0,maxWidth:'110px'}}>
+            <div style={{fontSize:'11px',color:T.textMuted,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{c.chatPreview.length>24?c.chatPreview.slice(0,24)+'…':c.chatPreview}</div>
+            <div style={{fontSize:'14px',color:c.color,marginTop:'2px'}}>›</div>
+          </div>
+        </div>
+      ))}
+      <button
+        onMouseEnter={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='var(--owf-horizon)';(e.currentTarget as HTMLButtonElement).style.color='var(--owf-text)';}}
+        onMouseLeave={e=>{(e.currentTarget as HTMLButtonElement).style.borderColor='var(--owf-border)';(e.currentTarget as HTMLButtonElement).style.color='var(--owf-text-muted)';}}
+        style={{width:'100%',height:'52px',borderRadius:'16px',border:'1.5px dashed var(--owf-border)',background:'transparent',cursor:'pointer',fontSize:'13px',color:'var(--owf-text-muted)',transition:'all 0.15s'}}>
+        + New Circle
+      </button>
     </div>
   );
 
@@ -552,9 +576,10 @@ export default function ProfilePage(){
             <div style={PC}>
               <p style={{...LS,marginBottom:'10px'}}>MY CIRCLES</p>
               <div style={{display:'flex',flexDirection:'column',gap:'5px'}}>
-                {CIRCLES.map(c=><div key={c.name} className="owf-card-lift" style={{display:'flex',alignItems:'center',gap:'9px',padding:'7px 9px',borderRadius:'12px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.04)':'rgba(0,0,0,0.03)'}}>
-                  <div style={{width:'30px',height:'30px',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'15px',background:`${c.color}22`,flexShrink:0}}>{c.icon}</div>
-                  <span style={{fontSize:'12px',fontWeight:600,color:T.text}}>{c.name}</span>
+                {CIRCLES.map(c=><div key={c.id} onClick={()=>setOpenCircle(c.id)} className="owf-card-lift" style={{display:'flex',alignItems:'center',gap:'9px',padding:'7px 9px',borderRadius:'12px',cursor:'pointer',background:`${c.color}08`,borderLeft:`2px solid ${c.color}`,transition:'all 0.15s'}}>
+                  <div style={{width:'30px',height:'30px',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'15px',background:`${c.color}18`,flexShrink:0}}>{c.emoji}</div>
+                  <span style={{fontSize:'12px',fontWeight:600,color:T.text,flex:1}}>{c.name}</span>
+                  <span style={{fontSize:'11px',color:c.color}}>›</span>
                 </div>)}
               </div>
             </div>
@@ -752,7 +777,7 @@ export default function ProfilePage(){
                           return(
                             <div key={c.cycle} className="owf-card-lift" style={{position:'relative',display:'flex',flexDirection:'column',alignItems:'center',gap:'6px',padding:'14px 6px 10px',borderRadius:'18px',cursor:'pointer',overflow:'hidden',background:T.isDark?`${c.color}14`:`${c.color}10`,border:`1.5px solid ${isActive?c.color+'80':c.color+'28'}`,boxShadow:isActive?`0 4px 20px ${c.color}30`:`0 2px 8px ${c.color}14`}}>
                               {isActive&&<div style={{position:'absolute',top:'6px',right:'6px',width:'6px',height:'6px',borderRadius:'50%',background:c.color,boxShadow:`0 0 6px ${c.color}`}}/>}
-                              <OWFOwl cycle={c.cycle} size="sm" mood="happy" animate={isActive}/>
+                              <OwlImage cycle={c.cycle} size={64} mood="happy" animate={isActive} style={{ background: 'transparent' }}/>
                               <span style={{fontSize:'10px',fontWeight:900,textAlign:'center',lineHeight:1.2,color:c.color}}>{c.label}</span>
                               <span style={{fontSize:'9px',fontWeight:700,padding:'1px 7px',borderRadius:'99px',background:`${c.color}22`,color:c.color}}>{c.rarity}</span>
                               <span style={{fontSize:'8px',color:T.textMuted}}>{c.days===0?'Day 1':`${c.days}d`}</span>
@@ -766,9 +791,7 @@ export default function ProfilePage(){
                       <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'10px'}}>
                         {lockedCycles.map(c=>(
                           <div key={c.cycle} style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'6px',padding:'14px 6px 10px',borderRadius:'18px',background:T.isDark?'rgba(255,255,255,0.03)':'rgba(0,0,0,0.03)',border:`1.5px dashed ${T.border}`,opacity:0.45}}>
-                            <div style={{filter:'grayscale(1) brightness(0.6)'}}>
-                              <OWFOwl cycle={c.cycle} size="sm" mood="calm"/>
-                            </div>
+                            <OwlImage cycle={c.cycle} size={64} mood="calm" style={{ background: 'transparent', filter: 'grayscale(1) opacity(0.35)' }}/>
                             <span style={{fontSize:'10px',fontWeight:900,textAlign:'center',lineHeight:1.2,color:T.textMuted}}>{c.label}</span>
                             <span style={{fontSize:'8px',color:T.textMuted}}>🔒 {c.days}d streak</span>
                           </div>
@@ -788,15 +811,7 @@ export default function ProfilePage(){
                 </div>)}
                 {tab==='circles'&&(<div>
                   <p style={{...LS,marginBottom:'12px'}}>MY CIRCLES</p>
-                  <div style={{display:'flex',flexDirection:'column',gap:'8px'}}>
-                    {CIRCLES.map(c=><div key={c.name} className="owf-card-lift" style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 16px',borderRadius:'16px',cursor:'pointer',background:T.surface,backdropFilter:'blur(16px)',border:`1px solid ${T.border}`}}>
-                      <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
-                        <div style={{width:'40px',height:'40px',borderRadius:'13px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'18px',background:`${c.color}20`,border:`1px solid ${c.color}28`}}>{c.icon}</div>
-                        <span style={{fontSize:'13px',fontWeight:600,color:T.text}}>{c.name}</span>
-                      </div>
-                      <span style={{fontSize:'11px',color:T.textMuted}}>0 →</span>
-                    </div>)}
-                  </div>
+                  {renderCircles()}
                 </div>)}
               </div>
             </>}
@@ -880,5 +895,12 @@ export default function ProfilePage(){
         </div>
       </div>
     </div>
+
+    {openCircle && (
+      <CircleDetail
+        circle={CIRCLES.find((c: Circle) => c.id === openCircle)!}
+        onClose={() => setOpenCircle(null)}
+      />
+    )}
   </>);
 }

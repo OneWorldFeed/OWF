@@ -1,19 +1,16 @@
 "use client";
-import { getStreakTier, getOwlColors, getStreakLabel } from "@/lib/streak";
+import { getStreakTier, getOwlColors, getStreakLabel, cycleFromDays } from "@/lib/streak";
 import type { Conversation } from "@/types/dm";
-import OWFOwl, { type OwlCycle, type OwlMood } from "./OWFOwl";
+import { type OwlMood } from "./OWFOwl";
+import type { OwlCycle } from "@/lib/streak";
+import OwlImage from "./OwlImage";
 
 const C = { border: "#1A2535", muted: "#3D5268", gold: "#E8B84B" };
 
 function owlProps(c: Conversation): { cycle: OwlCycle; mood: OwlMood } {
-  if (c.broken) return { cycle: "city",  mood: "broken" };
-  if (c.atRisk) return { cycle: "fire",  mood: "atRisk" };
-  const t = getStreakTier(c.streak);
-  if (t === "legendary") return { cycle: "mythic", mood: "happy" };
-  if (t === "fire")      return { cycle: "fire",   mood: "happy" };
-  if (t === "high")      return { cycle: "solar",  mood: "happy" };
-  if (t === "mid")       return { cycle: "lunar",  mood: "happy" };
-  return { cycle: "city", mood: "calm" };
+  if (c.broken) return { cycle: "city", mood: "broken" };
+  if (c.atRisk) return { cycle: cycleFromDays(c.streak ?? 0), mood: "atRisk" };
+  return { cycle: cycleFromDays(c.streak ?? 0), mood: (c.streak ?? 0) > 0 ? "happy" : "calm" };
 }
 
 interface Props { convo: Conversation; onOwlClick: () => void; }
@@ -41,7 +38,7 @@ export default function ThreadStreakBar({ convo, onOwlClick }: Props) {
       onMouseLeave={e => (e.currentTarget.style.background =
         `radial-gradient(ellipse at 50% 100%, ${oc.haloStrong} 0%, transparent 80%)`)}
     >
-      <OWFOwl size={44} cycle={cycle} mood={mood} animate streakDays={convo.streak ?? 0}/>
+      <OwlImage size={44} cycle={cycle} mood={mood} animate streakDays={convo.streak ?? 0}/>
       <div>
         <span style={{ fontSize: 13, fontWeight: 700, color: col }}>{label.short}</span>
         {convo.atRisk  && <span style={{ fontSize: 11, color: "#F59E0B", marginLeft: 8 }}>· Ends today</span>}

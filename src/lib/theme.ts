@@ -20,7 +20,10 @@ export type ThemeId =
   | 'parchment' // Warm off-white, editorial
   | 'chalk'     // Cool clean white, minimal
   | 'sand'      // Warm beige, earthy
-  | 'fog';      // Soft cool grey, muted
+  | 'fog'       // Soft cool grey, muted
+  // ── Owl Cycle themes ──────────────────────────────────────────────────────
+  | 'owl-city' | 'owl-lunar' | 'owl-frost' | 'owl-forest' | 'owl-fire'
+  | 'owl-solar' | 'owl-storm' | 'owl-aurora' | 'owl-cosmic' | 'owl-mythic';
 
 // ─── Spatial theme definitions ──────────────────────────────────────────────
 // Each theme carries: the AI page DNA — void bg, glass surfaces, glow horizon
@@ -298,11 +301,145 @@ export const THEMES: Record<ThemeId, OWFTheme> = {
     gold:         '#F97316',
     swatch:       'linear-gradient(160deg, #E8EBF0 0%, #D8DCE2 60%, #4F46E518 100%)',
   },
+
+  // ── OWL CYCLE THEMES ─────────────────────────────────────────────────────
+
+  'owl-city': {
+    id: 'owl-city', label: 'City Owl', emoji: '🦉', isDark: true,
+    void: '#0A0602', bg: '#120A04',
+    surface: 'rgba(255,200,140,0.06)', surfaceHover: 'rgba(255,200,140,0.10)',
+    raised: 'rgba(255,200,140,0.09)', border: 'rgba(255,180,100,0.12)',
+    borderStrong: 'rgba(240,130,26,0.5)',
+    text: '#FFE8CC', textSub: 'rgba(255,220,180,0.55)', textMuted: 'rgba(255,200,160,0.30)',
+    horizon: 'rgba(240,130,26,1)', horizonRgb: '240,130,26',
+    aurora: 'rgba(240,130,26,0.15)', glow: 'rgba(240,130,26,0.25)',
+    gold: '#F0821A',
+    swatch: 'linear-gradient(160deg, #120A04 0%, #1E1008 55%, #F0821A22 100%)',
+  },
+
+  'owl-lunar': {
+    id: 'owl-lunar', label: 'Lunar Owl', emoji: '🌙', isDark: true,
+    void: '#020408', bg: '#060E1A',
+    surface: 'rgba(106,157,255,0.06)', surfaceHover: 'rgba(106,157,255,0.10)',
+    raised: 'rgba(106,157,255,0.09)', border: 'rgba(106,157,255,0.12)',
+    borderStrong: 'rgba(106,157,255,0.5)',
+    text: '#D0E8FF', textSub: 'rgba(180,210,255,0.55)', textMuted: 'rgba(160,190,255,0.30)',
+    horizon: 'rgba(106,157,255,1)', horizonRgb: '106,157,255',
+    aurora: 'rgba(106,157,255,0.15)', glow: 'rgba(106,157,255,0.25)',
+    gold: '#6A9DFF',
+    swatch: 'linear-gradient(160deg, #060E1A 0%, #0A1828 55%, #6A9DFF22 100%)',
+  },
+
+  'owl-frost': {
+    id: 'owl-frost', label: 'Frost Owl', emoji: '❄️', isDark: true,
+    void: '#020608', bg: '#06101A',
+    surface: 'rgba(169,214,255,0.06)', surfaceHover: 'rgba(169,214,255,0.10)',
+    raised: 'rgba(169,214,255,0.09)', border: 'rgba(169,214,255,0.12)',
+    borderStrong: 'rgba(169,214,255,0.5)',
+    text: '#D8F0FF', textSub: 'rgba(200,235,255,0.55)', textMuted: 'rgba(180,220,255,0.30)',
+    horizon: 'rgba(169,214,255,1)', horizonRgb: '169,214,255',
+    aurora: 'rgba(169,214,255,0.12)', glow: 'rgba(169,214,255,0.22)',
+    gold: '#7ABCE0',
+    swatch: 'linear-gradient(160deg, #06101A 0%, #0A1C2E 55%, #A9D6FF22 100%)',
+  },
+
+  'owl-forest': {
+    id: 'owl-forest', label: 'Forest Owl', emoji: '🌿', isDark: true,
+    void: '#020802', bg: '#061006',
+    surface: 'rgba(76,175,80,0.06)', surfaceHover: 'rgba(76,175,80,0.10)',
+    raised: 'rgba(76,175,80,0.09)', border: 'rgba(76,175,80,0.12)',
+    borderStrong: 'rgba(76,175,80,0.5)',
+    text: '#D0F0D0', textSub: 'rgba(180,230,180,0.55)', textMuted: 'rgba(150,210,150,0.30)',
+    horizon: 'rgba(76,175,80,1)', horizonRgb: '76,175,80',
+    aurora: 'rgba(76,175,80,0.14)', glow: 'rgba(76,175,80,0.24)',
+    gold: '#4CAF50',
+    swatch: 'linear-gradient(160deg, #061006 0%, #0A1E0A 55%, #4CAF5022 100%)',
+  },
+
+  'owl-fire': {
+    id: 'owl-fire', label: 'Fire Owl', emoji: '🔥', isDark: true,
+    void: '#080200', bg: '#120400',
+    surface: 'rgba(255,106,0,0.07)', surfaceHover: 'rgba(255,106,0,0.12)',
+    raised: 'rgba(255,106,0,0.10)', border: 'rgba(255,106,0,0.15)',
+    borderStrong: 'rgba(255,106,0,0.55)',
+    text: '#FFE0CC', textSub: 'rgba(255,200,160,0.55)', textMuted: 'rgba(255,160,100,0.30)',
+    horizon: 'rgba(255,106,0,1)', horizonRgb: '255,106,0',
+    aurora: 'rgba(255,106,0,0.18)', glow: 'rgba(255,106,0,0.28)',
+    gold: '#FF6A00',
+    swatch: 'linear-gradient(160deg, #120400 0%, #200600 55%, #FF6A0022 100%)',
+  },
+
+  'owl-solar': {
+    id: 'owl-solar', label: 'Solar Owl', emoji: '☀️', isDark: true,
+    void: '#080600', bg: '#120C00',
+    surface: 'rgba(255,193,7,0.06)', surfaceHover: 'rgba(255,193,7,0.10)',
+    raised: 'rgba(255,193,7,0.09)', border: 'rgba(255,193,7,0.12)',
+    borderStrong: 'rgba(255,193,7,0.5)',
+    text: '#FFF5CC', textSub: 'rgba(255,235,150,0.55)', textMuted: 'rgba(255,210,100,0.30)',
+    horizon: 'rgba(255,193,7,1)', horizonRgb: '255,193,7',
+    aurora: 'rgba(255,193,7,0.15)', glow: 'rgba(255,193,7,0.25)',
+    gold: '#FFC107',
+    swatch: 'linear-gradient(160deg, #120C00 0%, #1E1400 55%, #FFC10722 100%)',
+  },
+
+  'owl-storm': {
+    id: 'owl-storm', label: 'Storm Owl', emoji: '⚡', isDark: true,
+    void: '#020408', bg: '#060C18',
+    surface: 'rgba(58,134,255,0.06)', surfaceHover: 'rgba(58,134,255,0.10)',
+    raised: 'rgba(58,134,255,0.09)', border: 'rgba(58,134,255,0.12)',
+    borderStrong: 'rgba(58,134,255,0.5)',
+    text: '#CCE0FF', textSub: 'rgba(160,200,255,0.55)', textMuted: 'rgba(120,170,255,0.30)',
+    horizon: 'rgba(58,134,255,1)', horizonRgb: '58,134,255',
+    aurora: 'rgba(58,134,255,0.15)', glow: 'rgba(58,134,255,0.25)',
+    gold: '#3A86FF',
+    swatch: 'linear-gradient(160deg, #060C18 0%, #0A1428 55%, #3A86FF22 100%)',
+  },
+
+  'owl-aurora': {
+    id: 'owl-aurora', label: 'Aurora Owl', emoji: '🌌', isDark: true,
+    void: '#020808', bg: '#041210',
+    surface: 'rgba(42,255,198,0.06)', surfaceHover: 'rgba(42,255,198,0.10)',
+    raised: 'rgba(42,255,198,0.09)', border: 'rgba(42,255,198,0.10)',
+    borderStrong: 'rgba(42,255,198,0.45)',
+    text: '#C8FFF0', textSub: 'rgba(160,255,230,0.55)', textMuted: 'rgba(100,220,190,0.30)',
+    horizon: 'rgba(42,255,198,1)', horizonRgb: '42,255,198',
+    aurora: 'rgba(42,255,198,0.14)', glow: 'rgba(42,255,198,0.22)',
+    gold: '#2AFFC6',
+    swatch: 'linear-gradient(160deg, #041210 0%, #082420 55%, #2AFFC622 100%)',
+  },
+
+  'owl-cosmic': {
+    id: 'owl-cosmic', label: 'Cosmic Owl', emoji: '🪐', isDark: true,
+    void: '#020208', bg: '#060618',
+    surface: 'rgba(91,108,255,0.06)', surfaceHover: 'rgba(91,108,255,0.10)',
+    raised: 'rgba(91,108,255,0.09)', border: 'rgba(91,108,255,0.12)',
+    borderStrong: 'rgba(91,108,255,0.5)',
+    text: '#D0D4FF', textSub: 'rgba(180,190,255,0.55)', textMuted: 'rgba(140,155,255,0.30)',
+    horizon: 'rgba(91,108,255,1)', horizonRgb: '91,108,255',
+    aurora: 'rgba(91,108,255,0.16)', glow: 'rgba(91,108,255,0.26)',
+    gold: '#5B6CFF',
+    swatch: 'linear-gradient(160deg, #060618 0%, #0C0C28 55%, #5B6CFF22 100%)',
+  },
+
+  'owl-mythic': {
+    id: 'owl-mythic', label: 'Mythic Owl', emoji: '✨', isDark: true,
+    void: '#000808', bg: '#001414',
+    surface: 'rgba(0,194,199,0.07)', surfaceHover: 'rgba(0,194,199,0.12)',
+    raised: 'rgba(0,194,199,0.10)', border: 'rgba(0,194,199,0.14)',
+    borderStrong: 'rgba(0,194,199,0.55)',
+    text: '#C0F8F8', textSub: 'rgba(150,240,240,0.55)', textMuted: 'rgba(80,200,200,0.30)',
+    horizon: 'rgba(0,194,199,1)', horizonRgb: '0,194,199',
+    aurora: 'rgba(0,194,199,0.18)', glow: 'rgba(0,194,199,0.28)',
+    gold: '#00C2C7',
+    swatch: 'linear-gradient(160deg, #001414 0%, #002828 55%, #00C2C722 100%)',
+  },
 };
 
 export const THEME_ORDER: ThemeId[] = [
   'void', 'obsidian', 'midnight', 'cosmos', 'aurora', 'ember', 'dusk', 'slate',
   'parchment', 'chalk', 'sand', 'fog',
+  'owl-city', 'owl-lunar', 'owl-frost', 'owl-forest', 'owl-fire',
+  'owl-solar', 'owl-storm', 'owl-aurora', 'owl-cosmic', 'owl-mythic',
 ];
 
 // ─── CSS custom properties output ────────────────────────────────────────────

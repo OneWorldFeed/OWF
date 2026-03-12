@@ -1,8 +1,14 @@
 "use client";
 import { useEffect } from "react";
-import { getStreakTier, getOwlColors, getStreakLabel } from "@/lib/streak";
+import {
+  getOwlColors, getStreakLabel, getStreakTier,
+  cycleFromDays, CYCLE_INFO, CYCLE_ORDER, CYCLE_THRESHOLDS,
+  nextCycle, earnedCycles,
+} from "@/lib/streak";
+import type { OwlCycle } from "@/lib/streak";
+import type { OwlMood } from "./OWFOwl";
 import type { Conversation } from "@/types/dm";
-import OWFOwl, { type OwlCycle, type OwlMood } from "./OWFOwl";
+import OwlImage from "./OwlImage";
 
 const C = {
   surface: "#0D1219", border: "#1A2535", text: "#E2EAF2",
@@ -10,14 +16,9 @@ const C = {
 };
 
 function owlProps(c: Conversation): { cycle: OwlCycle; mood: OwlMood } {
-  if (c.broken) return { cycle: "city",  mood: "broken" };
-  if (c.atRisk) return { cycle: "fire",  mood: "atRisk" };
-  const t = getStreakTier(c.streak);
-  if (t === "legendary") return { cycle: "mythic", mood: "happy" };
-  if (t === "fire")      return { cycle: "fire",   mood: "happy" };
-  if (t === "high")      return { cycle: "solar",  mood: "happy" };
-  if (t === "mid")       return { cycle: "lunar",  mood: "happy" };
-  return { cycle: "city", mood: "calm" };
+  if (c.broken) return { cycle: "city", mood: "broken" };
+  if (c.atRisk) return { cycle: cycleFromDays(c.streak ?? 0), mood: "atRisk" };
+  return { cycle: cycleFromDays(c.streak ?? 0), mood: (c.streak ?? 0) > 0 ? "happy" : "calm" };
 }
 
 interface Props { convo: Conversation; onClose: () => void; }
@@ -28,6 +29,21 @@ export default function StreakSheet({ convo, onClose }: Props) {
   const label = getStreakLabel(convo.streak, convo.atRisk, convo.broken, convo.lastStreak);
   const days  = convo.streak ?? 0;
   const { cycle, mood } = owlProps(convo);
+
+  const next      = nextCycle(days);
+  const earned    = earnedCycles(days);
+  const currentCycleInfo = CYCLE_INFO[cycle];
+
+  // Progress bar: from current cycle threshold to next cycle threshold
+  const progressBar = (() => {
+    if (!next) return null;
+    const from  = CYCLE_THRESHOLDS[cycle];
+    const to    = CYCLE_THRESHOLDS[next.cycle];
+    const pct   = Math.min(((days - from) / (to - from)) * 100, 100);
+    const color1 = currentCycleInfo.auraColor;
+    const color2 = CYCLE_INFO[next.cycle].auraColor;
+    return { pct, color1, color2, nextName: CYCLE_INFO[next.cycle].name, daysLeft: next.daysLeft };
+  })();
 
   useEffect(() => {
     const onEsc = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -66,7 +82,12 @@ export default function StreakSheet({ convo, onClose }: Props) {
           display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
           position: "relative",
         }}>
-          <OWFOwl size={130} cycle={cycle} mood={mood} animate streakDays={convo.streak ?? 0}/>
+          <div style={{
+            width: 130, height: 130, borderRadius: "50%", overflow: "hidden",
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
+            <OwlImage size={130} cycle={cycle} mood={mood} animate streakDays={days}/>
+          </div>
 
           <div style={{ textAlign: "center", padding: "0 32px" }}>
             {convo.broken ? (
@@ -132,6 +153,32 @@ export default function StreakSheet({ convo, onClose }: Props) {
             ))}
           </div>
 
+          {/* Next cycle progress bar */}
+          {progressBar && !convo.broken && (
+            <div style={{ marginTop: 20 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 7 }}>
+                <span style={{ fontSize: 12, color: C.sub }}>
+                  Next: <span style={{ color: C.text, fontWeight: 600 }}>{progressBar.nextName}</span>
+                </span>
+                <span style={{ fontSize: 11, color: C.muted }}>
+                  {progressBar.daysLeft} day{progressBar.daysLeft !== 1 ? "s" : ""} away
+                </span>
+              </div>
+              <div style={{
+                height: 6, borderRadius: 99,
+                background: "rgba(255,255,255,0.06)",
+                overflow: "hidden",
+              }}>
+                <div style={{
+                  height: "100%", borderRadius: 99,
+                  width: `${progressBar.pct}%`,
+                  background: `linear-gradient(90deg, ${progressBar.color1}, ${progressBar.color2})`,
+                  transition: "width 0.4s ease",
+                }}/>
+              </div>
+            </div>
+          )}
+
           {convo.atRisk && (
             <div style={{
               marginTop: 18, background: "rgba(245,158,11,0.08)",
@@ -142,6 +189,51 @@ export default function StreakSheet({ convo, onClose }: Props) {
               </p>
             </div>
           )}
+
+          {/* Earned cycles grid */}
+          <div style={{ marginTop: 22, borderTop: `1px solid ${C.border}`, paddingTop: 18 }}>
+            <div style={{ fontSize: 11, color: C.muted, marginBottom: 12, textAlign: "center", letterSpacing: "0.05em", textTransform: "uppercase" }}>
+              Owl Cycles
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(10, 1fr)", gap: 6, width: "100%" }}>
+              {CYCLE_ORDER.map(c => {
+                const isEarned  = earned.includes(c);
+                const isCurrent = c === cycle;
+                const aura      = CYCLE_INFO[c].auraColor;
+                return (
+                  <div key={c} style={{
+                    position: "relative",
+                    display: "flex", flexDirection: "column", alignItems: "center",
+                    paddingBottom: 8,
+                  }}>
+                    <OwlImage
+                      size={32}
+                      cycle={c}
+                      mood="calm"
+                      style={{
+                        background: "transparent",
+                        filter: isCurrent
+                          ? `drop-shadow(0 0 5px ${aura})`
+                          : isEarned
+                            ? "none"
+                            : "grayscale(1) opacity(0.12)",
+                        transition: "filter 0.2s",
+                      }}
+                    />
+                    {isCurrent && (
+                      <div style={{
+                        position: "absolute", bottom: 0,
+                        left: "50%", transform: "translateX(-50%)",
+                        width: 5, height: 5, borderRadius: "50%",
+                        background: aura,
+                        boxShadow: `0 0 6px ${aura}`,
+                      }}/>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
           <p style={{
             margin: "20px 0 0", textAlign: "center",

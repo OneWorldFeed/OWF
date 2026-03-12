@@ -1,6 +1,6 @@
 "use client";
 import type { Conversation } from "@/types/dm";
-import OWFOwl from "./OWFOwl";
+import OwlImage from "./OwlImage";
 
 interface Props { convo: Conversation; onDismiss: () => void; }
 
@@ -16,7 +16,7 @@ export default function AtRiskBanner({ convo, onDismiss }: Props) {
       display: "flex", alignItems: "center", gap: 10,
       animation: "owfFadeIn 0.3s ease",
     }}>
-      <OWFOwl size={34} cycle="fire" mood="atRisk" animate/>
+      <OwlImage size={34} cycle="fire" mood="atRisk" animate/>
       <span style={{ fontSize: 12.5, color: "#F59E0B", flex: 1, lineHeight: 1.5 }}>
         Your streak ends today if you both don't send a message.
       </span>
