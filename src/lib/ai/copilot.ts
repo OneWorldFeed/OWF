@@ -320,9 +320,24 @@ export async function copilotCall(
     : config.systemPrompt;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    // Get Firebase auth token to authenticate with our secure route
+    let authToken = '';
+    try {
+      const { getAuth } = await import('firebase/auth');
+      const auth = getAuth();
+      if (auth.currentUser) {
+        authToken = await auth.currentUser.getIdToken();
+      }
+    } catch {
+      // Guest mode — no token
+    }
+
+    const res = await fetch('/api/ai', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {}),
+      },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: config.maxTokens,

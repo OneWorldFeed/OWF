@@ -90,7 +90,209 @@ const LANGUAGES: { label: string; code: string }[] = [
 
 // ─── Tab types ───────────────────────────────────────────────────────────────
 
-type Tab = 'ask' | 'catchup' | 'translate' | 'transparency';
+type Tab = 'ask' | 'catchup' | 'translate' | 'clock' | 'explore' | 'transparency';
+
+// ─────────────────────────────────────────────────────────
+//  WORLD CLOCK TAB
+//  Live clocks for 12 OWF cities. Updates every second.
+// ─────────────────────────────────────────────────────────
+
+const CLOCK_CITIES_AI = [
+  { name: 'Lagos',       tz: 'Africa/Lagos',                   flag: '🇳🇬' },
+  { name: 'Accra',       tz: 'Africa/Accra',                   flag: '🇬🇭' },
+  { name: 'Nairobi',     tz: 'Africa/Nairobi',                 flag: '🇰🇪' },
+  { name: 'Cairo',       tz: 'Africa/Cairo',                   flag: '🇪🇬' },
+  { name: 'London',      tz: 'Europe/London',                  flag: '🇬🇧' },
+  { name: 'Paris',       tz: 'Europe/Paris',                   flag: '🇫🇷' },
+  { name: 'Dubai',       tz: 'Asia/Dubai',                     flag: '🇦🇪' },
+  { name: 'Mumbai',      tz: 'Asia/Kolkata',                   flag: '🇮🇳' },
+  { name: 'Tokyo',       tz: 'Asia/Tokyo',                     flag: '🇯🇵' },
+  { name: 'New York',    tz: 'America/New_York',               flag: '🇺🇸' },
+  { name: 'Mexico City', tz: 'America/Mexico_City',            flag: '🇲🇽' },
+  { name: 'São Paulo',   tz: 'America/Sao_Paulo',              flag: '🇧🇷' },
+];
+
+function WorldClockTab({ horizon, horizonRgb }: { horizon: string; horizonRgb: string }) {
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick(t => t + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div style={{ padding: '24px 0' }}>
+      <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, marginBottom: 20, textAlign: 'center', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+        Live city times
+      </p>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+        {CLOCK_CITIES_AI.map(city => {
+          const now = new Date();
+          const time = now.toLocaleTimeString('en-US', {
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            hour12: true, timeZone: city.tz,
+          });
+          const date = now.toLocaleDateString('en-US', {
+            weekday: 'short', month: 'short', day: 'numeric', timeZone: city.tz,
+          });
+          const hour = parseInt(now.toLocaleTimeString('en-US', {
+            hour: 'numeric', hour12: false, timeZone: city.tz,
+          }));
+          const isDay = hour >= 6 && hour < 20;
+          return (
+            <div key={city.name} style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: `1px solid rgba(${horizonRgb},0.15)`,
+              borderRadius: 12,
+              padding: '14px 16px',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                <span style={{ fontSize: 18 }}>{city.flag}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.85)' }}>{city.name}</span>
+                <span style={{ marginLeft: 'auto', fontSize: 16 }}>{isDay ? '☀️' : '🌙'}</span>
+              </div>
+              <div style={{ fontFamily: 'monospace', fontSize: 20, fontWeight: 700, color: horizon, letterSpacing: '0.05em' }}>
+                {time}
+              </div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)', marginTop: 3 }}>
+                {date}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────
+//  EXPLORE TAB
+//  Curated quick-access prompts organized by category.
+//  Taps into existing escalation pipeline.
+// ─────────────────────────────────────────────────────────
+
+const EXPLORE_CATEGORIES = [
+  {
+    label: '🌤 Weather',
+    color: '#60A5FA',
+    prompts: [
+      'Weather in Lagos right now',
+      'Weather in Tokyo right now',
+      'Weather in New York right now',
+      'Weather in London right now',
+      'Weather in Dubai right now',
+      'Weather in Mexico City right now',
+    ],
+  },
+  {
+    label: '💱 Exchange Rates',
+    color: '#34D399',
+    prompts: [
+      'USD to NGN exchange rate',
+      'EUR to USD exchange rate',
+      'GBP to USD exchange rate',
+      'USD to KES exchange rate',
+      'USD to GHS exchange rate',
+      'USD to ETB exchange rate',
+    ],
+  },
+  {
+    label: '🗺 City Facts',
+    color: '#A78BFA',
+    prompts: [
+      'Tell me about Lagos',
+      'Tell me about Accra',
+      'Tell me about Nairobi',
+      'Tell me about Mexico City',
+      'Tell me about Seoul',
+      'Tell me about Buenos Aires',
+    ],
+  },
+  {
+    label: '🎉 Holidays',
+    color: '#F97316',
+    prompts: [
+      'Upcoming holidays in Nigeria',
+      'Upcoming holidays in Ghana',
+      'Upcoming holidays in USA',
+      'Upcoming holidays in UK',
+      'Upcoming holidays in Mexico',
+      'Upcoming holidays in Kenya',
+    ],
+  },
+  {
+    label: '🌍 Global Mood',
+    color: '#FB7185',
+    prompts: [
+      'What is the mood of the world today?',
+      'What city has the most energy in the feed right now?',
+      'What should I post today?',
+      'Give me a post idea about community',
+      'Suggest +tags for a travel post',
+      'What is happening in the feed right now?',
+    ],
+  },
+];
+
+function ExploreTab({
+  horizon,
+  horizonRgb,
+  onPrompt,
+}: {
+  horizon: string;
+  horizonRgb: string;
+  onPrompt: (prompt: string) => void;
+}) {
+  return (
+    <div style={{ padding: '16px 0', display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {EXPLORE_CATEGORIES.map(cat => (
+        <div key={cat.label}>
+          <div style={{
+            fontSize: 11,
+            fontWeight: 700,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: cat.color,
+            marginBottom: 10,
+          }}>
+            {cat.label}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+            {cat.prompts.map(prompt => (
+              <button
+                key={prompt}
+                onClick={() => onPrompt(prompt)}
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  border: `1px solid rgba(${horizonRgb},0.12)`,
+                  borderRadius: 10,
+                  padding: '10px 12px',
+                  color: 'rgba(255,255,255,0.7)',
+                  fontSize: 12,
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  lineHeight: 1.4,
+                  transition: 'all 0.15s',
+                }}
+                onMouseEnter={e => {
+                  (e.currentTarget as HTMLElement).style.background = `rgba(${horizonRgb},0.1)`;
+                  (e.currentTarget as HTMLElement).style.color = '#fff';
+                  (e.currentTarget as HTMLElement).style.borderColor = `rgba(${horizonRgb},0.3)`;
+                }}
+                onMouseLeave={e => {
+                  (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.04)';
+                  (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.7)';
+                  (e.currentTarget as HTMLElement).style.borderColor = `rgba(${horizonRgb},0.12)`;
+                }}
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // ─── Main component ──────────────────────────────────────────────────────────
 
@@ -216,6 +418,8 @@ export default function AIPage() {
     { id: 'ask',          label: 'Ask',          icon: '◈' },
     { id: 'catchup',      label: 'Catch Me Up',  icon: '🌍' },
     { id: 'translate',    label: 'Translate',    icon: '🌐' },
+    { id: 'clock',        label: 'World Clock',  icon: '🕐' },
+    { id: 'explore',      label: 'Explore',      icon: '🌍' },
     { id: 'transparency', label: 'What I Know',  icon: '🔍' },
   ];
 
@@ -448,6 +652,23 @@ export default function AIPage() {
               )}
             </div>
           </div>
+        )}
+
+        {/* ── WORLD CLOCK TAB ──────────────────────────────────── */}
+        {activeTab === 'clock' && (
+          <WorldClockTab horizon={h} horizonRgb={hRgb} />
+        )}
+
+        {/* ── EXPLORE TAB ──────────────────────────────────────── */}
+        {activeTab === 'explore' && (
+          <ExploreTab
+            horizon={h}
+            horizonRgb={hRgb}
+            onPrompt={(prompt) => {
+              setActiveTab('ask');
+              handleSend(prompt);
+            }}
+          />
         )}
 
         {/* TRANSPARENCY PANEL */}
