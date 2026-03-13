@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { sanitizeDmText, checkRateLimit, RATE_LIMITS } from "@/lib/sanitize";
 import { CONVOS, MESSAGES } from "@/data/dm";
 import type { Conversation, Message } from "@/types/dm";
 import ConvoRow from "@/components/dm/ConvoRow";
@@ -33,11 +34,16 @@ export default function DMPage() {
   }, [activeId, thread.length]);
 
   const sendMessage = () => {
-    if (!input.trim()) return;
+    const safeText = sanitizeDmText(input);
+    if (!safeText.trim()) return;
+    if (!checkRateLimit('dm', RATE_LIMITS.dm)) {
+      console.warn('DM rate limit hit');
+      return;
+    }
     const msg: Message = {
       id: `msg_${Date.now()}`,
       senderId: "me",
-      text: input.trim(),
+      text: safeText,
       ts: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
     setMessages(prev => ({ ...prev, [activeId]: [...(prev[activeId] ?? []), msg] }));

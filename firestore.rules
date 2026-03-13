@@ -1,0 +1,203 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ──────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function notTooLong(field, max) {
+      return field.size() <= max;
+    }
+
+    function hasNoScript(field) {
+      return !field.matches('.*<script.*') &&
+             !field.matches('.*javascript:.*') &&
+             !field.matches('.*on\\w+=.*');
+    }
+
+    function isSafeString(field, max) {
+      return notTooLong(field, max) && hasNoScript(field);
+    }
+
+    function isValidPost() {
+      let d = request.resource.data;
+      return d.keys().hasAll(['authorId', 'text', 'mood', 'city', 'createdAt'])
+        && d.authorId == request.auth.uid
+        && isSafeString(d.text, 2000)
+        && isSafeString(d.mood, 40)
+        && isSafeString(d.city, 80)
+        && d.likeCount == 0
+        && d.commentCount == 0
+        && d.shareCount == 0;
+    }
+
+    function isValidProfile() {
+      let d = request.resource.data;
+      return isSafeString(d.displayName, 60)
+        && isSafeString(d.bio, 300)
+        && isSafeString(d.city, 80)
+        && isSafeString(d.handle, 40);
+    }
+
+    function isValidInteraction() {
+      let d = request.resource.data;
+      return d.userId == request.auth.uid
+        && d.keys().hasAll(['postId', 'userId', 'type', 'createdAt'])
+        && d.type in ['like', 'comment', 'share', 'save'];
+    }
+
+    function isValidMessage() {
+      let d = request.resource.data;
+      return d.senderId == request.auth.uid
+        && isSafeString(d.text, 1000)
+        && d.keys().hasAll(['senderId', 'text', 'createdAt']);
+    }
+
+    function isConversationParticipant(convoId) {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/conversations/$(convoId)/participants/$(request.auth.uid));
+    }
+
+    // ── Users ─────────────────────────────────────────────
+    // Anyone signed in can read public profiles
+    // Only the owner can write their own profile
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(uid) && isValidProfile();
+      allow update: if isOwner(uid) && isValidProfile();
+      allow delete: if false; // Never delete via client
+
+      // Private settings — owner only
+      match /private/{doc} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // ── Posts ─────────────────────────────────────────────
+    // Anyone signed in can read posts
+    // Only authenticated users can create their own posts
+    // Posts cannot be deleted by clients (use Cloud Function)
+    // Counters (likeCount etc) can only be updated via interactions
+    match /posts/{postId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidPost();
+      allow update: if isSignedIn()
+        && request.resource.data.authorId == resource.data.authorId
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['likeCount', 'commentCount', 'shareCount', 'saveCount', 'lastInteractionAt']);
+      allow delete: if false; // Cloud Function only
+
+      // Comments subcollection
+      match /comments/{commentId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn()
+          && request.resource.data.authorId == request.auth.uid
+          && isSafeString(request.resource.data.text, 500);
+        allow update: if false;
+        allow delete: if isOwner(request.resource.data.authorId);
+      }
+    }
+
+    // ── Interactions ──────────────────────────────────────
+    // Write-only from client (analytics pipeline reads via admin SDK)
+    // Rate limiting enforced by Cloud Functions
+    match /interactions/{docId} {
+      allow read: if false;
+      allow create: if isSignedIn() && isValidInteraction();
+      allow update, delete: if false;
+    }
+
+    // ── Direct Messages ───────────────────────────────────
+    // Only conversation participants can read or write
+    match /conversations/{convoId} {
+      allow read: if isConversationParticipant(convoId);
+      allow create: if isSignedIn()
+        && request.resource.data.participants.hasAll([request.auth.uid]);
+      allow update: if isConversationParticipant(convoId)
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['lastMessage', 'lastMessageAt', 'unreadCount']);
+      allow delete: if false;
+
+      match /participants/{uid} {
+        allow read: if isConversationParticipant(convoId);
+        allow write: if false; // Cloud Function only
+      }
+
+      match /messages/{messageId} {
+        allow read: if isConversationParticipant(convoId);
+        allow create: if isConversationParticipant(convoId)
+          && isValidMessage();
+        allow update, delete: if false;
+      }
+    }
+
+    // ── Streaks ───────────────────────────────────────────
+    // Read: both participants
+    // Write: Cloud Function only (never trust client streak updates)
+    match /streaks/{streakId} {
+      allow read: if isSignedIn()
+        && (resource.data.user1 == request.auth.uid
+            || resource.data.user2 == request.auth.uid);
+      allow write: if false; // Admin SDK only
+    }
+
+    // ── Circles ───────────────────────────────────────────
+    match /circles/{circleId} {
+      allow read: if isSignedIn()
+        && resource.data.memberIds.hasAny([request.auth.uid]);
+      allow create: if isSignedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && isSafeString(request.resource.data.name, 40)
+        && request.resource.data.memberIds.size() <= 200;
+      allow update: if isSignedIn()
+        && resource.data.ownerId == request.auth.uid;
+      allow delete: if isSignedIn()
+        && resource.data.ownerId == request.auth.uid;
+
+      match /posts/{postId} {
+        allow read: if isSignedIn()
+          && get(/databases/$(database)/documents/circles/$(circleId)).data.memberIds.hasAny([request.auth.uid]);
+        allow create: if isSignedIn()
+          && get(/databases/$(database)/documents/circles/$(circleId)).data.memberIds.hasAny([request.auth.uid])
+          && request.resource.data.authorId == request.auth.uid
+          && isSafeString(request.resource.data.text, 2000);
+        allow update, delete: if false;
+      }
+    }
+
+    // ── Trending / Hashtags ───────────────────────────────
+    // Read: anyone signed in
+    // Write: Cloud Function only
+    match /trending/{tag} {
+      allow read: if isSignedIn();
+      allow write: if false;
+    }
+
+    // ── Global Moments ────────────────────────────────────
+    match /globalMoments/{momentId} {
+      allow read: if isSignedIn();
+      allow write: if false; // Curated by Cloud Function
+    }
+
+    // ── Reports / Moderation ─────────────────────────────
+    match /reports/{reportId} {
+      allow read: if false; // Admin only
+      allow create: if isSignedIn()
+        && request.resource.data.reporterId == request.auth.uid
+        && request.resource.data.keys().hasAll(['reporterId', 'targetId', 'reason', 'createdAt'])
+        && isSafeString(request.resource.data.reason, 500);
+      allow update, delete: if false;
+    }
+
+    // ── Block all other collections ───────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

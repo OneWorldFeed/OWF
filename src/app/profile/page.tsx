@@ -1,5 +1,6 @@
 'use client';
 import ProfilePostCard from '@/components/cards/ProfilePostCard';
+import { sanitizeProfile } from '@/lib/sanitize';
 import { useState, useEffect, useRef } from 'react';
 import { db } from '@/lib/firebase/config';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -220,17 +221,27 @@ export default function ProfilePage(){
     setSaving(true);setSaveError('');
     const d={...draft,coverImage:coverPrev,coverImagePosition:coverPosition};
     if(draft.handle!==profile.handle)d.handleChangedAt=new Date().toISOString();
+    const safeProfile = sanitizeProfile({
+      displayName: d.displayName,
+      handle:      d.handle,
+      bio:         d.bio,
+      city:        d.city,
+      country:     d.country,
+      website:     d.website,
+      pronouns:    d.pronouns,
+    });
+    const safeD = { ...d, ...safeProfile };
     try{
-      await setDoc(doc(db,'users',GUEST_ID),d,{merge:true});
-      setProfile(d);
+      await setDoc(doc(db,'users',GUEST_ID),safeD,{merge:true});
+      setProfile(safeD);
       // Also persist to localStorage as fallback
-      localStorage.setItem('owf-profile',JSON.stringify(d));
+      localStorage.setItem('owf-profile',JSON.stringify(safeD));
       setSaved(true);
       setTimeout(()=>{setEditing(false);setSaved(false);},900);
     }catch(err:unknown){
       // Firebase failed — save to localStorage so changes aren't lost
-      localStorage.setItem('owf-profile',JSON.stringify(d));
-      setProfile(d);
+      localStorage.setItem('owf-profile',JSON.stringify(safeD));
+      setProfile(safeD);
       setSaved(true);
       setTimeout(()=>{setEditing(false);setSaved(false);},900);
       console.warn('Firestore save failed, used localStorage fallback:',err);

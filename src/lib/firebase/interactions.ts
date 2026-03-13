@@ -12,6 +12,7 @@ import {
   collection,
   addDoc,
 } from 'firebase/firestore';
+import { sanitize, checkRateLimit, RATE_LIMITS } from '@/lib/sanitize';
 
 export type InteractionType = 'like' | 'comment' | 'share' | 'save';
 
@@ -35,6 +36,10 @@ export async function recordInteraction(
   moodId: string,
   city: string,
 ) {
+  if (!checkRateLimit('like', RATE_LIMITS.like)) {
+    console.warn('Rate limit hit for interactions');
+    return;
+  }
   try {
     // 1. Increment counter on the post document
     const postRef = doc(db, 'posts', postId);
@@ -49,7 +54,7 @@ export async function recordInteraction(
       userId,
       type,
       moodId,
-      city,
+      city: sanitize(city, 'city').value,
       createdAt: serverTimestamp(),
     });
 
