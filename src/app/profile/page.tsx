@@ -14,6 +14,7 @@ import { getStreakLabel } from '@/lib/streak';
 import { CIRCLES } from '@/data/circles';
 import type { Circle } from '@/data/circles';
 import CircleDetail from '@/components/circles/CircleDetail';
+import { sanitizeProfileFields, sanitizeUrl, sanitizeText, LIMITS } from '@/lib/sanitize';
 
 const GUEST_ID = 'guest_preview';
 const LANGUAGES = ['English','French','Arabic','Spanish','Portuguese','Swahili','Yoruba','Mandarin','Hindi','Japanese'];
@@ -218,7 +219,9 @@ export default function ProfilePage(){
   function startEdit(){setDraft({...profile});setCoverPrev(profile.coverImage||'');setCoverPosition(profile.coverImagePosition||{x:50,y:50});setEditing(true);setSaved(false);}
   async function save(){
     setSaving(true);setSaveError('');
-    const d={...draft,coverImage:coverPrev,coverImagePosition:coverPosition};
+    // Sanitize all user-editable text fields before persisting
+    const clean = sanitizeProfileFields(draft);
+    const d={...draft,...clean,coverImage:coverPrev,coverImagePosition:coverPosition};
     if(draft.handle!==profile.handle)d.handleChangedAt=new Date().toISOString();
     try{
       await setDoc(doc(db,'users',GUEST_ID),d,{merge:true});

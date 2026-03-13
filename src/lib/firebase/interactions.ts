@@ -12,6 +12,7 @@ import {
   collection,
   addDoc,
 } from 'firebase/firestore';
+import { sanitizeText, LIMITS } from '@/lib/sanitize';
 
 export type InteractionType = 'like' | 'comment' | 'share' | 'save';
 
@@ -48,8 +49,8 @@ export async function recordInteraction(
       postId,
       userId,
       type,
-      moodId,
-      city,
+      moodId: sanitizeText(moodId, 30),
+      city: sanitizeText(city, LIMITS.city),
       createdAt: serverTimestamp(),
     });
 
@@ -78,8 +79,8 @@ export async function toggleLike(
       postId,
       userId,
       type: 'like',
-      moodId,
-      city,
+      moodId: sanitizeText(moodId, 30),
+      city: sanitizeText(city, LIMITS.city),
       createdAt: serverTimestamp(),
     });
   }

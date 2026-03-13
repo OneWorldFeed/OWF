@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import { sanitizeCommentText } from '@/lib/sanitize';
 
 interface Comment {
   handle: string;
@@ -109,7 +110,7 @@ export default function ImageLightbox({
 
   // ── Comment submit ────────────────────────────────────────────────────────
   const handleCommentSubmit = () => {
-    const text = commentText.trim();
+    const text = sanitizeCommentText(commentText);
     if (!text) return;
     const newComment: Comment = { handle: 'you.feed', text, time: 'just now', color };
     setComments(prev => [...prev, newComment]);

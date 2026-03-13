@@ -9,6 +9,7 @@ import AtRiskBanner from "@/components/dm/AtRiskBanner";
 import StreakSheet from "@/components/dm/StreakSheet";
 import BadgeUnlockModal from "@/components/ui/BadgeUnlockModal";
 import { justUnlockedCycle, type OwlCycle } from "@/lib/streak";
+import { sanitizeMessageText } from "@/lib/sanitize";
 
 const C = {
   bg: "#07090D", surface: "#0D1219", raised: "#121A24",
@@ -33,11 +34,12 @@ export default function DMPage() {
   }, [activeId, thread.length]);
 
   const sendMessage = () => {
-    if (!input.trim()) return;
+    const sanitized = sanitizeMessageText(input);
+    if (!sanitized) return;
     const msg: Message = {
       id: `msg_${Date.now()}`,
       senderId: "me",
-      text: input.trim(),
+      text: sanitized,
       ts: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
     setMessages(prev => ({ ...prev, [activeId]: [...(prev[activeId] ?? []), msg] }));
