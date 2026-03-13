@@ -11,6 +11,7 @@ import ImageRepositionModal from '@/components/ui/ImageRepositionModal';
 import { type OwlCycle } from '@/components/dm/OWFOwl';
 import OwlImage from '@/components/dm/OwlImage';
 import { getStreakLabel } from '@/lib/streak';
+import { OwlBadgeRing } from '@/components/dm/OwlBadgeRing';
 import { CIRCLES } from '@/data/circles';
 import type { Circle } from '@/data/circles';
 import CircleDetail from '@/components/circles/CircleDetail';
@@ -623,21 +624,23 @@ export default function ProfilePage(){
               <div style={{position:'absolute',inset:'-1px',borderRadius:'23px',pointerEvents:'none',background:`linear-gradient(135deg,${accent}40,transparent 50%,${accent}18)`,zIndex:-1,filter:'blur(1px)'}}/>
               <div style={{display:'flex',alignItems:'flex-start',gap:'14px'}}>
                 <div style={{flexShrink:0}}>
-                  <div style={{position:'relative',width:isMobile?'64px':'72px',height:isMobile?'64px':'72px',flexShrink:0}}>
-                    <div className="owf-avatar-pulse owf-mood-transition" style={{width:'100%',height:'100%',borderRadius:'20px',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:900,fontSize:isMobile?'18px':'20px',fontFamily:"'Playfair Display',serif",backgroundColor:accent,boxShadow:`0 0 0 3px ${T.bg},0 0 0 5px ${accent}60,0 12px 32px ${accent}50`,overflow:'hidden'}}>
-                      {avatarPrev
-                        ? <img src={avatarPrev} alt="avatar" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'20px',objectPosition:`${avatarPosition.x}% ${avatarPosition.y}%`}}/>
-                        : ini(editing?draft.displayName:profile.displayName)
-                      }
+                  <OwlBadgeRing streakDays={MOCK_STREAK_DAYS} size={84}>
+                    <div style={{position:'relative',width:isMobile?'64px':'72px',height:isMobile?'64px':'72px',flexShrink:0}}>
+                      <div className="owf-avatar-pulse owf-mood-transition" style={{width:'100%',height:'100%',borderRadius:'20px',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:900,fontSize:isMobile?'18px':'20px',fontFamily:"'Playfair Display',serif",backgroundColor:accent,boxShadow:`0 0 0 3px ${T.bg},0 0 0 5px ${accent}60,0 12px 32px ${accent}50`,overflow:'hidden'}}>
+                        {avatarPrev
+                          ? <img src={avatarPrev} alt="avatar" style={{width:'100%',height:'100%',objectFit:'cover',borderRadius:'20px',objectPosition:`${avatarPosition.x}% ${avatarPosition.y}%`}}/>
+                          : ini(editing?draft.displayName:profile.displayName)
+                        }
+                      </div>
+                      {editing&&(
+                        <button onClick={()=>avatarFileRef.current?.click()} style={{position:'absolute',inset:0,borderRadius:'20px',background:'rgba(0,0,0,0.45)',display:'flex',alignItems:'center',justifyContent:'center',border:'none',cursor:'pointer',fontSize:'18px',opacity:0,transition:'opacity 0.2s'}}
+                          onMouseEnter={e=>e.currentTarget.style.opacity='1'}
+                          onMouseLeave={e=>e.currentTarget.style.opacity='0'}
+                        >📷</button>
+                      )}
+                      <input ref={avatarFileRef} type="file" accept="image/*" style={{display:'none'}} onChange={onAvatarFile}/>
                     </div>
-                    {editing&&(
-                      <button onClick={()=>avatarFileRef.current?.click()} style={{position:'absolute',inset:0,borderRadius:'20px',background:'rgba(0,0,0,0.45)',display:'flex',alignItems:'center',justifyContent:'center',border:'none',cursor:'pointer',fontSize:'18px',opacity:0,transition:'opacity 0.2s'}}
-                        onMouseEnter={e=>e.currentTarget.style.opacity='1'}
-                        onMouseLeave={e=>e.currentTarget.style.opacity='0'}
-                      >📷</button>
-                    )}
-                    <input ref={avatarFileRef} type="file" accept="image/*" style={{display:'none'}} onChange={onAvatarFile}/>
-                  </div>
+                  </OwlBadgeRing>
                   {editing&&<div style={{display:'flex',gap:'4px',flexWrap:'wrap',marginTop:'8px',width:isMobile?'64px':'72px'}}>{ACCENT_COLORS.map(c=><button key={c} onClick={()=>setDraft(p=>({...p,accentColor:c}))} style={{width:'17px',height:'17px',borderRadius:'50%',backgroundColor:c,cursor:'pointer',border:'none',outline:draft.accentColor===c?`3px solid ${c}`:'3px solid transparent',outlineOffset:'2px'}}/>)}</div>}
                 </div>
                 <div style={{flex:1,minWidth:0}}>

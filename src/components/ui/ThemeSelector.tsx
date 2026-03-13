@@ -1,139 +1,80 @@
 'use client';
+
 import { THEMES, THEME_ORDER } from '@/lib/theme';
 import { useTheme } from '@/context/ThemeProvider';
+import { getUnlockedOwlThemes } from '@/lib/streak';
 import type { ThemeId } from '@/lib/theme';
-import type { OwlCycle } from '@/lib/streak';
-import OwlImage from '@/components/dm/OwlImage';
 
-const OWL_IDS = THEME_ORDER.filter((id: ThemeId) => id.startsWith('owl-'));
+// In production this comes from the user's real streak data
+// For now default to 0 so everything is locked except what they earned
+const DEMO_STREAK_DAYS = 0;
 
-export default function ThemeSelector() {
+const OWL_CYCLE_ORDER = [
+  'city', 'lunar', 'frost', 'forest', 'fire',
+  'solar', 'storm', 'aurora', 'cosmic', 'mythic',
+];
+
+const OWL_UNLOCK_DAYS: Record<string, number> = {
+  city: 4, lunar: 10, frost: 20, forest: 30, fire: 50,
+  solar: 70, storm: 100, aurora: 200, cosmic: 365, mythic: 999999,
+};
+
+export default function ThemeSelector({ streakDays = DEMO_STREAK_DAYS }: { streakDays?: number }) {
   const { themeId, theme: T, setTheme } = useTheme();
+  const unlockedOwl = getUnlockedOwlThemes(streakDays);
+  const standardThemes = THEME_ORDER.filter(id => !THEMES[id].isOwlTheme);
+  const darkStandard   = standardThemes.filter(id => THEMES[id].isDark);
+  const lightStandard  = standardThemes.filter(id => !THEMES[id].isDark);
 
-  const standardIds = THEME_ORDER.filter((id: ThemeId) => !id.startsWith('owl-'));
-  const darkIds     = standardIds.filter((id: ThemeId) => THEMES[id].isDark);
-  const lightIds    = standardIds.filter((id: ThemeId) => !THEMES[id].isDark);
+  const hRgb = T.horizonRgb;
+  const isDark = T.isDark;
 
-  function renderGrid(ids: ThemeId[], isDarkGroup: boolean) {
+  function renderStandardGrid(ids: ThemeId[]) {
     return (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
-        {ids.map((id: ThemeId) => {
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 8 }}>
+        {ids.map(id => {
           const t = THEMES[id];
           const active = themeId === id;
           return (
             <button key={id} onClick={() => setTheme(id)} title={t.label} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px',
-              background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0',
-              minWidth: 0,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
+              background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0', minWidth: 0,
             }}>
               <div style={{
-                width: '100%', aspectRatio: '1', borderRadius: '14px',
+                width: '100%', aspectRatio: '1', borderRadius: 12,
                 background: t.swatch,
-                border: active
-                  ? `2px solid ${t.horizon}`
-                  : isDarkGroup ? '2px solid rgba(255,255,255,0.08)' : '2px solid rgba(0,0,0,0.10)',
-                boxShadow: active
-                  ? `0 0 0 3px ${t.horizon}35, 0 0 18px ${t.aurora}`
-                  : isDarkGroup ? '0 2px 8px rgba(0,0,0,0.35)' : '0 2px 8px rgba(0,0,0,0.10)',
-                position: 'relative', overflow: 'hidden', transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
+                border: active ? `2px solid ${t.horizon}` : `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.09)'}`,
+                boxShadow: active ? `0 0 0 3px ${t.horizon}30, 0 0 16px ${t.aurora}` : '0 2px 6px rgba(0,0,0,0.12)',
+                position: 'relative', overflow: 'hidden',
                 transform: active ? 'scale(1.08)' : 'scale(1)',
+                transition: 'all 0.2s ease',
               }}>
+                {active && (
+                  <div style={{
+                    position: 'absolute', inset: 0, borderRadius: 'inherit',
+                    background: 'linear-gradient(90deg,transparent,rgba(255,255,255,0.3) 50%,transparent)',
+                    animation: 'themeShimmer 2.4s linear infinite',
+                  }} />
+                )}
                 <div style={{
-                  position: 'absolute', inset: 0, borderRadius: 'inherit',
-                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35) 50%, transparent)',
-                  backgroundSize: '200% auto',
-                  animation: active ? 'themeShimmer 2.4s linear infinite' : undefined,
-                  opacity: active ? 1 : 0, transition: 'opacity 0.3s', pointerEvents: 'none',
-                }} />
-                <div style={{
-                  position: 'absolute', bottom: 0, left: 0, right: 0, height: '3px',
-                  background: t.horizon, opacity: active ? 1 : 0.45,
-                  boxShadow: active ? `0 0 8px ${t.horizon}` : undefined,
-                  transition: 'opacity 0.2s',
+                  position: 'absolute', bottom: 0, left: 0, right: 0, height: 2,
+                  background: t.horizon, opacity: active ? 1 : 0.4,
+                  boxShadow: active ? `0 0 6px ${t.horizon}` : 'none',
                 }} />
                 {active && (
                   <div style={{
-                    position: 'absolute', top: '5px', right: '5px',
-                    width: '9px', height: '9px', borderRadius: '50%',
-                    background: t.horizon, boxShadow: `0 0 6px ${t.horizon}`,
+                    position: 'absolute', top: 4, right: 4,
+                    width: 7, height: 7, borderRadius: '50%',
+                    background: t.horizon, boxShadow: `0 0 5px ${t.horizon}`,
                   }} />
                 )}
               </div>
               <span style={{
-                fontSize: '8px', fontWeight: active ? 800 : 500,
-                color: active ? t.horizon : 'var(--owf-text-muted)',
-                letterSpacing: '0.02em', transition: 'color 0.2s',
+                fontSize: 8, fontWeight: active ? 700 : 400,
+                color: active ? t.horizon : `rgba(${hRgb},0.5)`,
+                letterSpacing: '0.04em', width: '100%', textAlign: 'center',
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                width: '100%', textAlign: 'center',
-              }}>
-                {t.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    );
-  }
-
-  function renderOwlGrid() {
-    return (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
-        {OWL_IDS.map((id: ThemeId) => {
-          const t      = THEMES[id];
-          const active = themeId === id;
-          const cycle  = id.replace('owl-', '') as OwlCycle;
-          return (
-            <button key={id} onClick={() => setTheme(id)} title={t.label} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px',
-              background: 'none', border: 'none', cursor: 'pointer', padding: '2px 0',
-              minWidth: 0,
-            }}>
-              <div style={{
-                width: '100%', aspectRatio: '1', borderRadius: '14px',
-                background: t.swatch,
-                border: active
-                  ? `2px solid ${t.horizon}`
-                  : '2px solid rgba(255,255,255,0.08)',
-                boxShadow: active
-                  ? `0 0 0 3px ${t.horizon}35, 0 0 18px ${t.aurora}`
-                  : '0 2px 8px rgba(0,0,0,0.35)',
-                position: 'relative', overflow: 'hidden', transition: 'all 0.2s cubic-bezier(0.4,0,0.2,1)',
-                transform: active ? 'scale(1.08)' : 'scale(1)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}>
-                <div style={{
-                  position: 'absolute', inset: 0, borderRadius: 'inherit',
-                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35) 50%, transparent)',
-                  backgroundSize: '200% auto',
-                  animation: active ? 'themeShimmer 2.4s linear infinite' : undefined,
-                  opacity: active ? 1 : 0, transition: 'opacity 0.3s', pointerEvents: 'none',
-                }} />
-                <div style={{
-                  position: 'absolute', bottom: 0, left: 0, right: 0, height: '3px',
-                  background: t.horizon, opacity: active ? 1 : 0.45,
-                  boxShadow: active ? `0 0 8px ${t.horizon}` : undefined,
-                  transition: 'opacity 0.2s',
-                }} />
-                {active && (
-                  <div style={{
-                    position: 'absolute', top: '5px', right: '5px',
-                    width: '9px', height: '9px', borderRadius: '50%',
-                    background: t.horizon, boxShadow: `0 0 6px ${t.horizon}`,
-                  }} />
-                )}
-                <OwlImage
-                  cycle={cycle}
-                  size={28}
-                  mood="calm"
-                  style={{ background: 'transparent', position: 'relative', zIndex: 1 }}
-                />
-              </div>
-              <span style={{
-                fontSize: '8px', fontWeight: active ? 800 : 500,
-                color: active ? t.horizon : 'var(--owf-text-muted)',
-                letterSpacing: '0.02em', transition: 'color 0.2s',
-                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                width: '100%', textAlign: 'center',
+                transition: 'color 0.2s',
               }}>
                 {t.label}
               </span>
@@ -145,50 +86,157 @@ export default function ThemeSelector() {
   }
 
   return (
-    <div>
-      <style>{`
-        @keyframes themeShimmer {
-          0%   { background-position: -200% center; }
-          100% { background-position:  200% center; }
-        }
-      `}</style>
-
-      {/* Active theme header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '14px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Standard dark themes */}
+      <div>
         <div style={{
-          width: '22px', height: '22px', borderRadius: '7px', flexShrink: 0,
-          background: T.swatch, border: `1.5px solid ${T.horizon}60`,
-          position: 'relative', overflow: 'hidden',
+          fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase',
+          color: `rgba(${hRgb},0.5)`, marginBottom: 10,
         }}>
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4) 50%, transparent)',
-            backgroundSize: '200% auto', animation: 'themeShimmer 2.4s linear infinite',
-          }} />
+          Dark
         </div>
-        <p style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '0.12em', color: 'var(--owf-text-muted)', lineHeight: 1 }}>
-          THEME — <span style={{ color: T.horizon }}>{T.emoji} {T.label}</span>
-        </p>
+        {renderStandardGrid(darkStandard)}
       </div>
 
-      <p style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--owf-text-muted)', marginBottom: '8px' }}>
-        DARK
-      </p>
-      {renderGrid(darkIds, true)}
+      {/* Standard light themes */}
+      <div>
+        <div style={{
+          fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase',
+          color: `rgba(${hRgb},0.5)`, marginBottom: 10,
+        }}>
+          Light
+        </div>
+        {renderStandardGrid(lightStandard)}
+      </div>
 
-      <div style={{ height: '1px', background: 'var(--owf-border)', margin: '16px 0' }} />
+      {/* Divider */}
+      <div style={{
+        height: 0.5,
+        background: `linear-gradient(90deg, transparent, rgba(${hRgb},0.3), transparent)`,
+      }} />
 
-      <p style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--owf-text-muted)', marginBottom: '8px' }}>
-        LIGHT
-      </p>
-      {renderGrid(lightIds, false)}
+      {/* Owl themes */}
+      <div>
+        <div style={{ marginBottom: 12 }}>
+          <div style={{
+            fontSize: 9, letterSpacing: '0.12em', textTransform: 'uppercase',
+            color: `rgba(${hRgb},0.5)`, marginBottom: 2,
+          }}>
+            Owl Cycles — Streak Rewards
+          </div>
+          <div style={{ fontSize: 10, color: `rgba(${hRgb},0.35)` }}>
+            {streakDays === 0
+              ? 'Build a streak to unlock these themes'
+              : `${streakDays} day streak — keep going`}
+          </div>
+        </div>
 
-      <div style={{ height: '1px', background: 'var(--owf-border)', margin: '16px 0' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          {OWL_CYCLE_ORDER.map(cycle => {
+            const darkId   = `owl-${cycle}` as ThemeId;
+            const lightId  = `owl-${cycle}-light` as ThemeId;
+            const darkTheme  = THEMES[darkId];
+            const lightTheme = THEMES[lightId];
+            const unlocked   = unlockedOwl.includes(darkId);
+            const required   = OWL_UNLOCK_DAYS[cycle];
+            const activeDark  = themeId === darkId;
+            const activeLight = themeId === lightId;
 
-      <p style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.12em', color: 'var(--owf-text-muted)', marginBottom: '8px' }}>
-        OWL CYCLES
-      </p>
-      {renderOwlGrid()}
+            return (
+              <div key={cycle} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                {/* Dark variant */}
+                <button
+                  onClick={() => unlocked && setTheme(darkId)}
+                  disabled={!unlocked}
+                  title={unlocked ? darkTheme.label : `Unlock at day ${required}`}
+                  style={{
+                    flex: 1, position: 'relative', borderRadius: 10,
+                    aspectRatio: '1.6', overflow: 'hidden', cursor: unlocked ? 'pointer' : 'default',
+                    background: unlocked ? darkTheme.swatch : 'rgba(255,255,255,0.04)',
+                    border: activeDark
+                      ? `2px solid ${darkTheme.horizon}`
+                      : unlocked
+                        ? `1px solid rgba(255,255,255,0.10)`
+                        : `1px solid rgba(255,255,255,0.05)`,
+                    transform: activeDark ? 'scale(1.06)' : 'scale(1)',
+                    transition: 'all 0.2s ease',
+                    filter: unlocked ? 'none' : 'grayscale(1)',
+                    opacity: unlocked ? 1 : 0.35,
+                  }}
+                >
+                  {unlocked && (
+                    <div style={{
+                      position: 'absolute', bottom: 0, left: 0, right: 0, height: 1.5,
+                      background: darkTheme.horizon, opacity: activeDark ? 1 : 0.5,
+                      boxShadow: activeDark ? `0 0 5px ${darkTheme.horizon}` : 'none',
+                    }} />
+                  )}
+                  {!unlocked && (
+                    <div style={{
+                      position: 'absolute', inset: 0, display: 'flex',
+                      alignItems: 'center', justifyContent: 'center', flexDirection: 'column' as const, gap: 1,
+                    }}>
+                      <div style={{ fontSize: 10, opacity: 0.4 }}>🦉</div>
+                    </div>
+                  )}
+                </button>
+
+                {/* Light variant */}
+                <button
+                  onClick={() => unlocked && setTheme(lightId)}
+                  disabled={!unlocked}
+                  title={unlocked ? lightTheme.label : `Unlock at day ${required}`}
+                  style={{
+                    flex: 1, position: 'relative', borderRadius: 10,
+                    aspectRatio: '1.6', overflow: 'hidden', cursor: unlocked ? 'pointer' : 'default',
+                    background: unlocked ? lightTheme.swatch : 'rgba(255,255,255,0.03)',
+                    border: activeLight
+                      ? `2px solid ${lightTheme.horizon}`
+                      : unlocked
+                        ? `1px solid rgba(0,0,0,0.09)`
+                        : `1px solid rgba(255,255,255,0.04)`,
+                    transform: activeLight ? 'scale(1.06)' : 'scale(1)',
+                    transition: 'all 0.2s ease',
+                    filter: unlocked ? 'none' : 'grayscale(1)',
+                    opacity: unlocked ? 1 : 0.3,
+                  }}
+                >
+                  {unlocked && (
+                    <div style={{
+                      position: 'absolute', bottom: 0, left: 0, right: 0, height: 1.5,
+                      background: lightTheme.horizon, opacity: activeLight ? 1 : 0.5,
+                      boxShadow: activeLight ? `0 0 5px ${lightTheme.horizon}` : 'none',
+                    }} />
+                  )}
+                  {!unlocked && (
+                    <div style={{
+                      position: 'absolute', inset: 0, display: 'flex',
+                      alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <div style={{ fontSize: 10, opacity: 0.3 }}>🦉</div>
+                    </div>
+                  )}
+                </button>
+
+                {/* Cycle label + progress */}
+                <div style={{ width: 56, flexShrink: 0 }}>
+                  <div style={{
+                    fontSize: 9, fontWeight: 600, letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: unlocked ? darkTheme.horizon : `rgba(${hRgb},0.3)`,
+                    marginBottom: 2,
+                  }}>
+                    {cycle}
+                  </div>
+                  <div style={{ fontSize: 8, color: `rgba(${hRgb},0.3)` }}>
+                    {unlocked ? '✓ Unlocked' : `Day ${required}`}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

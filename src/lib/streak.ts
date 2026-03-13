@@ -1,3 +1,5 @@
+import type { ThemeId } from '@/lib/theme';
+
 export type StreakTier = "none" | "low" | "mid" | "high" | "fire" | "legendary";
 
 export type OwlCycle = "city" | "lunar" | "frost" | "forest" | "fire" | "solar" | "storm" | "aurora" | "cosmic" | "mythic";
@@ -110,4 +112,48 @@ export function getStreakLabel(
     short: `${streak}d 🔥`,
     long:  `${streak} days of daily conversation.`,
   };
+}
+
+// ─── Owl theme unlock gates ─────────────────────────────────────────────────
+// Theme unlocks when you COMPLETE a cycle — meaning you reach the NEXT milestone
+// e.g. City theme (cycle 0) unlocks when you hit day 4 (Lunar threshold)
+export const OWL_THEME_UNLOCK_DAYS: Record<string, number> = {
+  'city':   4,    // reach Lunar to unlock City theme
+  'lunar':  10,   // reach Frost to unlock Lunar theme
+  'frost':  20,   // reach Forest to unlock Frost theme
+  'forest': 30,   // reach Fire to unlock Forest theme
+  'fire':   50,   // reach Solar to unlock Fire theme
+  'solar':  70,   // reach Storm to unlock Solar theme
+  'storm':  100,  // reach Aurora to unlock Storm theme
+  'aurora': 200,  // reach Cosmic to unlock Aurora theme
+  'cosmic': 365,  // reach Mythic to unlock Cosmic theme
+  'mythic': 999999, // Mythic is permanent — once earned, always owned
+};
+
+// Check if a specific owl theme is unlocked for a given streak
+export function isOwlThemeUnlocked(cycle: string, streakDays: number): boolean {
+  const required = OWL_THEME_UNLOCK_DAYS[cycle] ?? 999999;
+  return streakDays >= required;
+}
+
+// Get all unlocked owl theme IDs for a given streak
+export function getUnlockedOwlThemes(streakDays: number): ThemeId[] {
+  const unlocked: ThemeId[] = [];
+  for (const [cycle, required] of Object.entries(OWL_THEME_UNLOCK_DAYS)) {
+    if (streakDays >= required) {
+      unlocked.push(`owl-${cycle}` as ThemeId);
+      unlocked.push(`owl-${cycle}-light` as ThemeId);
+    }
+  }
+  return unlocked;
+}
+
+// Days remaining to unlock the next owl theme
+export function daysToNextOwlTheme(streakDays: number): { cycle: string; daysRemaining: number } | null {
+  const thresholds = Object.entries(OWL_THEME_UNLOCK_DAYS)
+    .map(([cycle, days]) => ({ cycle, days }))
+    .sort((a, b) => a.days - b.days);
+  const next = thresholds.find(t => t.days > streakDays);
+  if (!next) return null;
+  return { cycle: next.cycle, daysRemaining: next.days - streakDays };
 }
