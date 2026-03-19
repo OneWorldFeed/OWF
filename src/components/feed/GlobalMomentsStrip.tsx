@@ -9,7 +9,7 @@ function formatCount(n: number) {
   return n.toString();
 }
 
-export default function GlobalMomentsStrip() {
+export function GlobalMomentsStrip() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollLeft  = () => scrollRef.current?.scrollBy({ left: -280, behavior: 'smooth' });
   const scrollRight = () => scrollRef.current?.scrollBy({ left:  280, behavior: 'smooth' });

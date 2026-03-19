@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import ImageLightbox from '@/components/ui/ImageLightbox';
+import { sanitizeCommentText } from '@/lib/sanitize';
 
 // Mood color map — mirrors profile page
 const MOOD_COLORS: Record<string, string> = {
@@ -55,7 +56,7 @@ export default function ProfilePostCard({ post, index = 0, accent, displayName, 
   const handleToggleRepost = () => { setReposted(r => !r); setRepostCount(c => reposted ? c - 1 : c + 1); };
 
   const handleCommentSubmit = () => {
-    const text = commentText.trim();
+    const text = sanitizeCommentText(commentText);
     if (!text) return;
     setComments(prev => [...prev, { handle: 'you.feed', text, time: 'just now', color: mc }]);
     setCommentText('');
@@ -226,7 +227,9 @@ export default function ProfilePostCard({ post, index = 0, accent, displayName, 
           accentColor={accent}
           onClose={() => setLightboxOpen(false)}
           onCommentAdd={(text) => {
-            setComments(prev => [...prev, { handle: 'you.feed', text, time: 'just now', color: mc }]);
+            const cleanText = sanitizeCommentText(text);
+            if (!cleanText) return;
+            setComments(prev => [...prev, { handle: 'you.feed', text: cleanText, time: 'just now', color: mc }]);
             setCommentCount(c => c + 1);
           }}
         />

@@ -5,6 +5,7 @@ import { getMood, getMoodIntensity } from '@/lib/theme';
 import { toggleLike, recordInteraction, GLOW_PULSE } from '@/lib/firebase/interactions';
 import type { MoodId } from '@/lib/theme';
 import ImageLightbox from '@/components/ui/ImageLightbox';
+import { sanitizeCommentText } from '@/lib/sanitize';
 
 export interface FeedCardProps {
   id: string;
@@ -108,7 +109,7 @@ export default function FeedCard({
   };
 
   const handleCommentSubmit = () => {
-    const text = commentText.trim();
+    const text = sanitizeCommentText(commentText);
     if (!text) return;
     setComments(prev => [...prev, {
       handle: 'you.feed',
@@ -333,7 +334,9 @@ export default function FeedCard({
             initialCommentCount={likes}
             onClose={() => setLightboxOpen(false)}
             onCommentAdd={(text) => {
-              const newComment = { handle: 'you.feed', text, time: 'just now', color: moodColor };
+              const cleanText = sanitizeCommentText(text);
+              if (!cleanText) return;
+              const newComment = { handle: 'you.feed', text: cleanText, time: 'just now', color: moodColor };
               setComments(prev => [...prev, newComment]);
               setCommentCount2(prev => prev + 1);
             }}

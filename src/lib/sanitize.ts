@@ -107,6 +107,20 @@ export function sanitize(
   return { value: clean, safe: true };
 }
 
+// ── Simple text sanitizer (used by AI route for arbitrary lengths) ──
+/**
+ * Sanitize a text string with a custom max length.
+ * Strips HTML, control chars, normalizes whitespace, enforces length.
+ */
+export function sanitizeText(input: string, maxLength: number): string {
+  if (typeof input !== 'string') return '';
+  if (hasAttackPattern(input)) return '';
+  let clean = stripHtml(input);
+  clean = normalizeWhitespace(clean, true);
+  if (clean.length > maxLength) clean = clean.slice(0, maxLength);
+  return clean;
+}
+
 // ── Convenience wrappers ──────────────────────────────────────
 
 export function sanitizePostText(text: unknown): string {
@@ -204,6 +218,28 @@ export function checkRateLimit(
   ACTION_COUNTS[key].count++;
   return ACTION_COUNTS[key].count <= maxPerMinute;
 }
+
+// ── Compatibility aliases ──────────────────────────────────────
+// These match names used elsewhere in the codebase
+
+export function sanitizeCommentText(text: unknown): string {
+  const result = sanitize(text, 'commentText', { multiline: true });
+  return result.value;
+}
+
+export function sanitizeMessageText(text: unknown): string {
+  return sanitizeDmText(text);
+}
+
+export const sanitizeProfileFields = sanitizeProfile;
+export const sanitizeUrl = sanitizeWebsite;
+export const isValidUrl = (url: string): boolean => {
+  if (!url) return true;
+  return /^https:\/\/[^\s<>"']+$/.test(url) && url.length <= 200;
+};
+export const isValidHandle = (handle: string): boolean => {
+  return handle.length >= 3 && handle.length <= LIMITS.handle && /^[a-zA-Z0-9_.]+$/.test(handle);
+};
 
 // Limits per action type
 export const RATE_LIMITS = {

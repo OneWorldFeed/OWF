@@ -13,6 +13,9 @@ export type Intent =
   | 'time'       // Current time in any city/timezone
   | 'news'       // Live headlines and current events
   | 'search'     // General web search
+  | 'wiki'       // Wikipedia summary for "what is X" queries
+  | 'currency'   // Exchange rates between currencies
+  | 'holiday'    // Public holidays for a country
 
 interface IntentMatch {
   intent: Intent;
@@ -52,6 +55,38 @@ const INTENT_PATTERNS: { intent: Intent; patterns: RegExp[] }[] = [
       /breaking news/i,
       /what happened (today|recently|this week)/i,
       /tell me about .*(today|recently|this week|latest)/i,
+    ],
+  },
+  {
+    intent: 'wiki',
+    patterns: [
+      /what is (a |an |the )?(.+)\??$/i,
+      /who (is|was) (.+)\??$/i,
+      /tell me about (.+)/i,
+      /history of (.+)/i,
+      /explain (.+) to me/i,
+      /what does (.+) mean/i,
+      /define (.+)/i,
+    ],
+  },
+  {
+    intent: 'currency',
+    patterns: [
+      /(exchange rate|currency|convert|conversion)/i,
+      /how much is \d+ (.+) in (.+)/i,
+      /(dollar|euro|pound|yen|naira|rupee|peso|rand|won|real|dirham|riyal|birr|cedi|shilling) (to|in|vs|versus)/i,
+      /\b(usd|eur|gbp|jpy|ngn|inr|mxn|brl|cad|aud|zar|aed|krw|ghs|kes|etb)\b.*(to|in|vs)/i,
+    ],
+  },
+  {
+    intent: 'holiday',
+    patterns: [
+      /public holiday/i,
+      /next holiday/i,
+      /holiday in (.+)/i,
+      /upcoming holiday/i,
+      /when is (.+) holiday/i,
+      /is (today|tomorrow|monday|tuesday|wednesday|thursday|friday) a holiday/i,
     ],
   },
   {

@@ -124,3 +124,111 @@ export async function getSearch(query: string): Promise<string> {
     return `Unable to search right now. Try again in a moment.`;
   }
 }
+
+// ── Wikipedia Summary ─────────────────────────────────────
+// Free, no key, no rate limit. Used for "What is X" queries.
+export async function getWikiSummary(query: string): Promise<string> {
+  try {
+    const q = encodeURIComponent(query.trim());
+    const res = await fetch(
+      `https://en.wikipedia.org/api/rest_v1/page/summary/${q}`,
+      { headers: { 'Accept': 'application/json' } }
+    );
+    if (!res.ok) return '';
+    const data = await res.json();
+    if (data.type === 'disambiguation') {
+      return `"${query}" has multiple meanings. Can you be more specific?`;
+    }
+    return data.extract
+      ? `${data.extract.slice(0, 400)}${data.extract.length > 400 ? '...' : ''}`
+      : '';
+  } catch {
+    return '';
+  }
+}
+
+// ── Exchange Rates ────────────────────────────────────────
+// frankfurter.app — free, no key, ECB data updated daily
+export async function getExchangeRate(query: string): Promise<string> {
+  try {
+    // Extract currency codes from query e.g. "USD to EUR" or "dollar to euro"
+    const CURRENCY_MAP: Record<string, string> = {
+      'dollar': 'USD', 'usd': 'USD', 'us dollar': 'USD',
+      'euro': 'EUR', 'eur': 'EUR',
+      'pound': 'GBP', 'gbp': 'GBP', 'sterling': 'GBP',
+      'yen': 'JPY', 'jpy': 'JPY', 'japanese yen': 'JPY',
+      'naira': 'NGN', 'ngn': 'NGN', 'nigerian naira': 'NGN',
+      'rand': 'ZAR', 'zar': 'ZAR', 'south african rand': 'ZAR',
+      'rupee': 'INR', 'inr': 'INR', 'indian rupee': 'INR',
+      'won': 'KRW', 'krw': 'KRW', 'korean won': 'KRW',
+      'peso': 'MXN', 'mxn': 'MXN', 'mexican peso': 'MXN',
+      'real': 'BRL', 'brl': 'BRL', 'brazilian real': 'BRL',
+      'cad': 'CAD', 'canadian dollar': 'CAD',
+      'aud': 'AUD', 'australian dollar': 'AUD',
+      'dirham': 'AED', 'aed': 'AED',
+      'riyal': 'SAR', 'sar': 'SAR',
+      'birr': 'ETB', 'etb': 'ETB', 'ethiopian birr': 'ETB',
+      'cedi': 'GHS', 'ghs': 'GHS', 'ghanaian cedi': 'GHS',
+      'shilling': 'KES', 'kes': 'KES', 'kenyan shilling': 'KES',
+    };
+    const lower = query.toLowerCase();
+    let from = 'USD', to = 'EUR';
+    for (const [name, code] of Object.entries(CURRENCY_MAP)) {
+      if (lower.includes(name)) {
+        if (from === 'USD') from = code;
+        else if (to === 'EUR' && code !== from) { to = code; break; }
+      }
+    }
+    const res = await fetch(`https://api.frankfurter.app/latest?from=${from}&to=${to}`);
+    const data = await res.json();
+    const rate = data.rates?.[to];
+    if (!rate) return '';
+    return `1 ${from} = ${rate.toFixed(4)} ${to} (European Central Bank rate, updated daily).`;
+  } catch {
+    return '';
+  }
+}
+
+// ── Public Holiday Lookup ─────────────────────────────────
+// nager.date — free, no key. Covers 100+ countries.
+export async function getHolidays(query: string): Promise<string> {
+  try {
+    const COUNTRY_CODES: Record<string, string> = {
+      'nigeria': 'NG', 'ghana': 'GH', 'kenya': 'KE', 'ethiopia': 'ET',
+      'south africa': 'ZA', 'egypt': 'EG', 'morocco': 'MA',
+      'united states': 'US', 'usa': 'US', 'america': 'US',
+      'canada': 'CA', 'mexico': 'MX',
+      'brazil': 'BR', 'argentina': 'AR', 'colombia': 'CO',
+      'uk': 'GB', 'united kingdom': 'GB', 'england': 'GB',
+      'france': 'FR', 'germany': 'DE', 'spain': 'ES', 'italy': 'IT',
+      'netherlands': 'NL', 'portugal': 'PT', 'poland': 'PL',
+      'japan': 'JP', 'china': 'CN', 'india': 'IN', 'south korea': 'KR',
+      'indonesia': 'ID', 'philippines': 'PH', 'thailand': 'TH',
+      'singapore': 'SG', 'malaysia': 'MY', 'vietnam': 'VN',
+      'australia': 'AU', 'new zealand': 'NZ',
+      'saudi arabia': 'SA', 'uae': 'AE', 'turkey': 'TR',
+      'russia': 'RU', 'ukraine': 'UA', 'sweden': 'SE', 'norway': 'NO',
+    };
+    const lower = query.toLowerCase();
+    let countryCode = 'US';
+    for (const [name, code] of Object.entries(COUNTRY_CODES)) {
+      if (lower.includes(name)) { countryCode = code; break; }
+    }
+    const year = new Date().getFullYear();
+    const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/${countryCode}`);
+    const holidays = await res.json();
+    if (!Array.isArray(holidays) || holidays.length === 0) return '';
+    const today = new Date();
+    const upcoming = holidays
+      .filter((h: { date: string }) => new Date(h.date) >= today)
+      .slice(0, 3);
+    if (upcoming.length === 0) return `No more public holidays in ${countryCode} this year.`;
+    const list = upcoming.map((h: { date: string; name: string }) => {
+      const d = new Date(h.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+      return `${d} — ${h.name}`;
+    }).join('\n');
+    return `Upcoming public holidays:\n${list}`;
+  } catch {
+    return '';
+  }
+}

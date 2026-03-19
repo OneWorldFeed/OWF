@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { getMood, getMoodIntensity } from '@/lib/theme';
 import { recordInteraction, toggleLike, GLOW_PULSE } from '@/lib/firebase/interactions';
 import type { MoodId } from '@/lib/theme';
+import { sanitizeCommentText } from '@/lib/sanitize';
 
 interface VideoCardProps {
   id: string;
@@ -146,7 +147,7 @@ export default function VideoCard({
   const handleCommentToggle = () => setCommentsOpen(prev => !prev);
 
   const handleCommentSubmit = () => {
-    const text = commentText.trim();
+    const text = sanitizeCommentText(commentText);
     if (!text) return;
     setComments(prev => [...prev, { handle: 'you.feed', text, time: 'just now', color: moodColor }]);
     setCommentText('');

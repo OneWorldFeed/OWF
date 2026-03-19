@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef } from 'react';
 import type { MoodId } from '@/lib/theme';
+import { sanitizePostText, sanitizeText, LIMITS } from '@/lib/sanitize';
 
 const MOODS: { id: MoodId; label: string; emoji: string; color: string }[] = [
   { id: 'electric',   label: 'Electric',   emoji: '⚡', color: '#D97706' },
@@ -94,6 +95,12 @@ export default function Composer({ onClose }: ComposerProps) {
   async function handlePost() {
     if (!text.trim() || !mood || posting) return;
     setPosting(true);
+    // Sanitize all user text before persisting
+    const cleanText = sanitizePostText(text);
+    const cleanCity = sanitizeText(city, LIMITS.city);
+    if (!cleanText) { setPosting(false); return; }
+    setText(cleanText);
+    setCity(cleanCity);
     // Simulate post — replace with Firestore write when Auth is added
     await new Promise(r => setTimeout(r, 900));
     setPosted(true);

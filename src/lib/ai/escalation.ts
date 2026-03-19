@@ -1,7 +1,7 @@
 import { detectIntent } from './router';
 import { rulesEngineCall } from './rules-engine';
 import { copilotCall, type Lens, type CopilotMessage, type CopilotResponse } from './copilot';
-import { getWeather, getTime, getNews, getSearch } from './connectors';
+import { getWeather, getTime, getNews, getSearch, getWikiSummary, getExchangeRate, getHolidays } from './connectors';
 
 export interface EscalatedResponse extends CopilotResponse {
   escalated: boolean;
@@ -15,7 +15,7 @@ export async function escalatingCall(
   history: CopilotMessage[] = [],
 ): Promise<EscalatedResponse> {
 
-  const hasApiKey = !!process.env.NEXT_PUBLIC_ANTHROPIC_API_KEY;
+  const hasApiKey = true; // Always try /api/ai — key is server-side now
 
   if (!hasApiKey) {
     const rules = rulesEngineCall(userMessage);
@@ -57,6 +57,12 @@ export async function escalatingCall(
       rawData = await getNews(intent.extractedQuery || userMessage);
     } else if (intent.intent === 'search') {
       rawData = await getSearch(intent.extractedQuery || userMessage);
+    } else if (intent.intent === 'wiki') {
+      rawData = await getWikiSummary(intent.extractedQuery || userMessage);
+    } else if (intent.intent === 'currency') {
+      rawData = await getExchangeRate(intent.extractedQuery || userMessage);
+    } else if (intent.intent === 'holiday') {
+      rawData = await getHolidays(intent.extractedQuery || userMessage);
     }
   } catch {
     rawData = '';

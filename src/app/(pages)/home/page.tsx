@@ -62,7 +62,7 @@ export default function HomePage() {
       </div>
 
       {/* Global Moments */}
-      <GlobalMomentsStrip signals={signals} onSelect={setActiveSignal} />
+      <GlobalMomentsStrip />
 
       {/* Signal Grid */}
       <div style={{
