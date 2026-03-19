@@ -3,29 +3,35 @@
 import { useState, useEffect, useRef } from "react"
 import { Signal } from "@/types/signal"
 
-// ── Mood → subtle accent colour (always cool-toned) ───────────────────────────
+// ── Mood accent colours — semantic, independent of theme ──────────────────────
 const MOOD_ACCENT: Record<string, string> = {
-  wonder: "#00d4ff",
-  cosmos: "#a78bfa",
-  earth:  "#34d399",
-  aurora: "#818cf8",
-  fire:   "#f87171",
+  wonder: "#6366F1",
+  cosmos: "#8B5CF6",
+  earth:  "#10B981",
+  aurora: "#3B82F6",
+  fire:   "#EF4444",
 }
+function moodAccent(m: string) { return MOOD_ACCENT[m] ?? "#6366F1" }
 
-function moodAccent(mood: string) {
-  return MOOD_ACCENT[mood] ?? "#00d4ff"
+// Dark tone per mood for the thumbnail gradient (keeps emoji visible)
+const MOOD_THUMB_BG: Record<string, string> = {
+  wonder: "radial-gradient(ellipse at 40% 35%, #1e1b4b 0%, #0f0e23 100%)",
+  cosmos: "radial-gradient(ellipse at 50% 30%, #2e1065 0%, #12062a 100%)",
+  earth:  "radial-gradient(ellipse at 35% 45%, #064e3b 0%, #022c22 100%)",
+  aurora: "radial-gradient(ellipse at 50% 30%, #1e3a8a 0%, #0a1836 100%)",
+  fire:   "radial-gradient(ellipse at 45% 40%, #7f1d1d 0%, #3b0a0a 100%)",
 }
+function thumbBg(m: string) { return MOOD_THUMB_BG[m] ?? MOOD_THUMB_BG.wonder }
 
-// ── Scroll reveal ─────────────────────────────────────────────────────────────
+// ── Scroll-reveal hook ────────────────────────────────────────────────────────
 function useScrollReveal(delay = 0) {
-  const ref  = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
   useEffect(() => {
-    const el = ref.current
-    if (!el) return
+    const el = ref.current; if (!el) return
     const obs = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setVisible(true); obs.disconnect() } },
-      { threshold: 0.08 }
+      ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect() } },
+      { threshold: 0.06 }
     )
     obs.observe(el)
     return () => obs.disconnect()
@@ -33,24 +39,19 @@ function useScrollReveal(delay = 0) {
   return {
     ref,
     style: {
-      opacity:   visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(20px)",
-      transition: `opacity 0.5s ease ${delay}ms, transform 0.5s ease ${delay}ms`,
+      opacity:    visible ? 1 : 0,
+      transform:  visible ? "translateY(0)" : "translateY(16px)",
+      transition: `opacity 0.45s ease ${delay}ms, transform 0.45s ease ${delay}ms`,
     },
   }
 }
 
-// ── Play icon SVG ─────────────────────────────────────────────────────────────
-function PlayIcon() {
-  return (
-    <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
-      <circle cx="22" cy="22" r="21" stroke="var(--owf-horizon)" strokeWidth="1" opacity="0.6" />
-      <polygon points="17,13 35,22 17,31" fill="var(--owf-horizon)" opacity="0.9" />
-    </svg>
-  )
-}
+// ── Shared constants ──────────────────────────────────────────────────────────
+const DARK  = "#0F1924"
+const DARK2 = "rgba(15,25,36,0.55)"
+const DARK3 = "rgba(15,25,36,0.35)"
 
-// ── Main card ─────────────────────────────────────────────────────────────────
+// ── SignalCard ────────────────────────────────────────────────────────────────
 interface SignalCardProps {
   signal:  Signal
   onWatch: (signal: Signal) => void
@@ -58,21 +59,19 @@ interface SignalCardProps {
 }
 
 export function SignalCard({ signal, onWatch, index = 0 }: SignalCardProps) {
-  const reveal    = useScrollReveal(index * 55)
+  const reveal  = useScrollReveal(index * 55)
   const [open, setOpen] = useState(false)
   const [hov,  setHov]  = useState(false)
-  const accent = moodAccent(signal.mood)
+  const accent  = moodAccent(signal.mood)
   const isVideo = signal.type === "stream"
+  const isLive  = signal.duration === "LIVE"
 
-  // Cinematic gradient per mood — no real images yet, this is the "image area"
-  const MOOD_GRAD: Record<string, string> = {
-    wonder: "radial-gradient(ellipse at 40% 30%, #0d1a2e 0%, #050810 60%, #0a0a0f 100%)",
-    cosmos: "radial-gradient(ellipse at 60% 20%, #150d2e 0%, #0a0510 60%, #0a0a0f 100%)",
-    earth:  "radial-gradient(ellipse at 30% 50%, #0a1f14 0%, #050c08 60%, #0a0a0f 100%)",
-    aurora: "radial-gradient(ellipse at 50% 30%, #0f0d28 0%, #08070f 60%, #0a0a0f 100%)",
-    fire:   "radial-gradient(ellipse at 40% 40%, #1a0808 0%, #0f0505 60%, #0a0a0f 100%)",
-  }
-  const imgGrad = MOOD_GRAD[signal.mood] ?? MOOD_GRAD.wonder
+  const cardBorder = hov || open
+    ? `1px solid rgba(var(--owf-horizon-rgb), 0.30)`
+    : "1px solid rgba(0,0,0,0.09)"
+  const cardShadow = hov || open
+    ? `0 0 0 3px rgba(var(--owf-horizon-rgb), 0.07), 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)`
+    : "0 1px 4px rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.04)"
 
   return (
     <div ref={reveal.ref} style={reveal.style}>
@@ -80,71 +79,166 @@ export function SignalCard({ signal, onWatch, index = 0 }: SignalCardProps) {
         onMouseEnter={() => setHov(true)}
         onMouseLeave={() => setHov(false)}
         style={{
-          background:    "var(--owf-surface)",
-          border:        `1px solid ${hov || open ? `${accent}55` : "var(--owf-border)"}`,
-          borderRadius:  0,
-          cursor:        "pointer",
-          overflow:      "hidden",
-          boxShadow:     hov || open
-            ? `0 0 0 1px ${accent}30, 0 8px 40px rgba(0,0,0,0.7), 0 0 24px ${accent}18`
-            : "0 4px 24px rgba(0,0,0,0.5)",
-          transition:    "border-color 0.2s ease, box-shadow 0.2s ease",
+          background:  "#ffffff",
+          border:      cardBorder,
+          borderRadius:"0",
+          overflow:    "hidden",
+          boxShadow:   cardShadow,
+          transition:  "border-color 0.2s ease, box-shadow 0.25s ease",
+          position:    "relative",
         }}
       >
-        {/* ── Image / Media area ─ 16:9 ─────────────────────────────────── */}
+
+        {/* ── Header row ───────────────────────────────────────────────────── */}
+        <div
+          onClick={() => setOpen(o => !o)}
+          style={{
+            display:    "flex",
+            alignItems: "flex-start",
+            gap:        "12px",
+            padding:    "14px 16px 10px",
+            cursor:     "pointer",
+          }}
+        >
+          {/* Avatar — mood-coloured ring around emoji */}
+          <div style={{
+            width:        "40px",
+            height:       "40px",
+            borderRadius: "50%",
+            flexShrink:   0,
+            display:      "flex",
+            alignItems:   "center",
+            justifyContent: "center",
+            fontSize:     "20px",
+            background:   `${accent}14`,
+            border:       `2px solid ${accent}40`,
+            boxShadow:    `0 0 0 3px ${accent}12`,
+            transition:   "box-shadow 0.2s",
+          }}>
+            {signal.thumb}
+          </div>
+
+          {/* Title + meta */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{
+              fontSize:    "14px",
+              fontWeight:  600,
+              color:       DARK,
+              lineHeight:  1.35,
+              marginBottom:"3px",
+              letterSpacing: "-0.01em",
+            }}>
+              {signal.title}
+            </p>
+            <div style={{
+              display:    "flex",
+              alignItems: "center",
+              gap:        "8px",
+              flexWrap:   "wrap",
+            }}>
+              {/* Location */}
+              <span style={{
+                fontSize:  "11px",
+                color:     DARK3,
+                letterSpacing: "0.01em",
+              }}>
+                {signal.location}
+              </span>
+              <span style={{ color: DARK3, fontSize: "10px" }}>·</span>
+              {/* Viewers / time */}
+              <span style={{
+                fontSize:  "11px",
+                color:     DARK3,
+              }}>
+                {signal.viewers} watching
+              </span>
+            </div>
+          </div>
+
+          {/* Right side: mood badge + collapse button when open */}
+          <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
+            <span style={{
+              fontSize:      "9px",
+              fontWeight:    700,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+              color:         accent,
+              background:    `${accent}12`,
+              border:        `1px solid ${accent}30`,
+              padding:       "2px 7px",
+              borderRadius:  "3px",
+            }}>
+              {signal.mood}
+            </span>
+            {open && (
+              <button
+                onClick={e => { e.stopPropagation(); setOpen(false) }}
+                style={{
+                  width:        "24px",
+                  height:       "24px",
+                  borderRadius: "50%",
+                  border:       "1px solid rgba(0,0,0,0.12)",
+                  background:   "rgba(0,0,0,0.04)",
+                  cursor:       "pointer",
+                  display:      "flex",
+                  alignItems:   "center",
+                  justifyContent:"center",
+                  fontSize:     "11px",
+                  color:        DARK2,
+                  flexShrink:   0,
+                  lineHeight:   1,
+                }}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* ── Thumbnail — 16:9, always visible ─────────────────────────────── */}
         <div
           onClick={() => setOpen(o => !o)}
           style={{
             position:   "relative",
             width:      "100%",
-            paddingTop: "56.25%", // 16:9
-            background: imgGrad,
+            paddingTop: "56.25%",
+            background: thumbBg(signal.mood),
             overflow:   "hidden",
+            cursor:     "pointer",
           }}
         >
-          {/* Thumb emoji centred */}
+          {/* Emoji centred */}
           <div style={{
-            position:  "absolute",
-            inset:     0,
-            display:   "flex",
-            alignItems:"center",
+            position:       "absolute",
+            inset:          0,
+            display:        "flex",
+            alignItems:     "center",
             justifyContent: "center",
-            fontSize:  "52px",
-            filter:    `drop-shadow(0 0 32px ${accent}80)`,
-            transform: hov ? "scale(1.06)" : "scale(1)",
-            transition:"transform 0.4s ease",
+            fontSize:       "54px",
+            filter:         `drop-shadow(0 0 28px ${accent}90)`,
+            transform:      hov ? "scale(1.05)" : "scale(1)",
+            transition:     "transform 0.4s ease",
           }}>
             {signal.thumb}
           </div>
 
-          {/* Subtle glow orb */}
+          {/* Soft glow orb */}
           <div style={{
-            position:  "absolute",
-            top:       "30%",
-            left:      "50%",
-            transform: "translate(-50%,-50%)",
-            width:     "60%",
-            height:    "60%",
+            position:     "absolute",
+            top:          "30%", left: "50%",
+            transform:    "translate(-50%,-50%)",
+            width:        "55%", height: "55%",
             borderRadius: "50%",
-            background:`radial-gradient(circle, ${accent}22 0%, transparent 70%)`,
-            pointerEvents: "none",
+            background:   `radial-gradient(circle, ${accent}30 0%, transparent 70%)`,
+            pointerEvents:"none",
           }} />
 
-          {/* Scanline texture */}
+          {/* Vignette — dark at bottom so thumb text is readable */}
           <div style={{
-            position:   "absolute",
-            inset:      0,
-            backgroundImage:
-              "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px)",
-            pointerEvents: "none",
-          }} />
-
-          {/* Gradient vignette */}
-          <div style={{
-            position:   "absolute",
-            inset:      0,
-            background: "linear-gradient(to bottom, transparent 50%, rgba(13,13,20,0.92) 100%)",
-            pointerEvents: "none",
+            position:     "absolute",
+            inset:        0,
+            background:   "linear-gradient(to bottom, transparent 45%, rgba(0,0,0,0.55) 100%)",
+            pointerEvents:"none",
           }} />
 
           {/* Video play overlay */}
@@ -155,11 +249,24 @@ export function SignalCard({ signal, onWatch, index = 0 }: SignalCardProps) {
               display:        "flex",
               alignItems:     "center",
               justifyContent: "center",
-              opacity:        hov ? 1 : 0.65,
-              transition:     "opacity 0.2s",
               pointerEvents:  "none",
             }}>
-              <PlayIcon />
+              <div style={{
+                width:        "48px",
+                height:       "48px",
+                borderRadius: "50%",
+                background:   "rgba(255,255,255,0.92)",
+                boxShadow:    "0 2px 16px rgba(0,0,0,0.25)",
+                display:      "flex",
+                alignItems:   "center",
+                justifyContent:"center",
+                transform:    hov ? "scale(1.08)" : "scale(1)",
+                transition:   "transform 0.2s ease",
+              }}>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill={accent}>
+                  <polygon points="4,2 14,8 4,14" />
+                </svg>
+              </div>
             </div>
           )}
 
@@ -169,105 +276,61 @@ export function SignalCard({ signal, onWatch, index = 0 }: SignalCardProps) {
               position:     "absolute",
               bottom:       "10px",
               right:        "10px",
-              fontSize:     "10px",
+              fontSize:     "9px",
               fontWeight:   700,
               letterSpacing:"0.08em",
               padding:      "3px 8px",
-              background:   signal.duration === "LIVE"
-                ? `${accent}22`
-                : "rgba(0,0,0,0.75)",
-              border:       `1px solid ${signal.duration === "LIVE" ? accent : "var(--owf-text-muted)"}`,
-              color:        signal.duration === "LIVE" ? accent : "var(--owf-text-sub)",
+              background:   isLive ? `${accent}22` : "rgba(0,0,0,0.72)",
+              border:       `1px solid ${isLive ? accent + "60" : "rgba(255,255,255,0.18)"}`,
+              color:        isLive ? accent : "rgba(255,255,255,0.88)",
             }}>
-              {signal.duration === "LIVE" ? (
-                <span style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                  <span style={{
-                    width: 5, height: 5, borderRadius: "50%", background: accent,
-                    boxShadow: `0 0 6px ${accent}`,
-                    animation: "owfLivePulse 1.8s infinite",
-                    display: "inline-block",
-                  }} />
-                  LIVE
-                </span>
-              ) : signal.duration}
+              {isLive
+                ? <span style={{ display:"flex", alignItems:"center", gap:"5px" }}>
+                    <span style={{
+                      width: 5, height: 5, borderRadius: "50%",
+                      background: accent, display: "inline-block",
+                      boxShadow: `0 0 6px ${accent}`,
+                      animation: "owfLivePulse 1.8s infinite",
+                    }} />
+                    LIVE
+                  </span>
+                : signal.duration
+              }
             </div>
           )}
-
-          {/* Mood tag — top-left */}
-          <div style={{
-            position:      "absolute",
-            top:           "12px",
-            left:          "12px",
-            fontSize:      "8px",
-            fontWeight:    700,
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            color:         accent,
-            fontFamily:    "monospace",
-          }}>
-            {signal.mood}
-          </div>
-
-          {/* Viewers — top-right */}
-          <div style={{
-            position:      "absolute",
-            top:           "12px",
-            right:         isVideo ? "10px" : "12px",
-            fontSize:      "9px",
-            letterSpacing: "0.08em",
-            color:         "var(--owf-text-muted)",
-            fontFamily:    "monospace",
-          }}>
-            {signal.viewers} watching
-          </div>
         </div>
 
-        {/* ── Card body ──────────────────────────────────────────────────── */}
+        {/* ── Collapsed body ─ always visible ──────────────────────────────── */}
         <div
           onClick={() => setOpen(o => !o)}
-          style={{ padding: "16px 18px 0" }}
+          style={{ padding: "12px 16px 0", cursor: "pointer" }}
         >
-          {/* Location */}
+          {/* Blurb — 2-line clamp when collapsed */}
           <p style={{
-            fontSize:      "9px",
-            fontWeight:    600,
-            letterSpacing: "0.18em",
-            textTransform: "uppercase",
-            color:         "var(--owf-text-muted)",
-            marginBottom:  "6px",
-            fontFamily:    "monospace",
-          }}>
-            {signal.location}
+            fontSize:       "13px",
+            lineHeight:     1.6,
+            color:          DARK2,
+            marginBottom:   "10px",
+            display:        "-webkit-box",
+            WebkitBoxOrient:"vertical",
+            WebkitLineClamp: open ? "none" : 2,
+            overflow:       open ? "visible" : "hidden",
+          } as React.CSSProperties}>
+            {signal.blurb}
           </p>
 
-          {/* Title */}
-          <h3 style={{
-            fontSize:      "15px",
-            fontWeight:    300,
-            letterSpacing: "-0.01em",
-            color:         "var(--owf-text)",
-            lineHeight:    1.4,
-            marginBottom:  "8px",
-          }}>
-            {signal.title}
-          </h3>
-
-          {/* Cyan horizon rule */}
-          <div style={{
-            height:     "1px",
-            background: `linear-gradient(90deg, ${accent}60, transparent)`,
-            boxShadow:  `0 0 6px ${accent}40`,
-            marginBottom: "10px",
-          }} />
-
           {/* Tags */}
-          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
+          <div style={{
+            display:      "flex",
+            gap:          "10px",
+            flexWrap:     "wrap",
+            marginBottom: "12px",
+          }}>
             {signal.tags.slice(0, open ? 99 : 3).map(t => (
               <span key={t} style={{
-                fontSize:      "10px",
+                fontSize:      "11px",
                 color:         accent,
-                letterSpacing: "0.05em",
-                fontFamily:    "monospace",
+                letterSpacing: "0.03em",
               }}>
                 {t}
               </span>
@@ -275,59 +338,170 @@ export function SignalCard({ signal, onWatch, index = 0 }: SignalCardProps) {
           </div>
         </div>
 
-        {/* ── Expandable section ─────────────────────────────────────────── */}
+        {/* ── Expanded section ─ animated ───────────────────────────────────── */}
         <div style={{
-          maxHeight:  open ? "400px" : "0px",
+          maxHeight:  open ? "800px" : "0px",
           overflow:   "hidden",
-          transition: "max-height 0.4s cubic-bezier(0.4,0,0.2,1)",
+          transition: "max-height 0.35s ease",
         }}>
-          <div style={{ padding: "0 18px 18px" }}>
-            {/* Blurb */}
-            <p style={{
-              fontSize:   "12px",
-              lineHeight: 1.7,
-              color:      "var(--owf-text-sub)",
-              marginBottom: "12px",
-            }}>
-              {signal.blurb}
-            </p>
+          <div style={{ padding: "0 16px 16px" }}>
+
+            {/* Accent divider */}
+            <div style={{
+              height:       "1px",
+              background:   `linear-gradient(90deg, ${accent}50, transparent)`,
+              marginBottom: "14px",
+            }} />
 
             {/* Why it matters */}
             {signal.whyMatters && (
               <div style={{
                 padding:      "10px 12px",
-                borderLeft:   `2px solid ${accent}`,
+                borderLeft:   `3px solid ${accent}`,
                 background:   `${accent}08`,
+                borderRadius: "0 6px 6px 0",
                 marginBottom: "14px",
               }}>
                 <p style={{
                   fontSize:      "8px",
-                  fontWeight:    700,
+                  fontWeight:    800,
                   letterSpacing: "0.16em",
+                  textTransform: "uppercase",
                   color:         accent,
                   marginBottom:  "5px",
-                  fontFamily:    "monospace",
-                  textTransform: "uppercase",
                 }}>
                   WHY IT MATTERS
                 </p>
-                <p style={{ fontSize: "11px", color: "var(--owf-text-sub)", lineHeight: 1.65 }}>
+                <p style={{ fontSize: "12px", lineHeight: 1.65, color: DARK2 }}>
                   {signal.whyMatters}
                 </p>
               </div>
             )}
 
+            {/* Video player shell (expanded video cards) */}
+            {isVideo && (
+              <div style={{
+                borderRadius: "6px",
+                overflow:     "hidden",
+                background:   "#111",
+                border:       "1px solid rgba(0,0,0,0.12)",
+                marginBottom: "14px",
+                position:     "relative",
+              }}>
+                {/* Player viewport */}
+                <div style={{
+                  position:   "relative",
+                  paddingTop: "56.25%",
+                  background: thumbBg(signal.mood),
+                }}>
+                  <div style={{
+                    position:       "absolute",
+                    inset:          0,
+                    display:        "flex",
+                    alignItems:     "center",
+                    justifyContent: "center",
+                    fontSize:       "64px",
+                    filter:         `drop-shadow(0 0 32px ${accent}80)`,
+                  }}>
+                    {signal.thumb}
+                  </div>
+                  {/* Big play button */}
+                  <button
+                    onClick={e => { e.stopPropagation(); onWatch(signal) }}
+                    style={{
+                      position:       "absolute",
+                      inset:          0,
+                      background:     "transparent",
+                      border:         "none",
+                      cursor:         "pointer",
+                      display:        "flex",
+                      alignItems:     "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div style={{
+                      width:        "64px",
+                      height:       "64px",
+                      borderRadius: "50%",
+                      background:   "rgba(255,255,255,0.92)",
+                      boxShadow:    "0 4px 24px rgba(0,0,0,0.3)",
+                      display:      "flex",
+                      alignItems:   "center",
+                      justifyContent:"center",
+                    }}>
+                      <svg width="22" height="22" viewBox="0 0 16 16" fill={accent}>
+                        <polygon points="4,2 14,8 4,14" />
+                      </svg>
+                    </div>
+                  </button>
+                  {/* Live / duration pill */}
+                  <div style={{
+                    position:   "absolute",
+                    bottom:     "10px",
+                    right:      "10px",
+                    fontSize:   "9px",
+                    fontWeight: 700,
+                    padding:    "3px 10px",
+                    background: isLive ? `${accent}22` : "rgba(0,0,0,0.72)",
+                    border:     `1px solid ${isLive ? accent + "60" : "rgba(255,255,255,0.18)"}`,
+                    color:      isLive ? accent : "rgba(255,255,255,0.88)",
+                    letterSpacing: "0.08em",
+                  }}>
+                    {isLive ? "● LIVE" : signal.duration}
+                  </div>
+                </div>
+                {/* Minimal controls bar */}
+                <div style={{
+                  display:    "flex",
+                  alignItems: "center",
+                  gap:        "10px",
+                  padding:    "8px 12px",
+                  background: "#0a0a0a",
+                }}>
+                  <div style={{
+                    flex:         1,
+                    height:       "3px",
+                    background:   "rgba(255,255,255,0.12)",
+                    borderRadius: "99px",
+                    overflow:     "hidden",
+                  }}>
+                    <div style={{
+                      width:        isLive ? "100%" : "32%",
+                      height:       "100%",
+                      background:   accent,
+                      borderRadius: "99px",
+                      animation:    isLive ? "none" : undefined,
+                    }} />
+                  </div>
+                  <span style={{
+                    fontSize:     "10px",
+                    color:        "rgba(255,255,255,0.45)",
+                    fontFamily:   "monospace",
+                    whiteSpace:   "nowrap",
+                  }}>
+                    {isLive ? "● LIVE" : signal.duration}
+                  </span>
+                </div>
+              </div>
+            )}
+
             {/* Highlights */}
             {signal.highlights?.length > 0 && (
-              <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "14px" }}>
+              <div style={{
+                display:      "flex",
+                gap:          "0",
+                flexWrap:     "wrap",
+                marginBottom: "14px",
+                border:       "1px solid rgba(0,0,0,0.07)",
+              }}>
                 {signal.highlights.map((h, i) => (
                   <span key={i} style={{
-                    fontSize:      "9px",
+                    fontSize:      "11px",
+                    color:         DARK2,
+                    padding:       "6px 12px",
+                    borderRight:   i < signal.highlights.length - 1 ? "1px solid rgba(0,0,0,0.07)" : "none",
                     fontFamily:    "monospace",
-                    color:         "var(--owf-text-sub)",
-                    letterSpacing: "0.06em",
-                    paddingRight:  "8px",
-                    borderRight:   i < signal.highlights.length - 1 ? "1px solid var(--owf-border)" : "none",
+                    letterSpacing: "0.04em",
                   }}>
                     {h}
                   </span>
@@ -337,63 +511,52 @@ export function SignalCard({ signal, onWatch, index = 0 }: SignalCardProps) {
 
             {/* Action row */}
             <div style={{
-              display:         "flex",
-              alignItems:      "center",
-              justifyContent:  "space-between",
-              paddingTop:      "12px",
-              borderTop:       "1px solid var(--owf-border)",
+              display:        "flex",
+              alignItems:     "center",
+              justifyContent: "space-between",
+              paddingTop:     "12px",
+              borderTop:      "1px solid rgba(0,0,0,0.07)",
             }}>
-              <button
-                onClick={e => { e.stopPropagation(); onWatch(signal); }}
-                style={{
-                  fontSize:      "10px",
-                  fontWeight:    700,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  fontFamily:    "monospace",
-                  padding:       "8px 20px",
-                  background:    "transparent",
-                  border:        `1px solid ${accent}`,
-                  color:         accent,
-                  cursor:        "pointer",
-                  boxShadow:     `0 0 12px ${accent}25`,
-                  transition:    "background 0.15s, box-shadow 0.15s",
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLButtonElement).style.background = `${accent}18`
-                  ;(e.currentTarget as HTMLButtonElement).style.boxShadow = `0 0 20px ${accent}40`
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLButtonElement).style.background = "transparent"
-                  ;(e.currentTarget as HTMLButtonElement).style.boxShadow = `0 0 12px ${accent}25`
-                }}
-              >
-                {isVideo ? "Watch Live" : "Read More"}
-              </button>
-              <div style={{ display: "flex", gap: "16px" }}>
+              {/* Primary CTA */}
+              <PrimaryButton
+                label={isVideo ? "Watch Live" : "Read More"}
+                accent={accent}
+                onClick={e => { e.stopPropagation(); onWatch(signal) }}
+              />
+
+              {/* Secondary actions */}
+              <div style={{ display:"flex", gap:"4px" }}>
                 {[["◎", "Save"], ["↗", "Share"]].map(([icon, label]) => (
                   <button
                     key={label}
                     onClick={e => e.stopPropagation()}
                     style={{
-                      background:    "none",
-                      border:        "none",
-                      cursor:        "pointer",
-                      fontSize:      "11px",
-                      color:         "var(--owf-text-muted)",
-                      letterSpacing: "0.06em",
-                      display:       "flex",
-                      alignItems:    "center",
-                      gap:           "4px",
-                      fontFamily:    "monospace",
-                      padding:       "4px",
-                      transition:    "color 0.15s",
+                      background:  "none",
+                      border:      "1px solid rgba(0,0,0,0.08)",
+                      cursor:      "pointer",
+                      padding:     "6px 12px",
+                      display:     "flex",
+                      alignItems:  "center",
+                      gap:         "4px",
+                      color:       DARK3,
+                      fontSize:    "11px",
+                      transition:  "border-color 0.15s, color 0.15s",
                     }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = accent }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = "var(--owf-text-muted)" }}
+                    onMouseEnter={e => {
+                      const b = e.currentTarget as HTMLButtonElement
+                      b.style.borderColor = `${accent}50`
+                      b.style.color = accent
+                    }}
+                    onMouseLeave={e => {
+                      const b = e.currentTarget as HTMLButtonElement
+                      b.style.borderColor = "rgba(0,0,0,0.08)"
+                      b.style.color = DARK3
+                    }}
                   >
-                    <span style={{ fontSize: "13px" }}>{icon}</span>
-                    <span style={{ fontSize: "9px", textTransform: "uppercase" }}>{label}</span>
+                    <span>{icon}</span>
+                    <span style={{ fontSize:"9px", textTransform:"uppercase", letterSpacing:"0.08em" }}>
+                      {label}
+                    </span>
                   </button>
                 ))}
               </div>
@@ -401,42 +564,82 @@ export function SignalCard({ signal, onWatch, index = 0 }: SignalCardProps) {
           </div>
         </div>
 
-        {/* Collapse indicator */}
-        <div
+        {/* ── Expand / collapse footer ──────────────────────────────────────── */}
+        <button
           onClick={() => setOpen(o => !o)}
           style={{
-            padding:         "8px 18px",
-            display:         "flex",
-            alignItems:      "center",
-            justifyContent:  "center",
-            gap:             "6px",
-            borderTop:       open ? "1px solid var(--owf-border)" : "none",
-            cursor:          "pointer",
+            width:          "100%",
+            display:        "flex",
+            alignItems:     "center",
+            justifyContent: "center",
+            gap:            "8px",
+            padding:        "8px 16px",
+            background:     open ? `${accent}06` : "transparent",
+            border:         "none",
+            borderTop:      "1px solid rgba(0,0,0,0.06)",
+            cursor:         "pointer",
+            transition:     "background 0.15s",
           }}
         >
           <div style={{
-            width:     "24px",
-            height:    "1px",
-            background:accent,
-            opacity:   open ? 0.6 : 0.2,
+            width:      "20px",
+            height:     "1px",
+            background: open ? accent : "rgba(0,0,0,0.15)",
+            transition: "background 0.2s",
           }} />
-          <div style={{
-            fontSize:  "8px",
-            color:     open ? accent : "var(--owf-text-muted)",
-            fontFamily:"monospace",
-            letterSpacing: "0.1em",
-            transition:"color 0.2s",
+          <span style={{
+            fontSize:      "8px",
+            fontWeight:    700,
+            letterSpacing: "0.14em",
+            textTransform: "uppercase",
+            color:         open ? accent : DARK3,
+            transition:    "color 0.2s",
           }}>
-            {open ? "COLLAPSE" : "EXPAND"}
-          </div>
+            {open ? "Collapse" : "Expand"}
+          </span>
           <div style={{
-            width:     "24px",
-            height:    "1px",
-            background:accent,
-            opacity:   open ? 0.6 : 0.2,
+            width:      "20px",
+            height:     "1px",
+            background: open ? accent : "rgba(0,0,0,0.15)",
+            transition: "background 0.2s",
           }} />
-        </div>
+        </button>
+
       </div>
     </div>
+  )
+}
+
+// ── PrimaryButton ─────────────────────────────────────────────────────────────
+function PrimaryButton({
+  label,
+  accent,
+  onClick,
+}: {
+  label: string
+  accent: string
+  onClick: React.MouseEventHandler<HTMLButtonElement>
+}) {
+  const [hov, setHov] = useState(false)
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        fontSize:      "11px",
+        fontWeight:    700,
+        letterSpacing: "0.10em",
+        textTransform: "uppercase",
+        padding:       "8px 18px",
+        background:    hov ? accent : "#ffffff",
+        border:        `1px solid ${accent}`,
+        color:         hov ? "#ffffff" : accent,
+        cursor:        "pointer",
+        transition:    "background 0.15s, color 0.15s",
+      }}
+    >
+      {label}
+    </button>
   )
 }
