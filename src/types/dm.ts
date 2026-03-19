@@ -1,9 +1,35 @@
+export interface BadgePalette {
+  bg: string; card: string; body: string; face: string;
+  eye: string; halo: string; haloBright: string;
+  ring: string; accent: string; text: string;
+}
+
 export interface Message {
   id:        string;
   senderId:  string;
   text:      string;
   ts:        string;          // display time e.g. "2:41 PM"
   reactions?: string[];
+}
+
+export interface CycleBadge {
+  id:       string;
+  cycle:    number;
+  name:     string;
+  meaning:  string;
+  story:    string;
+  palette: {
+    bg: string; card: string; body: string; face: string;
+    eye: string; halo: string; haloBright: string;
+    ring: string; accent: string; text: string;
+  };
+  stars:      boolean;
+  crescent:   boolean;
+  rays:       boolean;
+  leaves:     boolean;
+  tealGlow:   boolean;
+  cosmicRing?: boolean;
+  horns?:     boolean;
 }
 
 export interface Conversation {

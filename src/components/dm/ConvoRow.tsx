@@ -49,7 +49,7 @@ export default function ConvoRow({ convo, active, onSelect, onOwlClick }: Props)
       {/* Content */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-          <span style={{ fontSize: 13.5, fontWeight: 600, color: C.text, truncate: "ellipsis" }}>
+          <span style={{ fontSize: 13.5, fontWeight: 600, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {convo.name}
           </span>
           <span style={{ fontSize: 11, color: C.muted, whiteSpace: "nowrap", flexShrink: 0 }}>{convo.ts}</span>

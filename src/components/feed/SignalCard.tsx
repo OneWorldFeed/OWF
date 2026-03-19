@@ -181,7 +181,7 @@ function EditorialCard({ signal, onWatch, index }: { signal: Signal; onWatch: ()
       </div>
       {/* City label */}
       <div style={{
-        fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase',
+        fontSize: 9, textTransform: 'uppercase',
         color: m.accent, marginBottom: 7,
         display: 'flex', alignItems: 'center', gap: 5,
         transition: 'letter-spacing 0.2s',

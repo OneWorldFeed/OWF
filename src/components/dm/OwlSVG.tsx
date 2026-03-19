@@ -1,6 +1,6 @@
 "use client";
 import { getOwlColors } from "@/lib/streak";
-import type { StreakTier } from "@/types/dm";
+import type { StreakTier } from "@/lib/streak";
 
 interface Props {
   size?: number;

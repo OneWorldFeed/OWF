@@ -96,7 +96,7 @@ function OfflineFallback({ cam, h, hRgb }: { cam: LiveCam; h: string; hRgb: stri
 // ── Cam player ────────────────────────────────────────────────
 function CamPlayer({ cam, h, hRgb }: { cam: LiveCam; h: string; hRgb: string }) {
   const [status, setStatus] = useState<'loading' | 'live' | 'offline'>('loading');
-  const timeout = useRef<NodeJS.Timeout>();
+  const timeout = useRef<NodeJS.Timeout>(undefined);
 
   useEffect(() => {
     setStatus('loading');

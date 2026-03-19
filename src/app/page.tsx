@@ -1,6 +1,6 @@
 import type React from 'react';
 import FeedTabs from '@/components/feed/FeedTabs';
-import GlobalMomentsStrip from '@/components/feed/GlobalMomentsStrip';
+import { GlobalMomentsStrip } from '@/components/feed/GlobalMomentsStrip';
 import RightPanel from '@/components/panels/RightPanel';
 
 const posts = [
