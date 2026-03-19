@@ -1,32 +1,33 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { escalatingCall } from '@/lib/ai/escalation';
-import { useTheme } from '@/context/ThemeProvider';
 import ThemeSelector from '@/components/ui/ThemeSelector';
 import RadioPlayer from '@/components/ui/RadioPlayer';
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const CYAN = 'var(--owf-horizon)'
 
 const TRENDING = [
-  { tag: '+lagos',          count: '12.4k', color: '#D97706' },
-  { tag: '+cherryblossoms', count: '8.1k',  color: '#60A5FA' },
-  { tag: '+ramadan',        count: '89.2k', color: '#A78BFA' },
-  { tag: '+community',      count: '4.3k',  color: '#34D399' },
-  { tag: '+nightlife',      count: '6.7k',  color: '#FB923C' },
-  { tag: '+afrobeats',      count: '11.2k', color: '#10B981' },
-  { tag: '+startups',       count: '3.8k',  color: '#F472B6' },
-];
+  { tag: '+lagos',          count: '12.4k' },
+  { tag: '+cherryblossoms', count: '8.1k'  },
+  { tag: '+ramadan',        count: '89.2k' },
+  { tag: '+community',      count: '4.3k'  },
+  { tag: '+nightlife',      count: '6.7k'  },
+  { tag: '+afrobeats',      count: '11.2k' },
+  { tag: '+startups',       count: '3.8k'  },
+]
 
 const SPOTLIGHT = [
-  { title: 'Sunrise in Tokyo',       subtitle: 'A new day begins',              image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600' },
-  { title: 'Voices of Nairobi',      subtitle: 'Street stories at golden hour', image: 'https://images.unsplash.com/photo-1611348586840-ea9872d33411?w=600' },
-];
+  { title: 'Sunrise in Tokyo',  subtitle: 'A new day begins',              image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=600' },
+  { title: 'Voices of Nairobi', subtitle: 'Street stories at golden hour', image: 'https://images.unsplash.com/photo-1611348586840-ea9872d33411?w=600' },
+]
 
 const WHO_TO_FOLLOW = [
-  { name: 'Yaw Darko',    handle: 'yawdarko.feed',    color: '#10B981' },
-  { name: 'Priya Sharma', handle: 'priyasharma.feed', color: '#FB923C' },
-  { name: 'Lena Müller',  handle: 'lenamuller.feed',  color: '#A78BFA' },
-];
+  { name: 'Yaw Darko',    handle: 'yawdarko.feed'    },
+  { name: 'Priya Sharma', handle: 'priyasharma.feed' },
+  { name: 'Lena Müller',  handle: 'lenamuller.feed'  },
+]
 
 const ALL_CITIES = [
   { name: 'Lagos',        timezone: 'Africa/Lagos',                   region: 'Africa'   },
@@ -49,345 +50,353 @@ const ALL_CITIES = [
   { name: 'Mexico City',  timezone: 'America/Mexico_City',            region: 'Americas' },
   { name: 'Buenos Aires', timezone: 'America/Argentina/Buenos_Aires', region: 'Americas' },
   { name: 'Sydney',       timezone: 'Australia/Sydney',               region: 'Oceania'  },
-];
+]
 
-const REGIONS = ['All', 'Africa', 'Asia', 'Europe', 'Americas', 'Oceania'];
-const MAX_PINNED = 3;
+const REGIONS  = ['All', 'Africa', 'Asia', 'Europe', 'Americas', 'Oceania']
+const MAX_PINNED = 3
 
 function getLocalTime(tz: string) {
-  try { return new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz }); }
-  catch { return '--'; }
+  try { return new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz }) }
+  catch { return '--' }
 }
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function Panel({ children, glow, delay = 0 }: { children: React.ReactNode; glow?: boolean; delay?: number }) {
+/** Dark glass panel */
+function Panel({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   return (
     <div
-      className="owf-fade-up owf-profile-card"
+      className="owf-fade-up"
       style={{
-        background: 'var(--owf-surface)',
-        backdropFilter: 'blur(28px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(28px) saturate(180%)',
-        border: '1px solid var(--owf-border)',
-        borderRadius: '20px',
-        padding: '20px',
-        position: 'relative',
-        animationDelay: `${delay}s`,
-        boxShadow: glow
-          ? `0 8px 32px rgba(var(--owf-horizon-rgb), 0.08), inset 0 1px 0 var(--owf-border)`
-          : `0 4px 20px rgba(0,0,0,0.08), inset 0 1px 0 var(--owf-border)`,
+        background:          'var(--owf-surface)',
+        border:              'none',
+        borderTop:           `1px solid var(--owf-border)`,
+        borderBottom:        `1px solid var(--owf-border)`,
+        padding:             '18px 16px',
+        position:            'relative',
+        animationDelay:      `${delay}s`,
       }}
     >
       {children}
     </div>
-  );
+  )
 }
 
+/** Section label — small caps, cyan, monospaced */
 function Label({ children }: { children: React.ReactNode }) {
   return (
     <p style={{
-      fontSize: '10px', fontWeight: 900, letterSpacing: '0.14em',
-      color: 'var(--owf-text-muted)', marginBottom: '14px', textTransform: 'uppercase',
+      fontSize:      '9px',
+      fontWeight:    700,
+      letterSpacing: '0.20em',
+      color:         CYAN,
+      marginBottom:  '14px',
+      textTransform: 'uppercase',
+      fontFamily:    'monospace',
     }}>
       {children}
     </p>
-  );
+  )
 }
 
-function HorizonLine({ color }: { color?: string }) {
+/** Thin cyan rule */
+function Rule() {
   return (
     <div style={{
-      marginTop: '16px', marginLeft: '-20px', marginRight: '-20px', marginBottom: '-4px', height: '1px',
-      background: color
-        ? `linear-gradient(90deg, transparent 0%, ${color}90 30%, ${color} 50%, ${color}90 70%, transparent 100%)`
-        : `linear-gradient(90deg, transparent 0%, var(--owf-horizon) 40% 60%, transparent 100%)`,
-      opacity: 0.45,
+      height:     '1px',
+      background: `linear-gradient(90deg, transparent, rgba(var(--owf-horizon-rgb), 0.19), transparent)`,
+      margin:     '14px -16px 0',
     }} />
-  );
+  )
 }
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function RightPanel() {
-  const { theme: T } = useTheme();
-
-  const [mounted, setMounted]               = useState(false);
-  const [times, setTimes]                   = useState<Record<string, string>>({});
-  const [aiOpen, setAiOpen]                 = useState(false);
-  const [moodResult, setMoodResult]         = useState('');
-  const [moodLoading, setMoodLoading]       = useState(false);
-  const [summaryResult, setSummaryResult]   = useState('');
-  const [summaryLoading, setSummaryLoading] = useState(false);
-  const [spotIdx, setSpotIdx]               = useState(0);
-  const [homeCity, setHomeCity]             = useState('Lagos');
-  const [pinned, setPinned]                 = useState<string[]>(['Tokyo', 'London', 'New York']);
-  const [showPicker, setShowPicker]         = useState(false);
-  const [settingHome, setSettingHome]       = useState(false);
-  const [search, setSearch]                 = useState('');
-  const [region, setRegion]                 = useState('All');
+  const [mounted, setMounted]               = useState(false)
+  const [times, setTimes]                   = useState<Record<string, string>>({})
+  const [aiOpen, setAiOpen]                 = useState(false)
+  const [moodResult, setMoodResult]         = useState('')
+  const [moodLoading, setMoodLoading]       = useState(false)
+  const [summaryResult, setSummaryResult]   = useState('')
+  const [summaryLoading, setSummaryLoading] = useState(false)
+  const [spotIdx, setSpotIdx]               = useState(0)
+  const [homeCity, setHomeCity]             = useState('Lagos')
+  const [pinned, setPinned]                 = useState<string[]>(['Tokyo', 'London', 'New York'])
+  const [showPicker, setShowPicker]         = useState(false)
+  const [settingHome, setSettingHome]       = useState(false)
+  const [search, setSearch]                 = useState('')
+  const [region, setRegion]                 = useState('All')
 
   useEffect(() => {
-    setMounted(true);
-    const c = localStorage.getItem('owf-cities');
-    const h = localStorage.getItem('owf-home-city');
-    if (c) setPinned(JSON.parse(c));
-    if (h) setHomeCity(h);
-    tick();
-    const id = setInterval(tick, 30000);
-    return () => clearInterval(id);
-  }, []);
+    setMounted(true)
+    const c = localStorage.getItem('owf-cities')
+    const h = localStorage.getItem('owf-home-city')
+    if (c) setPinned(JSON.parse(c))
+    if (h) setHomeCity(h)
+    tick()
+    const id = setInterval(tick, 30000)
+    return () => clearInterval(id)
+  }, [])
 
   function tick() {
-    const t: Record<string, string> = {};
-    ALL_CITIES.forEach(c => { t[c.name] = getLocalTime(c.timezone); });
-    setTimes(t);
+    const t: Record<string, string> = {}
+    ALL_CITIES.forEach(c => { t[c.name] = getLocalTime(c.timezone) })
+    setTimes(t)
   }
 
   function toggleCity(name: string) {
-    if (name === homeCity) return;
+    if (name === homeCity) return
     if (pinned.includes(name)) {
-      const next = pinned.filter(c => c !== name);
-      setPinned(next); localStorage.setItem('owf-cities', JSON.stringify(next));
+      const next = pinned.filter(c => c !== name)
+      setPinned(next); localStorage.setItem('owf-cities', JSON.stringify(next))
     } else {
-      const nonHome = pinned.filter(c => c !== homeCity);
-      if (nonHome.length >= MAX_PINNED) return;
-      const next = [...pinned, name];
-      setPinned(next); localStorage.setItem('owf-cities', JSON.stringify(next));
+      const nonHome = pinned.filter(c => c !== homeCity)
+      if (nonHome.length >= MAX_PINNED) return
+      const next = [...pinned, name]
+      setPinned(next); localStorage.setItem('owf-cities', JSON.stringify(next))
     }
   }
 
   function setAsHome(name: string) {
-    const oldHome = homeCity;
-    setHomeCity(name); localStorage.setItem('owf-home-city', name);
-    const next = pinned.filter(c => c !== name && c !== oldHome).slice(0, MAX_PINNED - 1);
-    setPinned(next); localStorage.setItem('owf-cities', JSON.stringify(next));
-    setSettingHome(false);
+    const oldHome = homeCity
+    setHomeCity(name); localStorage.setItem('owf-home-city', name)
+    const next = pinned.filter(c => c !== name && c !== oldHome).slice(0, MAX_PINNED - 1)
+    setPinned(next); localStorage.setItem('owf-cities', JSON.stringify(next))
+    setSettingHome(false)
   }
 
   async function handleMoodOfDay() {
-    setMoodLoading(true); setMoodResult('');
-    const res = await escalatingCall('right_panel', 'In 2 sentences, describe the overall emotional mood of the world today. Be poetic. Start with an emoji.');
-    setMoodResult(res.text); setMoodLoading(false);
+    setMoodLoading(true); setMoodResult('')
+    const res = await escalatingCall('right_panel', 'In 2 sentences, describe the overall emotional mood of the world today. Be poetic. Start with an emoji.')
+    setMoodResult(res.text); setMoodLoading(false)
   }
 
   async function handleFeedSummary() {
-    setSummaryLoading(true); setSummaryResult('');
-    const res = await escalatingCall('right_panel', 'Give a TL;DR of what people around the world are talking about right now. 3 bullet points, one sentence each. Use city names.');
-    setSummaryResult(res.text); setSummaryLoading(false);
+    setSummaryLoading(true); setSummaryResult('')
+    const res = await escalatingCall('right_panel', 'Give a TL;DR of what people around the world are talking about right now. 3 bullet points, one sentence each. Use city names.')
+    setSummaryResult(res.text); setSummaryLoading(false)
   }
 
   const displayCities = [
     ALL_CITIES.find(c => c.name === homeCity)!,
     ...pinned.filter(n => n !== homeCity).map(n => ALL_CITIES.find(c => c.name === n)!).filter(Boolean),
-  ].filter(Boolean);
+  ].filter(Boolean)
 
   const filteredCities = ALL_CITIES.filter(c => {
-    const byRegion = region === 'All' || c.region === region;
-    const bySearch = c.name.toLowerCase().includes(search.toLowerCase());
-    return byRegion && bySearch;
-  });
+    const byRegion = region === 'All' || c.region === region
+    const bySearch = c.name.toLowerCase().includes(search.toLowerCase())
+    return byRegion && bySearch
+  })
 
-  const nonHomePinned = pinned.filter(c => c !== homeCity).length;
-  const spot = SPOTLIGHT[spotIdx];
+  const nonHomePinned = pinned.filter(c => c !== homeCity).length
+  const spot = SPOTLIGHT[spotIdx]
 
   if (!mounted) return (
-    <aside style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
-      {[140, 60, 180, 200, 140, 320].map((h, i) => (
+    <aside style={{ display: 'flex', flexDirection: 'column', gap: 0, width: '100%' }}>
+      {[130, 60, 80, 200, 160].map((h, i) => (
         <div key={i} style={{
-          height: `${h}px`, borderRadius: '20px',
-          background: 'var(--owf-surface)', border: '1px solid var(--owf-border)',
+          height: `${h}px`,
+          background: 'var(--owf-surface)',
+          borderTop: '1px solid var(--owf-border)',
         }} />
       ))}
     </aside>
-  );
+  )
 
   return (
-    <aside style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%' }}>
+    <aside style={{ display: 'flex', flexDirection: 'column', gap: 0, width: '100%' }}>
 
       {/* ── Spotlight ─────────────────────────────────────────────────────── */}
       <Panel delay={0}>
         <Label>SPOTLIGHT</Label>
         <div
-          className="owf-card-lift"
-          style={{ position: 'relative', borderRadius: '14px', overflow: 'hidden', height: '130px', cursor: 'pointer' }}
           onClick={() => setSpotIdx((spotIdx + 1) % SPOTLIGHT.length)}
+          style={{
+            position:   'relative',
+            overflow:   'hidden',
+            height:     '120px',
+            cursor:     'pointer',
+            border:     `1px solid var(--owf-border)`,
+          }}
         >
-          <img src={spot.image} alt={spot.title} draggable={false}
+          <img
+            src={spot.image}
+            alt={spot.title}
+            draggable={false}
             onContextMenu={e => e.preventDefault()}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', pointerEvents: 'none', display: 'block' }} />
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.72), transparent 50%)' }} />
-          {/* Horizon shimmer on image */}
-          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '2px',
-            background: `linear-gradient(90deg, transparent, ${T.horizon}90, transparent)` }} />
-          <div style={{ position: 'absolute', bottom: '12px', left: '12px', right: '12px' }}>
-            <p style={{ color: '#fff', fontSize: '13px', fontWeight: 700, marginBottom: '2px' }}>{spot.title}</p>
-            <p style={{ color: 'rgba(255,255,255,0.65)', fontSize: '11px' }}>{spot.subtitle}</p>
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', pointerEvents: 'none' }}
+          />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,10,15,0.88), transparent 50%)' }} />
+          {/* Cyan bottom edge */}
+          <div style={{
+            position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px',
+            background: `linear-gradient(90deg, transparent, rgba(var(--owf-horizon-rgb), 0.50), transparent)`,
+          }} />
+          <div style={{ position: 'absolute', bottom: '10px', left: '12px', right: '12px' }}>
+            <p style={{ color: '#fff', fontSize: '12px', fontWeight: 600, letterSpacing: '0.02em', marginBottom: '2px' }}>{spot.title}</p>
+            <p style={{ color: 'var(--owf-text-sub)', fontSize: '10px', letterSpacing: '0.06em', fontFamily: 'monospace' }}>{spot.subtitle}</p>
           </div>
+          {/* Dot indicators */}
           <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', gap: '4px' }}>
             {SPOTLIGHT.map((_, i) => (
-              <div key={i} style={{ width: '5px', height: '5px', borderRadius: '50%',
-                background: i === spotIdx ? T.horizon : 'rgba(255,255,255,0.35)',
-                boxShadow: i === spotIdx ? `0 0 6px ${T.horizon}` : 'none',
-                transition: 'background 0.3s ease, box-shadow 0.3s ease',
+              <div key={i} style={{
+                width: '4px', height: '4px', borderRadius: '50%',
+                background: i === spotIdx ? CYAN : 'var(--owf-text-muted)',
+                boxShadow: i === spotIdx ? `0 0 6px ${CYAN}` : 'none',
+                transition: 'background 0.3s ease',
               }} />
             ))}
           </div>
         </div>
-        <HorizonLine />
+        <Rule />
       </Panel>
 
       {/* ── OWF Radio ─────────────────────────────────────────────────────── */}
       <Panel delay={0.05}>
+        <Label>RADIO</Label>
         <RadioPlayer />
-        <HorizonLine />
+        <Rule />
       </Panel>
 
       {/* ── OWF AI ────────────────────────────────────────────────────────── */}
-      <Panel glow delay={0.1}>
-        <button onClick={() => setAiOpen(!aiOpen)} style={{
-          width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          background: 'none', border: 'none', cursor: 'pointer', padding: 0,
-        }}>
+      <Panel delay={0.1}>
+        <button
+          onClick={() => setAiOpen(!aiOpen)}
+          style={{
+            width:      '100%',
+            display:    'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: 'none',
+            border:     'none',
+            cursor:     'pointer',
+            padding:    0,
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{
-              width: '28px', height: '28px', borderRadius: '9px',
+              width: '22px', height: '22px',
+              border: `1px solid rgba(var(--owf-horizon-rgb), 0.31)`,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: `rgba(var(--owf-horizon-rgb), 0.15)`,
-              border: `1px solid rgba(var(--owf-horizon-rgb), 0.3)`,
-              fontSize: '14px', color: T.horizon,
+              fontSize: '11px', color: CYAN,
+              background: `rgba(var(--owf-horizon-rgb), 0.05)`,
             }}>◈</div>
-            <p style={{ fontSize: '9px', fontWeight: 900, letterSpacing: '0.14em', color: 'var(--owf-text-muted)' }}>OWF AI</p>
             <span style={{
-              fontSize: '8px', fontWeight: 700, padding: '2px 6px', borderRadius: '99px',
-              background: `rgba(var(--owf-horizon-rgb), 0.12)`,
-              color: T.horizon, border: `1px solid rgba(var(--owf-horizon-rgb), 0.2)`,
+              fontSize: '9px', fontWeight: 700, letterSpacing: '0.20em',
+              color: CYAN, fontFamily: 'monospace', textTransform: 'uppercase',
+            }}>OWF AI</span>
+            <span style={{
+              fontSize: '8px', fontWeight: 700, padding: '1px 6px',
+              border: `1px solid rgba(var(--owf-horizon-rgb), 0.25)`, color: CYAN, fontFamily: 'monospace',
+              letterSpacing: '0.1em',
             }}>LIVE</span>
           </div>
-          <span style={{ fontSize: '10px', color: 'var(--owf-text-muted)', transition: 'transform 0.25s',
-            transform: aiOpen ? 'rotate(180deg)' : 'rotate(0deg)', display: 'inline-block' }}>▾</span>
+          <span style={{
+            fontSize: '10px', color: 'var(--owf-text-muted)',
+            transform: aiOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            display: 'inline-block', transition: 'transform 0.25s',
+          }}>▾</span>
         </button>
 
         {aiOpen && (
           <div style={{ marginTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {/* Mood of day */}
-            <div style={{ borderRadius: '12px', padding: '12px', background: 'var(--owf-raised)', border: '1px solid var(--owf-border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <div>
-                  <p style={{ fontSize: '11px', fontWeight: 700, color: 'var(--owf-text)' }}>🌍 Mood of the Day</p>
-                  <p style={{ fontSize: '9px', color: 'var(--owf-text-muted)', marginTop: '1px' }}>AI reads the global feed</p>
-                </div>
-                <button onClick={handleMoodOfDay} disabled={moodLoading} style={{
-                  fontSize: '9px', fontWeight: 800, padding: '5px 10px', borderRadius: '8px', cursor: 'pointer',
-                  background: `rgba(var(--owf-horizon-rgb), 0.15)`, color: T.horizon,
-                  border: `1px solid rgba(var(--owf-horizon-rgb), 0.3)`, opacity: moodLoading ? 0.5 : 1,
-                }}>
-                  {moodLoading ? '···' : moodResult ? '↺' : 'Read'}
-                </button>
-              </div>
-              {moodResult && (
-                <p style={{ fontSize: '11px', lineHeight: 1.6, color: 'var(--owf-text-sub)',
-                  borderLeft: `2px solid ${T.horizon}`, paddingLeft: '8px', margin: 0 }}>{moodResult}</p>
-              )}
-            </div>
+            <AIBlock
+              title="🌍 Mood of the Day"
+              sub="AI reads the global feed"
+              result={moodResult}
+              loading={moodLoading}
+              onRun={handleMoodOfDay}
+            />
             {/* Feed summary */}
-            <div style={{ borderRadius: '12px', padding: '12px', background: 'var(--owf-raised)', border: '1px solid var(--owf-border)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <div>
-                  <p style={{ fontSize: '11px', fontWeight: 700, color: 'var(--owf-text)' }}>📋 Feed Summary</p>
-                  <p style={{ fontSize: '9px', color: 'var(--owf-text-muted)', marginTop: '1px' }}>TL;DR of what's happening</p>
-                </div>
-                <button onClick={handleFeedSummary} disabled={summaryLoading} style={{
-                  fontSize: '9px', fontWeight: 800, padding: '5px 10px', borderRadius: '8px', cursor: 'pointer',
-                  background: `rgba(var(--owf-horizon-rgb), 0.15)`, color: T.horizon,
-                  border: `1px solid rgba(var(--owf-horizon-rgb), 0.3)`, opacity: summaryLoading ? 0.5 : 1,
-                }}>
-                  {summaryLoading ? '···' : summaryResult ? '↺' : 'Read'}
-                </button>
-              </div>
-              {summaryResult && (
-                <p style={{ fontSize: '11px', lineHeight: 1.6, color: 'var(--owf-text-sub)',
-                  borderLeft: `2px solid ${T.horizon}`, paddingLeft: '8px', margin: 0,
-                  whiteSpace: 'pre-line' }}>{summaryResult}</p>
-              )}
-            </div>
+            <AIBlock
+              title="📋 Feed Summary"
+              sub="TL;DR of what's happening"
+              result={summaryResult}
+              loading={summaryLoading}
+              onRun={handleFeedSummary}
+            />
           </div>
         )}
-        <HorizonLine />
+        <Rule />
       </Panel>
 
       {/* ── Trending ──────────────────────────────────────────────────────── */}
       <Panel delay={0.15}>
-        <Label>TRENDING NOW</Label>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <Label>TRENDING</Label>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
           {TRENDING.map((item, i) => (
-            <button key={item.tag} className="owf-collection-row" style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              padding: '10px 12px', borderRadius: '12px', cursor: 'pointer',
-              background: `${item.color}08`, border: `1px solid ${item.color}15`,
-              width: '100%',
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '10px', fontWeight: 900, color: 'var(--owf-text-muted)', width: '14px', textAlign: 'right' }}>{i + 1}</span>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: item.color }}>{item.tag}</span>
-              </div>
-              <span style={{ fontSize: '10px', fontWeight: 600, color: 'var(--owf-text-muted)' }}>{item.count}</span>
-            </button>
+            <TrendRow key={item.tag} rank={i + 1} tag={item.tag} count={item.count} />
           ))}
         </div>
-        <HorizonLine />
+        <Rule />
       </Panel>
 
       {/* ── World Clocks ──────────────────────────────────────────────────── */}
       <Panel delay={0.2}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
           <Label>WORLD CLOCKS</Label>
-          <div style={{ display: 'flex', gap: '4px', marginTop: '-8px' }}>
-            <button onClick={() => { setSettingHome(!settingHome); setShowPicker(false); setSearch(''); setRegion('All'); }}
+          <div style={{ display: 'flex', gap: '4px', marginTop: '-14px' }}>
+            <button
+              onClick={() => { setSettingHome(!settingHome); setShowPicker(false); setSearch(''); setRegion('All') }}
               style={{
-                fontSize: '9px', fontWeight: 800, padding: '4px 8px', borderRadius: '7px', cursor: 'pointer',
-                color: settingHome ? '#fff' : T.horizon,
-                background: settingHome ? T.horizon : `rgba(var(--owf-horizon-rgb), 0.10)`,
-                border: `1px solid rgba(var(--owf-horizon-rgb), 0.25)`,
-              }}>
-              {settingHome ? 'Cancel' : '🏠'}
+                fontSize: '8px', fontWeight: 700, padding: '3px 8px', cursor: 'pointer',
+                fontFamily: 'monospace', letterSpacing: '0.08em',
+                color: settingHome ? 'var(--owf-bg)' : CYAN,
+                background: settingHome ? CYAN : 'transparent',
+                border: `1px solid rgba(var(--owf-horizon-rgb), 0.31)`,
+              }}
+            >
+              {settingHome ? 'CANCEL' : 'HOME'}
             </button>
-            <button onClick={() => { setShowPicker(!showPicker); setSettingHome(false); setSearch(''); setRegion('All'); }}
+            <button
+              onClick={() => { setShowPicker(!showPicker); setSettingHome(false); setSearch(''); setRegion('All') }}
               style={{
-                fontSize: '9px', fontWeight: 800, padding: '4px 8px', borderRadius: '7px', cursor: 'pointer',
-                color: showPicker ? '#fff' : T.horizon,
-                background: showPicker ? T.horizon : `rgba(var(--owf-horizon-rgb), 0.10)`,
-                border: `1px solid rgba(var(--owf-horizon-rgb), 0.25)`,
-              }}>
-              {showPicker ? 'Done' : '+ Cities'}
+                fontSize: '8px', fontWeight: 700, padding: '3px 8px', cursor: 'pointer',
+                fontFamily: 'monospace', letterSpacing: '0.08em',
+                color: showPicker ? 'var(--owf-bg)' : CYAN,
+                background: showPicker ? CYAN : 'transparent',
+                border: `1px solid rgba(var(--owf-horizon-rgb), 0.31)`,
+              }}
+            >
+              {showPicker ? 'DONE' : '+ CITY'}
             </button>
           </div>
         </div>
 
         {!showPicker && !settingHome && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
             {displayCities.map((city, i) => (
-              <div key={city.name} className="owf-mood-transition" style={{
+              <div key={city.name} style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                padding: '8px 10px', borderRadius: '11px',
-                background: i === 0 ? `rgba(var(--owf-horizon-rgb), 0.08)` : 'transparent',
-                border: i === 0 ? `1px solid rgba(var(--owf-horizon-rgb), 0.15)` : '1px solid transparent',
+                padding: '8px 10px',
+                background: i === 0 ? `rgba(var(--owf-horizon-rgb), 0.03)` : 'transparent',
+                borderLeft: i === 0 ? `2px solid ${CYAN}` : '2px solid transparent',
               }}>
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--owf-text)' }}>{city.name}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--owf-text)', letterSpacing: '0.02em' }}>{city.name}</span>
                     {city.name === homeCity && (
-                      <span style={{ fontSize: '7px', fontWeight: 900, padding: '1px 5px', borderRadius: '99px',
-                        background: T.horizon, color: T.isDark ? '#000' : '#fff' }}>HOME</span>
+                      <span style={{
+                        fontSize: '7px', fontWeight: 700, padding: '1px 5px',
+                        border: `1px solid rgba(var(--owf-horizon-rgb), 0.31)`, color: CYAN,
+                        fontFamily: 'monospace', letterSpacing: '0.12em',
+                      }}>HOME</span>
                     )}
                   </div>
-                  <p style={{ fontSize: '10px', color: 'var(--owf-text-muted)', marginTop: '1px' }}>{times[city.name] || '--'}</p>
+                  <p style={{ fontSize: '10px', color: 'var(--owf-text-muted)', marginTop: '1px', fontFamily: 'monospace' }}>
+                    {times[city.name] || '--'}
+                  </p>
                 </div>
                 {city.name !== homeCity && (
-                  <button onClick={() => toggleCity(city.name)} style={{
-                    fontSize: '11px', color: 'var(--owf-text-muted)', background: 'none',
-                    border: 'none', cursor: 'pointer', opacity: 0.5, padding: '2px 6px',
-                  }}>✕</button>
+                  <button
+                    onClick={() => toggleCity(city.name)}
+                    style={{
+                      fontSize: '11px', color: 'var(--owf-text-muted)',
+                      background: 'none', border: 'none', cursor: 'pointer', padding: '2px 6px',
+                    }}
+                  >✕</button>
                 )}
               </div>
             ))}
@@ -396,99 +405,185 @@ export default function RightPanel() {
 
         {(settingHome || showPicker) && (
           <div>
-            <p style={{ fontSize: '10px', color: 'var(--owf-text-muted)', marginBottom: '8px', fontWeight: 600 }}>
-              {settingHome ? 'Tap a city to set as home' : `Select up to ${MAX_PINNED} cities (${nonHomePinned}/${MAX_PINNED})`}
+            <p style={{ fontSize: '9px', color: 'var(--owf-text-muted)', marginBottom: '8px', fontFamily: 'monospace', letterSpacing: '0.06em' }}>
+              {settingHome ? 'SELECT HOME CITY' : `SELECT UP TO ${MAX_PINNED} · ${nonHomePinned}/${MAX_PINNED}`}
             </p>
-            <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+            <input
+              type="text" value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Search cities..."
               style={{
-                width: '100%', fontSize: '11px', padding: '7px 10px', borderRadius: '9px',
-                background: 'var(--owf-raised)', border: '1px solid var(--owf-border)',
-                color: 'var(--owf-text)', outline: 'none', boxSizing: 'border-box', marginBottom: '8px',
-              }} />
+                width: '100%', fontSize: '11px', padding: '7px 10px',
+                background: 'var(--owf-bg)', border: `1px solid rgba(var(--owf-horizon-rgb), 0.20)`,
+                color: 'var(--owf-text)', outline: 'none', boxSizing: 'border-box',
+                marginBottom: '8px', fontFamily: 'monospace',
+              }}
+            />
             <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '8px' }}>
               {REGIONS.map(r => (
-                <button key={r} onClick={() => setRegion(r)} style={{
-                  fontSize: '8px', fontWeight: 700, padding: '3px 7px', borderRadius: '6px', cursor: 'pointer',
-                  background: region === r ? T.horizon : 'var(--owf-raised)',
-                  color: region === r ? (T.isDark ? '#000' : '#fff') : 'var(--owf-text-muted)',
-                  border: '1px solid var(--owf-border)',
-                }}>{r}</button>
+                <button
+                  key={r}
+                  onClick={() => setRegion(r)}
+                  style={{
+                    fontSize: '8px', fontWeight: 700, padding: '2px 7px', cursor: 'pointer',
+                    fontFamily: 'monospace', letterSpacing: '0.06em',
+                    background: region === r ? CYAN : 'transparent',
+                    color: region === r ? 'var(--owf-bg)' : 'var(--owf-text-muted)',
+                    border: `1px solid ${region === r ? CYAN : 'var(--owf-border)'}`,
+                  }}
+                >{r}</button>
               ))}
             </div>
-            <div style={{ maxHeight: '200px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            <div style={{ maxHeight: '200px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1px' }}>
               {filteredCities.map(city => {
-                const isPinned = pinned.includes(city.name);
-                const isHome = city.name === homeCity;
-                const atMax = !isPinned && !isHome && nonHomePinned >= MAX_PINNED;
+                const isPinned = pinned.includes(city.name)
+                const isHome   = city.name === homeCity
+                const atMax    = !isPinned && !isHome && nonHomePinned >= MAX_PINNED
                 return (
-                  <button key={city.name}
+                  <button
+                    key={city.name}
                     onClick={() => showPicker ? toggleCity(city.name) : setAsHome(city.name)}
                     disabled={showPicker ? (isHome || atMax) : false}
                     style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                      padding: '6px 8px', borderRadius: '8px', cursor: atMax ? 'not-allowed' : 'pointer',
-                      background: (isPinned && showPicker) || (isHome && settingHome) ? `rgba(var(--owf-horizon-rgb), 0.10)` : 'transparent',
-                      border: 'none', opacity: atMax ? 0.3 : 1, textAlign: 'left',
-                    }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      {showPicker && (
-                        <div style={{
-                          width: '14px', height: '14px', borderRadius: '4px', flexShrink: 0,
-                          background: isPinned ? T.horizon : 'var(--owf-border)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: '8px', color: isPinned ? (T.isDark ? '#000' : '#fff') : 'transparent',
-                        }}>✓</div>
-                      )}
-                      <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--owf-text)' }}>{city.name}</span>
-                      {isHome && <span style={{ fontSize: '7px', fontWeight: 900, padding: '1px 5px', borderRadius: '99px',
-                        background: T.horizon, color: T.isDark ? '#000' : '#fff' }}>HOME</span>}
-                    </div>
-                    <span style={{ fontSize: '9px', color: 'var(--owf-text-muted)' }}>{city.region}</span>
+                      padding: '5px 8px', cursor: atMax ? 'not-allowed' : 'pointer',
+                      background: (isPinned && showPicker) || (isHome && settingHome) ? `rgba(var(--owf-horizon-rgb), 0.06)` : 'transparent',
+                      border: 'none', opacity: atMax ? 0.25 : 1, textAlign: 'left',
+                      borderLeft: (isPinned && showPicker) ? `2px solid ${CYAN}` : '2px solid transparent',
+                    }}
+                  >
+                    <span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--owf-text-sub)' }}>{city.name}</span>
+                    <span style={{ fontSize: '9px', color: 'var(--owf-text-muted)', fontFamily: 'monospace' }}>{city.region}</span>
                   </button>
-                );
+                )
               })}
             </div>
           </div>
         )}
-        <HorizonLine />
+        <Rule />
       </Panel>
 
       {/* ── Who to Follow ─────────────────────────────────────────────────── */}
       <Panel delay={0.25}>
         <Label>WHO TO FOLLOW</Label>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {WHO_TO_FOLLOW.map(person => (
-            <div key={person.handle} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div className="owf-avatar-pulse" style={{
-                  width: '42px', height: '42px', borderRadius: '14px', flexShrink: 0,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#fff', fontSize: '16px', fontWeight: 900,
-                  background: `linear-gradient(135deg, ${person.color}, ${person.color}99)`,
-                  boxShadow: `0 0 14px ${person.color}40`,
-                }}>{person.name.charAt(0)}</div>
-                <div>
-                  <p style={{ fontSize: '13px', fontWeight: 700, color: 'var(--owf-text)' }}>{person.name}</p>
-                  <p style={{ fontSize: '11px', color: 'var(--owf-text-muted)', marginTop: '2px' }}>{person.handle}</p>
-                </div>
-              </div>
-              <button className="owf-card-lift" style={{
-                fontSize: '11px', fontWeight: 700, padding: '6px 14px', borderRadius: '99px', cursor: 'pointer',
-                background: `${person.color}15`, color: person.color, border: `1px solid ${person.color}30`,
-              }}>Follow</button>
-            </div>
+            <FollowRow key={person.handle} person={person} />
           ))}
         </div>
-        <HorizonLine />
+        <Rule />
       </Panel>
 
       {/* ── Theme Selector ────────────────────────────────────────────────── */}
       <Panel delay={0.3}>
+        <Label>INTERFACE</Label>
         <ThemeSelector />
-        <HorizonLine />
+        <Rule />
       </Panel>
 
     </aside>
-  );
+  )
 }
+
+// ─── Sub-row components ───────────────────────────────────────────────────────
+
+function TrendRow({ rank, tag, count }: { rank: number; tag: string; count: string }) {
+  const [hov, setHov] = useState(false)
+  return (
+    <button
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '8px 6px', cursor: 'pointer',
+        background: hov ? `rgba(var(--owf-horizon-rgb), 0.02)` : 'transparent',
+        border: 'none', width: '100%',
+        borderLeft: hov ? `2px solid rgba(var(--owf-horizon-rgb), 0.31)` : '2px solid transparent',
+        transition: 'all 0.15s',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--owf-text-muted)', width: '12px', textAlign: 'right', fontFamily: 'monospace' }}>{rank}</span>
+        <span style={{ fontSize: '12px', fontWeight: 500, color: hov ? 'var(--owf-text)' : CYAN, fontFamily: 'monospace', letterSpacing: '0.04em', transition: 'color 0.15s' }}>{tag}</span>
+      </div>
+      <span style={{ fontSize: '9px', color: 'var(--owf-text-muted)', fontFamily: 'monospace' }}>{count}</span>
+    </button>
+  )
+}
+
+function FollowRow({ person }: { person: { name: string; handle: string } }) {
+  const [hov, setHov] = useState(false)
+  const initials = person.name.split(' ').map(w => w[0]).join('').toUpperCase()
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* Avatar */}
+        <div style={{
+          width: '34px', height: '34px', flexShrink: 0,
+          border: `1px solid rgba(var(--owf-horizon-rgb), 0.19)`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: CYAN, fontSize: '12px', fontWeight: 700, fontFamily: 'monospace',
+          background: `rgba(var(--owf-horizon-rgb), 0.03)`,
+        }}>{initials}</div>
+        <div>
+          <p style={{ fontSize: '12px', fontWeight: 600, color: 'var(--owf-text)', letterSpacing: '0.02em' }}>{person.name}</p>
+          <p style={{ fontSize: '10px', color: 'var(--owf-text-muted)', marginTop: '1px', fontFamily: 'monospace' }}>{person.handle}</p>
+        </div>
+      </div>
+      <button
+        onMouseEnter={() => setHov(true)}
+        onMouseLeave={() => setHov(false)}
+        style={{
+          fontSize: '9px', fontWeight: 700, padding: '5px 12px', cursor: 'pointer',
+          background: hov ? CYAN : 'transparent',
+          color: hov ? 'var(--owf-bg)' : CYAN,
+          border: `1px solid rgba(var(--owf-horizon-rgb), 0.31)`,
+          fontFamily: 'monospace', letterSpacing: '0.1em',
+          transition: 'background 0.15s, color 0.15s',
+        }}
+      >FOLLOW</button>
+    </div>
+  )
+}
+
+function AIBlock({
+  title, sub, result, loading, onRun,
+}: {
+  title: string; sub: string; result: string; loading: boolean; onRun: () => void
+}) {
+  const [hov, setHov] = useState(false)
+  return (
+    <div style={{ padding: '10px', background: 'var(--owf-bg)', border: `1px solid var(--owf-border)` }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+        <div>
+          <p style={{ fontSize: '11px', fontWeight: 600, color: 'var(--owf-text)' }}>{title}</p>
+          <p style={{ fontSize: '9px', color: 'var(--owf-text-muted)', marginTop: '1px', fontFamily: 'monospace' }}>{sub}</p>
+        </div>
+        <button
+          onClick={onRun}
+          disabled={loading}
+          onMouseEnter={() => setHov(true)}
+          onMouseLeave={() => setHov(false)}
+          style={{
+            fontSize: '8px', fontWeight: 800, padding: '4px 10px', cursor: 'pointer',
+            background: hov ? CYAN : 'transparent',
+            color: hov ? 'var(--owf-bg)' : CYAN,
+            border: `1px solid rgba(var(--owf-horizon-rgb), 0.31)`,
+            fontFamily: 'monospace', letterSpacing: '0.1em',
+            opacity: loading ? 0.4 : 1,
+            transition: 'background 0.15s, color 0.15s',
+          }}
+        >
+          {loading ? '···' : result ? '↺' : 'READ'}
+        </button>
+      </div>
+      {result && (
+        <p style={{
+          fontSize: '11px', lineHeight: 1.65, color: 'var(--owf-text-sub)',
+          borderLeft: `2px solid ${CYAN}`, paddingLeft: '8px', margin: 0,
+          whiteSpace: 'pre-line',
+        }}>{result}</p>
+      )}
+    </div>
+  )
+}
+

@@ -21,16 +21,16 @@ import { sanitizeProfileFields, sanitizeUrl, sanitizeText, LIMITS } from '@/lib/
 const GUEST_ID = 'guest_preview';
 const LANGUAGES = ['English','French','Arabic','Spanish','Portuguese','Swahili','Yoruba','Mandarin','Hindi','Japanese'];
 const PRONOUNS = ['he/him','she/her','they/them','he/they','she/they','any/all'];
-const ACCENT_COLORS = ['#D97706','#E8650A','#CC0022','#0284C7','#1B5E20','#7C3AED','#00DCBE','#DB2777'];
+const ACCENT_COLORS = ['#00d4ff','#818cf8','#34d399','#a78bfa','#f87171','#38bdf8','#6ee7b7','#c084fc'];
 const COVER_GRADIENTS = [
-  {id:'dawn',g:'linear-gradient(160deg,#FEE4C0,#FEC89A,#C9B8FF)'},
-  {id:'noon',g:'linear-gradient(160deg,#BAE6FD,#E0F2FE,#FEF9C3)'},
-  {id:'golden',g:'linear-gradient(160deg,#FEF3C7,#FDE68A,#FDBA74)'},
-  {id:'dusk',g:'linear-gradient(160deg,#DDD6FE,#C4B5FD,#FCA5A5)'},
-  {id:'blush',g:'linear-gradient(160deg,#FFE4E6,#FECDD3,#FED7AA)'},
-  {id:'sage',g:'linear-gradient(160deg,#DCFCE7,#BBF7D0,#BAE6FD)'},
-  {id:'sand',g:'linear-gradient(160deg,#FDF6EC,#F5EFE0,#EDE3CC)'},
-  {id:'twilight',g:'linear-gradient(160deg,#E0E7FF,#C7D2FE,#FDE68A)'},
+  {id:'obsidian', g:'linear-gradient(160deg,#0a0a0f,#0d1a2a)'},
+  {id:'deep',     g:'linear-gradient(160deg,#080810,#0d0d20,#0a1520)'},
+  {id:'aurora',   g:'linear-gradient(160deg,#050d18,#0d1a2a,#081420)'},
+  {id:'void',     g:'linear-gradient(160deg,#060608,#0d0d14,#0a0a12)'},
+  {id:'nebula',   g:'linear-gradient(160deg,#0a0814,#100820,#080d18)'},
+  {id:'steel',    g:'linear-gradient(160deg,#080c14,#0d1420,#060c18)'},
+  {id:'midnight', g:'linear-gradient(160deg,#04040a,#0a0a14,#060a14)'},
+  {id:'horizon',  g:'linear-gradient(160deg,#08101a,#0d1a28,#060e1a)'},
 ];
 
 function clockStyle(h:number,dark:boolean){if(h>=5&&h<8)return{bg:'linear-gradient(160deg,#92400E,#D97706,#F59E0B)',sub:'rgba(255,255,255,0.8)'};if(h>=8&&h<12)return{bg:dark?'linear-gradient(160deg,#1E3A5F,#0EA5E9,#38BDF8)':'linear-gradient(160deg,#0EA5E9,#38BDF8,#BAE6FD)',sub:'rgba(255,255,255,0.85)'};if(h>=12&&h<16)return{bg:'linear-gradient(160deg,#92400E,#F59E0B,#FCD34D)',sub:'rgba(255,255,255,0.9)'};if(h>=16&&h<19)return{bg:'linear-gradient(160deg,#7C2D12,#EA580C,#F97316)',sub:'rgba(255,255,255,0.85)'};if(h>=19&&h<21)return{bg:'linear-gradient(160deg,#3B0764,#7C3AED,#A78BFA)',sub:'rgba(255,255,255,0.8)'};return{bg:'linear-gradient(160deg,#020617,#0F172A,#1E3A5F)',sub:'rgba(255,255,255,0.55)'};}
@@ -98,7 +98,7 @@ const WIDGET_BTNS = [
 interface NowPlaying{track:string;artist:string;playing:boolean;station?:string;}
 interface Profile{displayName:string;handle:string;bio:string;city:string;country:string;pronouns:string;languages:string[];website:string;joinDate:string;accentColor:string;coverStyle:string;coverImage:string;coverImagePosition:{x:number;y:number};handleChangedAt:string;visitedCountries:string[];nowPlaying:NowPlaying;}
 interface Weather{temp:number;condition:string;city:string;}
-const DEFAULT:Profile={displayName:'Your Name',handle:'yourhandle.feed',bio:'',city:'Los Angeles',country:'United States',pronouns:'',languages:[],website:'',joinDate:new Date().toISOString().split('T')[0],accentColor:'#D97706',coverStyle:'sand',coverImage:'',coverImagePosition:{x:50,y:50},handleChangedAt:'',visitedCountries:['US','CA','MX'],nowPlaying:{track:'',artist:'',playing:false}};
+const DEFAULT:Profile={displayName:'Your Name',handle:'yourhandle.feed',bio:'',city:'Los Angeles',country:'United States',pronouns:'',languages:[],website:'',joinDate:new Date().toISOString().split('T')[0],accentColor:'#00d4ff',coverStyle:'obsidian',coverImage:'',coverImagePosition:{x:50,y:50},handleChangedAt:'',visitedCountries:['US','CA','MX'],nowPlaying:{track:'',artist:'',playing:false}};
 function ini(n:string){return n.split(' ').map(x=>x[0]).join('').toUpperCase().slice(0,2)||'?';}
 function fmtDate(d:string){try{return new Date(d).toLocaleDateString('en-US',{month:'long',year:'numeric'});}catch{return '';}}
 function canChangeHandle(at:string){return !at||Date.now()-new Date(at).getTime()>365*24*60*60*1000;}
@@ -291,8 +291,8 @@ export default function ProfilePage(){
 
   if(loading)return(<div style={{display:'flex',alignItems:'center',justifyContent:'center',minHeight:'100vh',background:'var(--owf-bg)'}}><div style={{fontSize:'14px',color:accent}}>Loading…</div></div>);
 
-  const PC={background:T.surface,backdropFilter:'blur(28px) saturate(180%)',WebkitBackdropFilter:'blur(28px) saturate(180%)',border:`1px solid ${T.border}`,borderRadius:'20px',padding:'16px',boxShadow:T.isDark?`0 8px 32px rgba(0,0,0,0.4),0 0 0 1px ${accent}15`:`0 6px 24px rgba(0,0,0,0.05),0 0 0 1px ${accent}10`} as React.CSSProperties;
-  const LS={color:T.textMuted,fontSize:'10px',fontWeight:900,letterSpacing:'0.12em'} as React.CSSProperties;
+  const PC={background:'var(--owf-surface)',backdropFilter:'blur(28px)',WebkitBackdropFilter:'blur(28px)',border:`1px solid var(--owf-border)`,borderRadius:0,padding:'16px',boxShadow:`0 8px 32px rgba(0,0,0,0.5),0 0 0 1px ${accent}12`} as React.CSSProperties;
+  const LS={color:accent,fontSize:'9px',fontWeight:700,letterSpacing:'0.20em',fontFamily:'monospace',textTransform:'uppercase' as const} as React.CSSProperties;
 
   // ── SHARED PANEL CONTENT RENDERERS ──────────────────────
 
@@ -434,7 +434,7 @@ export default function ProfilePage(){
     <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px'}}>
       <div style={{borderRadius:'16px',height:'100px',background:'linear-gradient(135deg,#3B82F6,#6366F1)',display:'flex',alignItems:'center',justifyContent:'center',position:'relative',cursor:'pointer',boxShadow:'0 4px 16px rgba(59,130,246,0.35)'}}>
         <span style={{fontSize:'28px'}}>🏙️</span>
-        <div style={{position:'absolute',bottom:'7px',left:'10px',fontSize:'10px',fontWeight:900,color:'rgba(255,255,255,0.9)'}}>7:15 AM</div>
+        <div style={{position:'absolute',bottom:'7px',left:'10px',fontSize:'10px',fontWeight:900,color:'var(--owf-text)'}}>7:15 AM</div>
       </div>
       <div style={{borderRadius:'16px',height:'100px',background:'linear-gradient(135deg,#F59E0B,#EF4444)',display:'flex',alignItems:'center',justifyContent:'center',cursor:'pointer',boxShadow:'0 4px 16px rgba(245,158,11,0.35)'}}>
         <span style={{fontSize:'28px'}}>😄</span>
@@ -497,13 +497,13 @@ export default function ProfilePage(){
       }
     `}</style>
 
-    <div className="pr grain" style={{minHeight:'100vh',background:'var(--owf-bg)',color:'var(--owf-text)',position:'relative'}}
+    <div className="pr" style={{minHeight:'100vh',background:'var(--owf-bg)',color:'var(--owf-text)',position:'relative'}}
       onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
 
       {/* AURORA BG */}
       <div style={{position:'fixed',inset:0,overflow:'hidden',zIndex:0,pointerEvents:'none'}}>
-        <div className="aura" style={{position:'absolute',top:'-20%',left:'20%',width:'65vw',height:'65vw',borderRadius:'50%',background:`radial-gradient(ellipse,${accent}25 0%,transparent 70%)`,filter:'blur(80px)'}}/>
-        <div className="aura" style={{position:'absolute',bottom:'-15%',right:'5%',width:'50vw',height:'50vw',borderRadius:'50%',background:`radial-gradient(ellipse,${accent}15 0%,transparent 70%)`,filter:'blur(80px)',animationDelay:'-4s'}}/>
+        <div className="aura" style={{position:'absolute',top:'-20%',left:'20%',width:'65vw',height:'65vw',borderRadius:'50%',background:`radial-gradient(ellipse,${accent}14 0%,transparent 70%)`,filter:'blur(120px)'}}/>
+        <div className="aura" style={{position:'absolute',bottom:'-15%',right:'5%',width:'50vw',height:'50vw',borderRadius:'50%',background:`radial-gradient(ellipse,${accent}08 0%,transparent 70%)`,filter:'blur(120px)',animationDelay:'-4s'}}/>
       </div>
 
       {/* ── MOBILE DRAWER (left panel) ──────────────────── */}
@@ -517,7 +517,7 @@ export default function ProfilePage(){
                 <div style={{width:'36px',height:'36px',borderRadius:'12px',display:'flex',alignItems:'center',justifyContent:'center',color:'#fff',fontWeight:900,fontSize:'15px',fontFamily:"'Playfair Display',serif",backgroundColor:accent}}>{ini(profile.displayName)}</div>
                 <div><p style={{fontSize:'13px',fontWeight:700,color:T.text}}>{profile.displayName}</p><p style={{fontSize:'11px',color:accent}}>{profile.handle}</p></div>
               </div>
-              <button onClick={()=>setDrawerOpen(false)} style={{width:'28px',height:'28px',borderRadius:'8px',background:T.isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.05)',border:'none',cursor:'pointer',fontSize:'14px',color:T.textSub,display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
+              <button onClick={()=>setDrawerOpen(false)} style={{width:'28px',height:'28px',borderRadius:'8px',background:T.isDark?'var(--owf-border)':'rgba(0,0,0,0.05)',border:'none',cursor:'pointer',fontSize:'14px',color:T.textSub,display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
             </div>
             {/* Drawer content — scrollable */}
             <div className="ns" style={{flex:1,overflowY:'auto',padding:'16px',display:'flex',flexDirection:'column',gap:'20px'}}>
@@ -551,10 +551,10 @@ export default function ProfilePage(){
           <div onClick={e=>e.stopPropagation()} style={{position:'absolute',bottom:72,left:0,right:0,background:T.isDark?'#0F1525':T.bg,borderRadius:'24px 24px 0 0',border:`1px solid ${T.border}`,borderBottom:'none',animation:'sheetUp .3s cubic-bezier(.2,.8,.3,1)',maxHeight:'75vh',display:'flex',flexDirection:'column',zIndex:91,boxShadow:`0 -8px 40px rgba(0,0,0,0.25), 0 0 0 1px ${accent}20`}}>
             {/* Sheet handle */}
             <div style={{display:'flex',flexDirection:'column',alignItems:'center',padding:'12px 20px 0'}}>
-              <div style={{width:'36px',height:'4px',borderRadius:'99px',background:T.isDark?'rgba(255,255,255,0.2)':'rgba(0,0,0,0.15)',marginBottom:'14px'}}/>
+              <div style={{width:'36px',height:'4px',borderRadius:'99px',background:T.isDark?'var(--owf-text-muted)':'rgba(0,0,0,0.15)',marginBottom:'14px'}}/>
               <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',width:'100%',marginBottom:'16px'}}>
                 <h3 style={{fontSize:'15px',fontWeight:700,color:T.text}}>{widgetContent[activeWidget]?.title}</h3>
-                <button onClick={()=>setActiveWidget(null)} style={{width:'28px',height:'28px',borderRadius:'8px',background:T.isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)',border:'none',cursor:'pointer',fontSize:'14px',color:T.textSub,display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
+                <button onClick={()=>setActiveWidget(null)} style={{width:'28px',height:'28px',borderRadius:'8px',background:T.isDark?'var(--owf-border)':'rgba(0,0,0,0.06)',border:'none',cursor:'pointer',fontSize:'14px',color:T.textSub,display:'flex',alignItems:'center',justifyContent:'center'}}>✕</button>
               </div>
             </div>
             <div className="ns" style={{overflowY:'auto',padding:'0 20px 20px'}}>
@@ -566,13 +566,15 @@ export default function ProfilePage(){
 
       {/* COVER */}
       <div style={{position:'relative',zIndex:1,height:'160px',overflow:'hidden',background:isCoverImg?`url(${coverBg}) ${(editing?coverPosition:profile.coverImagePosition??{x:50,y:50}).x}% ${(editing?coverPosition:profile.coverImagePosition??{x:50,y:50}).y}% / cover no-repeat`:coverBg}}>
-        {/* Light sweep animation */}
-        <div className="owf-banner-sweep" style={{position:'absolute',inset:0,background:`linear-gradient(108deg, transparent 25%, ${accent}09 50%, transparent 75%)`,pointerEvents:'none',zIndex:2}} />
-        <div style={{position:'absolute',inset:0,background:T.isDark?'linear-gradient(to bottom,transparent 25%,rgba(8,11,20,0.97) 100%)':'linear-gradient(to bottom,transparent 25%,rgba(250,250,247,0.97) 100%)',zIndex:1}}/>
+        {/* Scanline texture */}
+        <div style={{position:'absolute',inset:0,backgroundImage:'repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px)',pointerEvents:'none',zIndex:2}} />
+        {/* Cyan bottom border */}
+        <div style={{position:'absolute',bottom:0,left:0,right:0,height:'1px',background:'linear-gradient(90deg,transparent,rgba(var(--owf-horizon-rgb),0.50),transparent)',zIndex:3}} />
+        <div style={{position:'absolute',inset:0,background:'linear-gradient(to bottom,transparent 25%,rgba(8,8,16,0.97) 100%)',zIndex:1}}/>
         {/* Mobile: hamburger to open drawer */}
         {isMobile&&!editing&&(
-          <button onClick={()=>setDrawerOpen(true)} style={{position:'absolute',top:'14px',right:'14px',zIndex:5,width:'36px',height:'36px',borderRadius:'10px',background:'rgba(255,255,255,0.15)',backdropFilter:'blur(8px)',border:`1px solid rgba(255,255,255,0.25)`,cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'4px'}}>
-            {[0,1,2].map(i=><div key={i} style={{width:'14px',height:'2px',borderRadius:'99px',background:'rgba(255,255,255,0.9)'}}/>)}
+          <button onClick={()=>setDrawerOpen(true)} style={{position:'absolute',top:'14px',right:'14px',zIndex:5,width:'36px',height:'36px',borderRadius:'10px',background:'var(--owf-text-muted)',backdropFilter:'blur(8px)',border:`1px solid var(--owf-text-muted)`,cursor:'pointer',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:'4px'}}>
+            {[0,1,2].map(i=><div key={i} style={{width:'14px',height:'2px',borderRadius:'99px',background:'var(--owf-text)'}}/>)}
           </button>
         )}
         {editing&&(<div style={{position:'absolute',bottom:'26px',right:'14px',zIndex:4,display:'flex',gap:'7px',flexWrap:'wrap',justifyContent:'flex-end'}}>
@@ -631,7 +633,7 @@ export default function ProfilePage(){
           <div className="desktop-center" style={{flex:1,minWidth:0,marginTop:'-16px'}}>
 
             {/* IDENTITY CARD */}
-            <div className="owf-fade-up owf-profile-card" style={{...PC,marginBottom:'14px',position:'relative',overflow:'visible',borderRadius:'22px',padding:'18px',boxShadow:T.isDark?`0 8px 40px rgba(0,0,0,0.4),0 0 0 1px ${accent}20,inset 0 1px 0 rgba(255,255,255,0.06)`:`0 8px 40px rgba(0,0,0,0.06),0 0 0 1px ${accent}15,inset 0 1px 0 rgba(255,255,255,0.95)`}}>
+            <div className="owf-fade-up owf-profile-card" style={{...PC,marginBottom:'1px',position:'relative',overflow:'visible',borderRadius:0,padding:'18px',boxShadow:`0 8px 40px rgba(0,0,0,0.5),inset 0 0 60px rgba(var(--owf-horizon-rgb),0.02)`}}>
               <div style={{position:'absolute',inset:'-1px',borderRadius:'23px',pointerEvents:'none',background:`linear-gradient(135deg,${accent}40,transparent 50%,${accent}18)`,zIndex:-1,filter:'blur(1px)'}}/>
               <div style={{display:'flex',alignItems:'flex-start',gap:'14px'}}>
                 <div style={{flexShrink:0}}>
@@ -656,20 +658,20 @@ export default function ProfilePage(){
                 </div>
                 <div style={{flex:1,minWidth:0}}>
                   {editing?(<div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
-                    <input value={draft.displayName} onChange={e=>setDraft(p=>({...p,displayName:e.target.value}))} style={{fontFamily:"'Playfair Display',serif",fontSize:'20px',fontWeight:900,background:'transparent',border:'none',borderBottom:`2px solid ${accent}`,outline:'none',color:T.text,width:'100%'}} placeholder="Your name"/>
+                    <input value={draft.displayName} onChange={e=>setDraft(p=>({...p,displayName:e.target.value}))} style={{fontFamily:'inherit',fontSize:'20px',fontWeight:300,background:'transparent',border:'none',borderBottom:`1px solid ${accent}60`,outline:'none',color:'var(--owf-text)',width:'100%',letterSpacing:'-0.02em'}} placeholder="Your name"/>
                     <div style={{display:'flex',alignItems:'center',gap:'5px'}}>
                       {canChangeHandle(profile.handleChangedAt)?(<><input value={draft.handle.replace('.feed','')} onChange={e=>setDraft(p=>({...p,handle:e.target.value.replace(/[\s.]/g,'').toLowerCase()+'.feed'}))} style={{fontSize:'12px',background:'transparent',border:'none',borderBottom:`1px solid ${T.border}`,outline:'none',color:accent,width:'110px'}}/><span style={{fontSize:'12px',fontWeight:600,color:accent}}>.feed</span></>):(<span style={{fontSize:'12px',fontWeight:600,color:accent}}>{profile.handle}</span>)}
                     </div>
                   </div>):(<div>
                     <div style={{display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}}>
-                      <h1 className="sf" style={{fontSize:'clamp(18px,4vw,26px)',fontWeight:900,color:T.text,lineHeight:1.15,margin:0}}>{profile.displayName}</h1>
-                      {weather&&<div style={{display:'flex',alignItems:'center',gap:'4px',padding:'3px 8px',borderRadius:'99px',background:T.isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.05)',border:`1px solid ${T.border}`}}><span style={{fontSize:'12px'}}>{weather.condition}</span><span style={{fontSize:'11px',fontWeight:700,color:T.text}}>{weather.temp}°C</span></div>}
+                      <h1 style={{fontSize:'clamp(18px,4vw,26px)',fontWeight:300,color:'var(--owf-text)',lineHeight:1.15,margin:0,letterSpacing:'-0.02em'}}>{profile.displayName}</h1>
+                      {weather&&<div style={{display:'flex',alignItems:'center',gap:'4px',padding:'3px 8px',borderRadius:'99px',background:T.isDark?'var(--owf-border)':'rgba(0,0,0,0.05)',border:`1px solid ${T.border}`}}><span style={{fontSize:'12px'}}>{weather.condition}</span><span style={{fontSize:'11px',fontWeight:700,color:T.text}}>{weather.temp}°C</span></div>}
                     </div>
                     <div style={{display:'flex',alignItems:'center',gap:'8px',marginTop:'3px',flexWrap:'wrap',fontSize:'11px',color:T.textSub}}>
                       {clocks[0]&&<span suppressHydrationWarning>{clocks[0].time}</span>}
                       {(profile.city||profile.country)&&<span>📍 {[profile.city,profile.country].filter(Boolean).join(', ')}</span>}
                     </div>
-                    <p style={{fontSize:'11px',fontWeight:600,color:accent,marginTop:'3px'}}>{profile.handle}</p>
+                    <p style={{fontSize:'11px',fontWeight:700,color:accent,marginTop:'3px',fontFamily:'monospace',letterSpacing:'0.06em'}}>{profile.handle}</p>
                     {profile.bio&&<p style={{fontSize:'12px',lineHeight:1.6,color:T.textSub,marginTop:'5px'}}>{profile.bio}</p>}
                     <div style={{display:'flex',flexWrap:'wrap',gap:'5px',marginTop:'5px'}}>
                       {profile.pronouns&&<span style={{fontSize:'10px',padding:'2px 8px',borderRadius:'99px',background:T.isDark?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.05)',color:T.textSub}}>{profile.pronouns}</span>}
@@ -687,7 +689,7 @@ export default function ProfilePage(){
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'7px'}}>{(['city','country','website'] as const).map(f=><input key={f} value={draft[f]} onChange={e=>setDraft(p=>({...p,[f]:e.target.value}))} placeholder={f.charAt(0).toUpperCase()+f.slice(1)} style={{fontSize:'12px',padding:'9px 11px',borderRadius:'11px',outline:'none',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',border:`1.5px solid ${T.border}`,color:T.text}}/>)}<select value={draft.pronouns} onChange={e=>setDraft(p=>({...p,pronouns:e.target.value}))} style={{fontSize:'12px',padding:'9px 11px',borderRadius:'11px',outline:'none',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',border:`1.5px solid ${T.border}`,color:T.text}}><option value="">Pronouns</option>{PRONOUNS.map(pr=><option key={pr} value={pr}>{pr}</option>)}</select></div>
                 <div><p style={{...LS,marginBottom:'7px'}}>LANGUAGES</p><div style={{display:'flex',flexWrap:'wrap',gap:'5px'}}>{LANGUAGES.map(l=><button key={l} onClick={()=>toggleLang(l)} style={{fontSize:'11px',padding:'4px 10px',borderRadius:'99px',cursor:'pointer',background:draft.languages.includes(l)?`${accent}20`:T.isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.04)',border:`1.5px solid ${draft.languages.includes(l)?accent:T.border}`,color:draft.languages.includes(l)?accent:T.textSub,fontWeight:draft.languages.includes(l)?600:400}}>{l}</button>)}</div></div>
               </div>)}
-              {!editing&&(<div style={{display:'flex',gap:isMobile?'16px':'20px',marginTop:'12px',paddingTop:'12px',borderTop:`1px solid ${T.border}`}}>{[['12','Posts'],['0','Followers'],['0','Following'],['0','Chapters']].map(([n,l])=>(<div key={l} className="owf-card-lift" style={{cursor:'pointer'}}><span className="sf" style={{fontSize:isMobile?'16px':'18px',fontWeight:900,color:T.text}}>{n}</span><span style={{fontSize:'9px',fontWeight:600,marginLeft:'4px',letterSpacing:'0.08em',color:T.textMuted}}>{l.toUpperCase()}</span></div>))}</div>)}
+              {!editing&&(<div style={{display:'flex',gap:isMobile?'16px':'20px',marginTop:'12px',paddingTop:'12px',borderTop:`1px solid var(--owf-border)`}}>{[['12','Posts'],['0','Followers'],['0','Following'],['0','Chapters']].map(([n,l],idx,arr)=>(<div key={l} className="owf-card-lift" style={{cursor:'pointer',paddingRight:idx<arr.length-1?isMobile?'16px':'20px':'0',borderRight:idx<arr.length-1?'1px solid var(--owf-border)':'none'}}><span style={{fontSize:isMobile?'16px':'18px',fontWeight:300,color:'var(--owf-text)',letterSpacing:'-0.02em'}}>{n}</span><span style={{fontSize:'9px',fontWeight:700,marginLeft:'5px',letterSpacing:'0.12em',color:'var(--owf-text-muted)',fontFamily:'monospace'}}>{l.toUpperCase()}</span></div>))}</div>)}
             </div>
 
             {/* MOBILE: Widget icon row */}
@@ -696,7 +698,7 @@ export default function ProfilePage(){
                 {WIDGET_BTNS.map(w=>(
                   <button key={w.id} onClick={()=>toggleWidget(w.id)}
                     style={{display:'flex',flexDirection:'column',alignItems:'center',gap:'4px',padding:'10px 14px',borderRadius:'16px',cursor:'pointer',flexShrink:0,transition:'all .2s',
-                      background:activeWidget===w.id?accent:T.isDark?'rgba(255,255,255,0.07)':'rgba(255,255,255,0.85)',
+                      background:activeWidget===w.id?accent:T.isDark?'rgba(255,255,255,0.07)':'var(--owf-text)',
                       boxShadow:activeWidget===w.id?`0 4px 16px ${accent}45`:`0 2px 8px rgba(0,0,0,0.06)`,
                       border:activeWidget===w.id?`1px solid ${accent}60`:`1px solid ${T.border}`,
                     }}>
@@ -709,10 +711,9 @@ export default function ProfilePage(){
 
             {/* TABS */}
             {!editing&&<>
-              <div className="ns" style={{display:'flex',marginBottom:'14px',borderBottom:`1.5px solid ${T.border}`,overflowX:'auto',position:'relative'}}>
-                {TABS.map(t=><button key={t} ref={(el: HTMLButtonElement | null) => { tabRefs.current[t.toLowerCase()] = el; }} onClick={()=>setTab(t.toLowerCase())} style={{padding:'10px 16px',fontSize:'13px',whiteSpace:'nowrap',flexShrink:0,fontWeight:tab===t.toLowerCase()?700:400,color:tab===t.toLowerCase()?accent:T.textMuted,background:'none',border:'none',cursor:'pointer',borderBottom:'2.5px solid transparent',marginBottom:'-1.5px',transition:'color .2s'}}>{t}</button>)}
-                  {/* Sliding pill indicator */}
-                  <div className="owf-tab-pill" style={{position:'absolute',bottom:-1,height:'2.5px',borderRadius:'2px',background:accent,left:tabPill.left,width:tabPill.width}} />
+              <div className="ns" style={{display:'flex',marginBottom:'1px',borderBottom:`1px solid var(--owf-border)`,overflowX:'auto',position:'relative'}}>
+                {TABS.map(t=><button key={t} ref={(el: HTMLButtonElement | null) => { tabRefs.current[t.toLowerCase()] = el; }} onClick={()=>setTab(t.toLowerCase())} style={{padding:'10px 16px',fontSize:'10px',whiteSpace:'nowrap',flexShrink:0,fontWeight:tab===t.toLowerCase()?700:400,color:tab===t.toLowerCase()?accent:'var(--owf-text-muted)',background:'none',border:'none',cursor:'pointer',borderBottom:'2px solid transparent',marginBottom:'-1px',transition:'color .2s',fontFamily:'monospace',letterSpacing:'0.10em',textTransform:'uppercase'}}>{t}</button>)}
+                  <div className="owf-tab-pill" style={{position:'absolute',bottom:-1,height:'2px',background:accent,left:tabPill.left,width:tabPill.width,boxShadow:`0 0 8px ${accent}60`}} />
               </div>
 
               {/* FEED */}
@@ -738,7 +739,7 @@ export default function ProfilePage(){
                         {counts[pt]>0&&<span style={{
                           fontSize:'10px',fontWeight:700,
                           padding:'1px 6px',borderRadius:'99px',
-                          background:active?'rgba(255,255,255,0.25)':T.isDark?'rgba(255,255,255,0.08)':'rgba(0,0,0,0.06)',
+                          background:active?'rgba(255,255,255,0.25)':T.isDark?'var(--owf-border)':'rgba(0,0,0,0.06)',
                           color:active?'#fff':T.textMuted,
                         }}>{counts[pt]}</span>}
                       </button>);
@@ -885,7 +886,7 @@ export default function ProfilePage(){
               </div>
               <p style={{fontSize:'9px',color:T.textMuted,marginTop:'6px',textAlign:'center'}}>Tap to add · {profile.visitedCountries.length}/{Object.keys(COUNTRY_REGIONS).length}</p>
             </div>
-            <div style={PC}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'10px'}}><p style={LS}>MY MOMENTS</p><button style={{fontSize:'10px',fontWeight:600,color:accent,background:'none',border:'none',cursor:'pointer'}}>See all</button></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'7px'}}><div className="owf-card-lift" style={{borderRadius:'13px',height:'72px',overflow:'hidden',cursor:'pointer',background:'linear-gradient(135deg,#3B82F6,#6366F1)',display:'flex',alignItems:'center',justifyContent:'center',position:'relative',boxShadow:'0 3px 12px rgba(59,130,246,0.32)'}}><span style={{fontSize:'22px'}}>🏙️</span><div style={{position:'absolute',bottom:'5px',left:'7px',fontSize:'9px',fontWeight:900,color:'rgba(255,255,255,0.9)'}}>7:15 AM</div></div><div className="owf-card-lift" style={{borderRadius:'13px',height:'72px',cursor:'pointer',background:'linear-gradient(135deg,#F59E0B,#EF4444)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 3px 12px rgba(245,158,11,0.32)'}}><span style={{fontSize:'22px'}}>😄</span></div><div className="owf-card-lift" style={{gridColumn:'span 2',borderRadius:'13px',padding:'10px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)',border:`1px solid ${T.border}`}}><p style={{fontSize:'11px',fontWeight:600,color:T.text,lineHeight:1.4}}>Just read something inspiring! ✨</p><p style={{fontSize:'9px',fontWeight:900,letterSpacing:'0.1em',color:T.textMuted,marginTop:'3px'}}>THU</p></div></div></div>
+            <div style={PC}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'10px'}}><p style={LS}>MY MOMENTS</p><button style={{fontSize:'10px',fontWeight:600,color:accent,background:'none',border:'none',cursor:'pointer'}}>See all</button></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'7px'}}><div className="owf-card-lift" style={{borderRadius:'13px',height:'72px',overflow:'hidden',cursor:'pointer',background:'linear-gradient(135deg,#3B82F6,#6366F1)',display:'flex',alignItems:'center',justifyContent:'center',position:'relative',boxShadow:'0 3px 12px rgba(59,130,246,0.32)'}}><span style={{fontSize:'22px'}}>🏙️</span><div style={{position:'absolute',bottom:'5px',left:'7px',fontSize:'9px',fontWeight:900,color:'var(--owf-text)'}}>7:15 AM</div></div><div className="owf-card-lift" style={{borderRadius:'13px',height:'72px',cursor:'pointer',background:'linear-gradient(135deg,#F59E0B,#EF4444)',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 3px 12px rgba(245,158,11,0.32)'}}><span style={{fontSize:'22px'}}>😄</span></div><div className="owf-card-lift" style={{gridColumn:'span 2',borderRadius:'13px',padding:'10px',cursor:'pointer',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.04)',border:`1px solid ${T.border}`}}><p style={{fontSize:'11px',fontWeight:600,color:T.text,lineHeight:1.4}}>Just read something inspiring! ✨</p><p style={{fontSize:'9px',fontWeight:900,letterSpacing:'0.1em',color:T.textMuted,marginTop:'3px'}}>THU</p></div></div></div>
             <div style={PC}><ThemeSelector /></div>
 
           </div>{/* /right panel */}
@@ -893,7 +894,7 @@ export default function ProfilePage(){
       </div>
 
       {/* ── MOBILE BOTTOM NAV ───────────────────────────── */}
-      <div className="bottom-nav" style={{display:'none',position:'fixed',bottom:0,left:0,right:0,zIndex:80,background:T.isDark?'rgba(8,11,20,0.92)':'rgba(250,250,247,0.92)',backdropFilter:'blur(24px) saturate(180%)',WebkitBackdropFilter:'blur(24px)',borderTop:`1px solid ${T.border}`,padding:'8px 0 max(8px, env(safe-area-inset-bottom))',boxShadow:T.isDark?`0 -1px 0 ${accent}20`:`0 -1px 0 rgba(0,0,0,0.08)`}}>
+      <div className="bottom-nav" style={{display:'none',position:'fixed',bottom:0,left:0,right:0,zIndex:80,background:'rgba(8,8,16,0.95)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderTop:`1px solid var(--owf-border)`,padding:'8px 0 max(8px, env(safe-area-inset-bottom))'}}>
         <div style={{display:'flex',alignItems:'center',justifyContent:'space-around',maxWidth:'500px',margin:'0 auto'}}>
           {BOTTOM_NAV.map(n=>(
             <button key={n.id} onClick={()=>setBottomNav(n.id)}
