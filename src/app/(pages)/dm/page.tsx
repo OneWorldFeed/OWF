@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import { sanitizeDmText, checkRateLimit, RATE_LIMITS } from "@/lib/sanitize";
 import { CONVOS, MESSAGES } from "@/data/dm";
 import type { Conversation, Message } from "@/types/dm";
 import ConvoRow from "@/components/dm/ConvoRow";
@@ -9,7 +10,6 @@ import AtRiskBanner from "@/components/dm/AtRiskBanner";
 import StreakSheet from "@/components/dm/StreakSheet";
 import BadgeUnlockModal from "@/components/ui/BadgeUnlockModal";
 import { justUnlockedCycle, type OwlCycle } from "@/lib/streak";
-import { sanitizeMessageText } from "@/lib/sanitize";
 
 const C = {
   bg: "#07090D", surface: "#0D1219", raised: "#121A24",
@@ -34,12 +34,16 @@ export default function DMPage() {
   }, [activeId, thread.length]);
 
   const sendMessage = () => {
-    const sanitized = sanitizeMessageText(input);
-    if (!sanitized) return;
+    const safeText = sanitizeDmText(input);
+    if (!safeText.trim()) return;
+    if (!checkRateLimit('dm', RATE_LIMITS.dm)) {
+      console.warn('DM rate limit hit');
+      return;
+    }
     const msg: Message = {
       id: `msg_${Date.now()}`,
       senderId: "me",
-      text: sanitized,
+      text: safeText,
       ts: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
     setMessages(prev => ({ ...prev, [activeId]: [...(prev[activeId] ?? []), msg] }));

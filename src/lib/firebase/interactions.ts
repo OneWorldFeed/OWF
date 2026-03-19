@@ -12,7 +12,7 @@ import {
   collection,
   addDoc,
 } from 'firebase/firestore';
-import { sanitizeText, LIMITS } from '@/lib/sanitize';
+import { sanitize, checkRateLimit, RATE_LIMITS } from '@/lib/sanitize';
 
 export type InteractionType = 'like' | 'comment' | 'share' | 'save';
 
@@ -36,6 +36,10 @@ export async function recordInteraction(
   moodId: string,
   city: string,
 ) {
+  if (!checkRateLimit('like', RATE_LIMITS.like)) {
+    console.warn('Rate limit hit for interactions');
+    return;
+  }
   try {
     // 1. Increment counter on the post document
     const postRef = doc(db, 'posts', postId);
@@ -49,8 +53,8 @@ export async function recordInteraction(
       postId,
       userId,
       type,
-      moodId: sanitizeText(moodId, 30),
-      city: sanitizeText(city, LIMITS.city),
+      moodId,
+      city: sanitize(city, 'city').value,
       createdAt: serverTimestamp(),
     });
 
@@ -79,9 +83,55 @@ export async function toggleLike(
       postId,
       userId,
       type: 'like',
-      moodId: sanitizeText(moodId, 30),
-      city: sanitizeText(city, LIMITS.city),
+      moodId,
+      city: sanitize(city, 'city').value,
       createdAt: serverTimestamp(),
     });
+  }
+}
+
+// Add comment
+export async function addComment(
+  postId: string,
+  userId: string,
+  text: string,
+  moodId: string,
+  city: string,
+) {
+  if (!checkRateLimit('comment', RATE_LIMITS.comment)) {
+    console.warn('Rate limit hit for comments');
+    return;
+  }
+
+  const safeText = sanitize(text, 'commentText', { multiline: true }).value;
+  if (!safeText) return;
+
+  const postRef = doc(db, 'posts', postId);
+  await updateDoc(postRef, {
+    commentCount: increment(1),
+    lastInteractionAt: serverTimestamp(),
+  });
+
+  await addDoc(collection(db, 'posts', postId, 'comments'), {
+    userId,
+    text: safeText,
+    moodId,
+    city: sanitize(city, 'city').value,
+    createdAt: serverTimestamp(),
+  });
+}
+
+// Save/Unsave post
+export async function toggleSave(
+  postId: string,
+  userId: string,
+  currentlySaved: boolean,
+) {
+  const ref = doc(db, 'users', userId, 'saved', postId);
+  if (currentlySaved) {
+    const { deleteDoc } = await import('firebase/firestore');
+    await deleteDoc(ref);
+  } else {
+    await setDoc(ref, { savedAt: serverTimestamp() });
   }
 }
