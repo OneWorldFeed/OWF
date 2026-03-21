@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react';
 import type { MoodId } from '@/lib/theme';
 import { sanitizePostText, sanitizeText, LIMITS } from '@/lib/sanitize';
+import { useModeration } from '@/hooks/useModeration';
 
 const MOODS: { id: MoodId; label: string; emoji: string; color: string }[] = [
   { id: 'electric',   label: 'Electric',   emoji: '⚡', color: '#D97706' },
@@ -42,6 +43,7 @@ export default function Composer({ onClose }: ComposerProps) {
   const [posted, setPosted] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { check: moderateCheck, result: modResult, checking: moderating, reset: resetModeration } = useModeration();
 
   const charsLeft = MAX_CHARS - text.length;
   const activeMood = MOODS.find(m => m.id === mood);
@@ -93,12 +95,18 @@ export default function Composer({ onClose }: ComposerProps) {
   }
 
   async function handlePost() {
-    if (!text.trim() || !mood || posting) return;
+    if (!text.trim() || !mood || posting || moderating) return;
     setPosting(true);
+    resetModeration();
     // Sanitize all user text before persisting
     const cleanText = sanitizePostText(text);
     const cleanCity = sanitizeText(city, LIMITS.city);
     if (!cleanText) { setPosting(false); return; }
+
+    // Moderation gate — block if flagged
+    const allowed = await moderateCheck(cleanText, 'post');
+    if (!allowed) { setPosting(false); return; }
+
     setText(cleanText);
     setCity(cleanCity);
     // Simulate post — replace with Firestore write when Auth is added
@@ -222,6 +230,29 @@ export default function Composer({ onClose }: ComposerProps) {
           </div>
         </div>
 
+        {/* Moderation warning banner */}
+        {modResult && !modResult.allowed && (
+          <div className="px-5 py-3 flex-shrink-0 text-xs font-semibold"
+            style={{
+              backgroundColor: modResult.crisisResources ? '#1e3a5f' : '#7f1d1d',
+              color: '#fff',
+              borderTop: '1px solid var(--owf-border)',
+            }}>
+            {modResult.crisisResources ? (
+              <p>
+                {modResult.message}{' '}
+                If you or someone you know is in crisis, please visit{' '}
+                <a href="https://findahelpline.com" target="_blank" rel="noopener noreferrer"
+                  className="underline font-bold" style={{ color: '#93c5fd' }}>
+                  findahelpline.com
+                </a>
+              </p>
+            ) : (
+              <p>{modResult.message}</p>
+            )}
+          </div>
+        )}
+
         {/* Footer */}
         <div className="px-5 py-4 flex-shrink-0 flex items-center justify-between"
           style={{ borderTop: '1px solid var(--owf-border)' }}>
@@ -239,13 +270,13 @@ export default function Composer({ onClose }: ComposerProps) {
               </span>
             )}
           </div>
-          <button onClick={handlePost} disabled={!canPost || posting}
+          <button onClick={handlePost} disabled={!canPost || posting || moderating}
             className="text-sm font-black px-6 py-2.5 rounded-full transition-all hover:scale-105 active:scale-95"
             style={{
-              backgroundColor: canPost && !posting ? 'var(--owf-gold)' : 'var(--owf-border)',
-              color: canPost && !posting ? '#fff' : 'var(--owf-text-secondary)',
+              backgroundColor: canPost && !posting && !moderating ? 'var(--owf-gold)' : 'var(--owf-border)',
+              color: canPost && !posting && !moderating ? '#fff' : 'var(--owf-text-secondary)',
             }}>
-            {posted ? '✓ Posted!' : posting ? 'Posting...' : 'Post'}
+            {posted ? '✓ Posted!' : moderating ? 'Checking...' : posting ? 'Posting...' : 'Post'}
           </button>
         </div>
       </div>
