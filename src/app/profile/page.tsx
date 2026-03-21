@@ -17,6 +17,7 @@ import { CIRCLES } from '@/data/circles';
 import type { Circle } from '@/data/circles';
 import CircleDetail from '@/components/circles/CircleDetail';
 import { sanitizeProfileFields, sanitizeUrl, sanitizeText, LIMITS } from '@/lib/sanitize';
+import { useModeration } from '@/hooks/useModeration';
 
 const GUEST_ID = 'guest_preview';
 const LANGUAGES = ['English','French','Arabic','Spanish','Portuguese','Swahili','Yoruba','Mandarin','Hindi','Japanese'];
@@ -111,6 +112,7 @@ export default function ProfilePage(){
   const [saving,setSaving]=useState(false);
   const [saved,setSaved]=useState(false);
   const [saveError,setSaveError]=useState('');
+  const [modErrors,setModErrors]=useState<{displayName?:string;bio?:string}>({});
   const [loading,setLoading]=useState(true);
   const [tab,setTab]=useState('posts');
   const [openCircle, setOpenCircle] = useState<string | null>(null);
@@ -119,6 +121,7 @@ export default function ProfilePage(){
   const [coverPrev,setCoverPrev]=useState('');
   const [avatarPrev,setAvatarPrev]=useState('');
   const avatarFileRef=useRef<HTMLInputElement>(null);
+  const { check: moderateCheck } = useModeration();
   const [coverPosition,setCoverPosition]=useState<{x:number;y:number}>({x:50,y:50});
   const [avatarPosition,setAvatarPosition]=useState<{x:number;y:number}>({x:50,y:50});
   const [repositionTarget,setRepositionTarget]=useState<'banner'|'avatar'|null>(null);
@@ -220,10 +223,20 @@ export default function ProfilePage(){
   }
   function startEdit(){setDraft({...profile});setCoverPrev(profile.coverImage||'');setCoverPosition(profile.coverImagePosition||{x:50,y:50});setEditing(true);setSaved(false);}
   async function save(){
-    setSaving(true);setSaveError('');
+    setSaving(true);setSaveError('');setModErrors({});
     // Sanitize all user-editable text fields before persisting
     const clean = sanitizeProfileFields(draft);
     const d={...draft,...clean,coverImage:coverPrev,coverImagePosition:coverPosition};
+
+    // Moderation gate — check displayName and bio in parallel
+    const errors:{displayName?:string;bio?:string}={};
+    const [nameOk,bioOk]=await Promise.all([
+      d.displayName?moderateCheck(d.displayName,'displayName'):Promise.resolve(true),
+      d.bio?moderateCheck(d.bio,'bio'):Promise.resolve(true),
+    ]);
+    if(!nameOk)errors.displayName='This display name was flagged by our content safety system.';
+    if(!bioOk)errors.bio='This bio was flagged by our content safety system.';
+    if(Object.keys(errors).length>0){setModErrors(errors);setSaving(false);return;}
     if(draft.handle!==profile.handle)d.handleChangedAt=new Date().toISOString();
     const safeProfile = sanitizeProfile({
       displayName: d.displayName,
@@ -658,7 +671,8 @@ export default function ProfilePage(){
                 </div>
                 <div style={{flex:1,minWidth:0}}>
                   {editing?(<div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
-                    <input value={draft.displayName} onChange={e=>setDraft(p=>({...p,displayName:e.target.value}))} style={{fontFamily:'inherit',fontSize:'20px',fontWeight:300,background:'transparent',border:'none',borderBottom:`1px solid ${accent}60`,outline:'none',color:'var(--owf-text)',width:'100%',letterSpacing:'-0.02em'}} placeholder="Your name"/>
+                    <input value={draft.displayName} onChange={e=>{setDraft(p=>({...p,displayName:e.target.value}));setModErrors(p=>({...p,displayName:undefined}));}} style={{fontFamily:'inherit',fontSize:'20px',fontWeight:300,background:'transparent',border:'none',borderBottom:`1px solid ${modErrors.displayName?'#EF4444':accent+'60'}`,outline:'none',color:'var(--owf-text)',width:'100%',letterSpacing:'-0.02em'}} placeholder="Your name"/>
+                    {modErrors.displayName&&<p style={{fontSize:'11px',color:'#EF4444',margin:'2px 0 0'}}>{modErrors.displayName}</p>}
                     <div style={{display:'flex',alignItems:'center',gap:'5px'}}>
                       {canChangeHandle(profile.handleChangedAt)?(<><input value={draft.handle.replace('.feed','')} onChange={e=>setDraft(p=>({...p,handle:e.target.value.replace(/[\s.]/g,'').toLowerCase()+'.feed'}))} style={{fontSize:'12px',background:'transparent',border:'none',borderBottom:`1px solid ${T.border}`,outline:'none',color:accent,width:'110px'}}/><span style={{fontSize:'12px',fontWeight:600,color:accent}}>.feed</span></>):(<span style={{fontSize:'12px',fontWeight:600,color:accent}}>{profile.handle}</span>)}
                     </div>
@@ -685,7 +699,7 @@ export default function ProfilePage(){
                 </div>
               </div>
               {editing&&(<div style={{marginTop:'14px',paddingTop:'14px',borderTop:`1px solid ${T.border}`,display:'flex',flexDirection:'column',gap:'10px'}}>
-                <div style={{position:'relative'}}><textarea value={draft.bio} onChange={e=>e.target.value.length<=160&&setDraft(p=>({...p,bio:e.target.value}))} placeholder="Short bio…" rows={2} style={{width:'100%',fontSize:'12px',padding:'10px 12px',borderRadius:'12px',resize:'none',outline:'none',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',border:`1.5px solid ${T.border}`,color:T.text,fontFamily:"'DM Sans',sans-serif"}}/><span style={{position:'absolute',bottom:'8px',right:'10px',fontSize:'10px',color:T.textMuted}}>{160-draft.bio.length}</span></div>
+                <div style={{position:'relative'}}><textarea value={draft.bio} onChange={e=>{if(e.target.value.length<=160){setDraft(p=>({...p,bio:e.target.value}));setModErrors(p=>({...p,bio:undefined}));}}} placeholder="Short bio…" rows={2} style={{width:'100%',fontSize:'12px',padding:'10px 12px',borderRadius:'12px',resize:'none',outline:'none',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',border:`1.5px solid ${modErrors.bio?'#EF4444':T.border}`,color:T.text,fontFamily:"'DM Sans',sans-serif"}}/><span style={{position:'absolute',bottom:'8px',right:'10px',fontSize:'10px',color:T.textMuted}}>{160-draft.bio.length}</span></div>{modErrors.bio&&<p style={{fontSize:'11px',color:'#EF4444',margin:'2px 0 0'}}>{modErrors.bio}</p>}
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'7px'}}>{(['city','country','website'] as const).map(f=><input key={f} value={draft[f]} onChange={e=>setDraft(p=>({...p,[f]:e.target.value}))} placeholder={f.charAt(0).toUpperCase()+f.slice(1)} style={{fontSize:'12px',padding:'9px 11px',borderRadius:'11px',outline:'none',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',border:`1.5px solid ${T.border}`,color:T.text}}/>)}<select value={draft.pronouns} onChange={e=>setDraft(p=>({...p,pronouns:e.target.value}))} style={{fontSize:'12px',padding:'9px 11px',borderRadius:'11px',outline:'none',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',border:`1.5px solid ${T.border}`,color:T.text}}><option value="">Pronouns</option>{PRONOUNS.map(pr=><option key={pr} value={pr}>{pr}</option>)}</select></div>
                 <div><p style={{...LS,marginBottom:'7px'}}>LANGUAGES</p><div style={{display:'flex',flexWrap:'wrap',gap:'5px'}}>{LANGUAGES.map(l=><button key={l} onClick={()=>toggleLang(l)} style={{fontSize:'11px',padding:'4px 10px',borderRadius:'99px',cursor:'pointer',background:draft.languages.includes(l)?`${accent}20`:T.isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.04)',border:`1.5px solid ${draft.languages.includes(l)?accent:T.border}`,color:draft.languages.includes(l)?accent:T.textSub,fontWeight:draft.languages.includes(l)?600:400}}>{l}</button>)}</div></div>
               </div>)}
