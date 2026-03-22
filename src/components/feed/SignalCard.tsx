@@ -123,8 +123,9 @@ export function SignalCard({ signal, onWatch, index = 0 }: SignalCardProps) {
   const handleTranslate = async () => {
     if (translated) { setTranslated(null); return }
     setTranslating(true)
-    const result = await translateText(signal.blurb)
-    setTranslated(result ?? signal.blurb)
+    const lang = navigator.language.split("-")[0]
+    const result = await translateText(signal.blurb, lang)
+    setTranslated(result)
     setTranslating(false)
   }
 

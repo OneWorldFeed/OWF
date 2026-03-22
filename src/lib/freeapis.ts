@@ -256,26 +256,25 @@ export function formatPopulation(n: number): string {
 
 export async function translateText(
   text: string,
-  targetLang = 'en',
-  sourceLang = 'auto',
-): Promise<string | null> {
-  const cacheKey = `translate:${sourceLang}:${targetLang}:${text.slice(0, 80)}`;
+  targetLang: string,
+): Promise<string> {
+  const cacheKey = `translate:${targetLang}:${text.slice(0, 80)}`;
   const cached = getCache<string>(cacheKey);
   if (cached) return cached;
 
   try {
     const q = encodeURIComponent(text.slice(0, 500));
-    const langpair = `${sourceLang === 'auto' ? '' : sourceLang}|${targetLang}`;
+    const langpair = `|${targetLang}`;
     const res = await fetch(
       `https://api.mymemory.translated.net/get?q=${q}&langpair=${encodeURIComponent(langpair)}`,
     );
-    if (!res.ok) return null;
+    if (!res.ok) return text;
     const data = await res.json();
     const translated: string | undefined = data?.responseData?.translatedText;
-    if (!translated) return null;
+    if (!translated) return text;
     setCache(cacheKey, translated, 60 * 60 * 1000); // 1h
     return translated;
   } catch {
-    return null;
+    return text;
   }
 }
