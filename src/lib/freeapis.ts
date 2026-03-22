@@ -251,3 +251,30 @@ export function formatPopulation(n: number): string {
   if (n >= 1_000) return `${(n / 1_000).toFixed(0)}K`;
   return n.toString();
 }
+
+// ─── TRANSLATION (MyMemory — free, no key) ──────────────────────────────────
+
+export async function translateText(
+  text: string,
+  targetLang: string,
+): Promise<string> {
+  const cacheKey = `translate:${targetLang}:${text.slice(0, 80)}`;
+  const cached = getCache<string>(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const q = encodeURIComponent(text.slice(0, 500));
+    const langpair = `|${targetLang}`;
+    const res = await fetch(
+      `https://api.mymemory.translated.net/get?q=${q}&langpair=${encodeURIComponent(langpair)}`,
+    );
+    if (!res.ok) return text;
+    const data = await res.json();
+    const translated: string | undefined = data?.responseData?.translatedText;
+    if (!translated) return text;
+    setCache(cacheKey, translated, 60 * 60 * 1000); // 1h
+    return translated;
+  } catch {
+    return text;
+  }
+}

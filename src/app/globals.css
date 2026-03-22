@@ -631,3 +631,10 @@ body {
   0%, 100% { opacity: 0.4; }
   50%       { opacity: 0.8; }
 }
+
+/* ── Right panel responsive visibility ────────────────────── */
+@media (max-width: 1023px) {
+  .right-panel-col {
+    display: none;
+  }
+}

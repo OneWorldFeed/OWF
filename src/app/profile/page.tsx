@@ -1,5 +1,4 @@
 'use client';
-import ProfilePostCard from '@/components/cards/ProfilePostCard';
 import { sanitizeProfile } from '@/lib/sanitize';
 import { useState, useEffect, useRef } from 'react';
 import { db } from '@/lib/firebase/config';
@@ -17,6 +16,10 @@ import { CIRCLES } from '@/data/circles';
 import type { Circle } from '@/data/circles';
 import CircleDetail from '@/components/circles/CircleDetail';
 import { sanitizeProfileFields, sanitizeUrl, sanitizeText, LIMITS } from '@/lib/sanitize';
+import { useModeration } from '@/hooks/useModeration';
+import { SignalCard } from '@/components/feed/SignalCard';
+import { SIGNALS } from '@/data/signals';
+import type { Signal } from '@/types/signal';
 
 const GUEST_ID = 'guest_preview';
 const LANGUAGES = ['English','French','Arabic','Spanish','Portuguese','Swahili','Yoruba','Mandarin','Hindi','Japanese'];
@@ -63,14 +66,7 @@ const OWL_CYCLES: {cycle:OwlCycle;label:string;days:number;color:string;rarity:s
   {cycle:'cosmic', label:'Cosmic Owl', days:200, color:'#1A1A5A', rarity:'Legendary'},
   {cycle:'mythic', label:'Mythic Owl', days:365, color:'#006868', rarity:'Mythic'},
 ];
-const SAMPLE_POSTS=[
-  {id:'1',mood:'Electric',city:'Lagos',time:'2h ago',text:'The energy in Lagos tonight is something else. The music never stops and neither do we. +lagos +nightlife',likes:24,comments:7,hasImage:false,hasVideo:false},
-  {id:'2',mood:'Reflective',city:'Tokyo',time:'5h ago',text:'Cherry blossom season begins today. Every year I forget how quickly it goes. +tokyo +cherryblossoms',likes:41,comments:12,hasImage:true,hasVideo:false},
-  {id:'3',mood:'Hopeful',city:'Berlin',time:'1d ago',text:'New chapter, new city. Berlin in spring hits different. +berlin +newbeginnings',likes:88,comments:31,hasImage:false,hasVideo:false},
-  {id:'4',mood:'Curious',city:'Paris',time:'2d ago',text:'The Louvre at midnight during a private event. Some spaces only reveal themselves in silence. +paris +art',likes:132,comments:44,hasImage:false,hasVideo:false},
-  {id:'5',mood:'Calm',city:'Nairobi',time:'3d ago',text:'Early morning run through Karura Forest. The mist, the birds, the absolute stillness. +nairobi +calm',likes:67,comments:18,hasImage:true,hasVideo:false},
-  {id:'6',mood:'Electric',city:'Lagos',time:'4d ago',text:'Live from the stage. The crowd was everything last night. +lagos +music +live',likes:103,comments:44,hasImage:false,hasVideo:true},
-];
+// User's posts — filtered from shared SIGNALS array by authorHandle
 const MOOD_COLORS:Record<string,string>={Electric:'#F59E0B',Reflective:'#6366F1',Hopeful:'#10B981',Curious:'#8B5CF6',Joyful:'#EF4444',Calm:'#06B6D4'};
 const MOOD_WEEK=[{day:'Mon',mood:'Calm',val:3},{day:'Tue',mood:'Hopeful',val:5},{day:'Wed',mood:'Electric',val:8},{day:'Thu',mood:'Reflective',val:4},{day:'Fri',mood:'Joyful',val:9},{day:'Sat',mood:'Curious',val:6},{day:'Sun',mood:'Hopeful',val:7}];
 const COUNTRY_REGIONS:Record<string,{label:string;x:number;y:number}>={US:{label:'🇺🇸',x:18,y:36},NG:{label:'🇳🇬',x:48,y:52},JP:{label:'🇯🇵',x:80,y:34},DE:{label:'🇩🇪',x:50,y:26},BR:{label:'🇧🇷',x:28,y:62},IN:{label:'🇮🇳',x:67,y:44},FR:{label:'🇫🇷',x:48,y:27},ZA:{label:'🇿🇦',x:52,y:68},CN:{label:'🇨🇳',x:74,y:36},GB:{label:'🇬🇧',x:47,y:23},AU:{label:'🇦🇺',x:78,y:68},MX:{label:'🇲🇽',x:17,y:44},EG:{label:'🇪🇬',x:54,y:40},KE:{label:'🇰🇪',x:56,y:54},AR:{label:'🇦🇷',x:26,y:72},TH:{label:'🇹🇭',x:73,y:46},GH:{label:'🇬🇭',x:46,y:52},IT:{label:'🇮🇹',x:51,y:30},CA:{label:'🇨🇦',x:16,y:24},MA:{label:'🇲🇦',x:45,y:36}};
@@ -111,14 +107,16 @@ export default function ProfilePage(){
   const [saving,setSaving]=useState(false);
   const [saved,setSaved]=useState(false);
   const [saveError,setSaveError]=useState('');
+  const [modErrors,setModErrors]=useState<{displayName?:string;bio?:string}>({});
   const [loading,setLoading]=useState(true);
   const [tab,setTab]=useState('posts');
   const [openCircle, setOpenCircle] = useState<string | null>(null);
-  const [postTab,setPostTab]=useState<'all'|'text'|'images'|'video'>('all');
+  const userSignals = SIGNALS.filter(s => s.authorHandle === profile.handle);
   const [clocks,setClocks]=useState<{name:string;time:string;hour:number}[]>([]);
   const [coverPrev,setCoverPrev]=useState('');
   const [avatarPrev,setAvatarPrev]=useState('');
   const avatarFileRef=useRef<HTMLInputElement>(null);
+  const { check: moderateCheck } = useModeration();
   const [coverPosition,setCoverPosition]=useState<{x:number;y:number}>({x:50,y:50});
   const [avatarPosition,setAvatarPosition]=useState<{x:number;y:number}>({x:50,y:50});
   const [repositionTarget,setRepositionTarget]=useState<'banner'|'avatar'|null>(null);
@@ -220,10 +218,20 @@ export default function ProfilePage(){
   }
   function startEdit(){setDraft({...profile});setCoverPrev(profile.coverImage||'');setCoverPosition(profile.coverImagePosition||{x:50,y:50});setEditing(true);setSaved(false);}
   async function save(){
-    setSaving(true);setSaveError('');
+    setSaving(true);setSaveError('');setModErrors({});
     // Sanitize all user-editable text fields before persisting
     const clean = sanitizeProfileFields(draft);
     const d={...draft,...clean,coverImage:coverPrev,coverImagePosition:coverPosition};
+
+    // Moderation gate — check displayName and bio in parallel
+    const errors:{displayName?:string;bio?:string}={};
+    const [nameOk,bioOk]=await Promise.all([
+      d.displayName?moderateCheck(d.displayName,'displayName'):Promise.resolve(true),
+      d.bio?moderateCheck(d.bio,'bio'):Promise.resolve(true),
+    ]);
+    if(!nameOk)errors.displayName='This display name was flagged by our content safety system.';
+    if(!bioOk)errors.bio='This bio was flagged by our content safety system.';
+    if(Object.keys(errors).length>0){setModErrors(errors);setSaving(false);return;}
     if(draft.handle!==profile.handle)d.handleChangedAt=new Date().toISOString();
     const safeProfile = sanitizeProfile({
       displayName: d.displayName,
@@ -658,7 +666,8 @@ export default function ProfilePage(){
                 </div>
                 <div style={{flex:1,minWidth:0}}>
                   {editing?(<div style={{display:'flex',flexDirection:'column',gap:'6px'}}>
-                    <input value={draft.displayName} onChange={e=>setDraft(p=>({...p,displayName:e.target.value}))} style={{fontFamily:'inherit',fontSize:'20px',fontWeight:300,background:'transparent',border:'none',borderBottom:`1px solid ${accent}60`,outline:'none',color:'var(--owf-text)',width:'100%',letterSpacing:'-0.02em'}} placeholder="Your name"/>
+                    <input value={draft.displayName} onChange={e=>{setDraft(p=>({...p,displayName:e.target.value}));setModErrors(p=>({...p,displayName:undefined}));}} style={{fontFamily:'inherit',fontSize:'20px',fontWeight:300,background:'transparent',border:'none',borderBottom:`1px solid ${modErrors.displayName?'#EF4444':accent+'60'}`,outline:'none',color:'var(--owf-text)',width:'100%',letterSpacing:'-0.02em'}} placeholder="Your name"/>
+                    {modErrors.displayName&&<p style={{fontSize:'11px',color:'#EF4444',margin:'2px 0 0'}}>{modErrors.displayName}</p>}
                     <div style={{display:'flex',alignItems:'center',gap:'5px'}}>
                       {canChangeHandle(profile.handleChangedAt)?(<><input value={draft.handle.replace('.feed','')} onChange={e=>setDraft(p=>({...p,handle:e.target.value.replace(/[\s.]/g,'').toLowerCase()+'.feed'}))} style={{fontSize:'12px',background:'transparent',border:'none',borderBottom:`1px solid ${T.border}`,outline:'none',color:accent,width:'110px'}}/><span style={{fontSize:'12px',fontWeight:600,color:accent}}>.feed</span></>):(<span style={{fontSize:'12px',fontWeight:600,color:accent}}>{profile.handle}</span>)}
                     </div>
@@ -685,11 +694,11 @@ export default function ProfilePage(){
                 </div>
               </div>
               {editing&&(<div style={{marginTop:'14px',paddingTop:'14px',borderTop:`1px solid ${T.border}`,display:'flex',flexDirection:'column',gap:'10px'}}>
-                <div style={{position:'relative'}}><textarea value={draft.bio} onChange={e=>e.target.value.length<=160&&setDraft(p=>({...p,bio:e.target.value}))} placeholder="Short bio…" rows={2} style={{width:'100%',fontSize:'12px',padding:'10px 12px',borderRadius:'12px',resize:'none',outline:'none',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',border:`1.5px solid ${T.border}`,color:T.text,fontFamily:"'DM Sans',sans-serif"}}/><span style={{position:'absolute',bottom:'8px',right:'10px',fontSize:'10px',color:T.textMuted}}>{160-draft.bio.length}</span></div>
+                <div style={{position:'relative'}}><textarea value={draft.bio} onChange={e=>{if(e.target.value.length<=160){setDraft(p=>({...p,bio:e.target.value}));setModErrors(p=>({...p,bio:undefined}));}}} placeholder="Short bio…" rows={2} style={{width:'100%',fontSize:'12px',padding:'10px 12px',borderRadius:'12px',resize:'none',outline:'none',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',border:`1.5px solid ${modErrors.bio?'#EF4444':T.border}`,color:T.text,fontFamily:"'DM Sans',sans-serif"}}/><span style={{position:'absolute',bottom:'8px',right:'10px',fontSize:'10px',color:T.textMuted}}>{160-draft.bio.length}</span></div>{modErrors.bio&&<p style={{fontSize:'11px',color:'#EF4444',margin:'2px 0 0'}}>{modErrors.bio}</p>}
                 <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'7px'}}>{(['city','country','website'] as const).map(f=><input key={f} value={draft[f]} onChange={e=>setDraft(p=>({...p,[f]:e.target.value}))} placeholder={f.charAt(0).toUpperCase()+f.slice(1)} style={{fontSize:'12px',padding:'9px 11px',borderRadius:'11px',outline:'none',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',border:`1.5px solid ${T.border}`,color:T.text}}/>)}<select value={draft.pronouns} onChange={e=>setDraft(p=>({...p,pronouns:e.target.value}))} style={{fontSize:'12px',padding:'9px 11px',borderRadius:'11px',outline:'none',background:T.isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',border:`1.5px solid ${T.border}`,color:T.text}}><option value="">Pronouns</option>{PRONOUNS.map(pr=><option key={pr} value={pr}>{pr}</option>)}</select></div>
                 <div><p style={{...LS,marginBottom:'7px'}}>LANGUAGES</p><div style={{display:'flex',flexWrap:'wrap',gap:'5px'}}>{LANGUAGES.map(l=><button key={l} onClick={()=>toggleLang(l)} style={{fontSize:'11px',padding:'4px 10px',borderRadius:'99px',cursor:'pointer',background:draft.languages.includes(l)?`${accent}20`:T.isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.04)',border:`1.5px solid ${draft.languages.includes(l)?accent:T.border}`,color:draft.languages.includes(l)?accent:T.textSub,fontWeight:draft.languages.includes(l)?600:400}}>{l}</button>)}</div></div>
               </div>)}
-              {!editing&&(<div style={{display:'flex',gap:isMobile?'16px':'20px',marginTop:'12px',paddingTop:'12px',borderTop:`1px solid var(--owf-border)`}}>{[['12','Posts'],['0','Followers'],['0','Following'],['0','Chapters']].map(([n,l],idx,arr)=>(<div key={l} className="owf-card-lift" style={{cursor:'pointer',paddingRight:idx<arr.length-1?isMobile?'16px':'20px':'0',borderRight:idx<arr.length-1?'1px solid var(--owf-border)':'none'}}><span style={{fontSize:isMobile?'16px':'18px',fontWeight:300,color:'var(--owf-text)',letterSpacing:'-0.02em'}}>{n}</span><span style={{fontSize:'9px',fontWeight:700,marginLeft:'5px',letterSpacing:'0.12em',color:'var(--owf-text-muted)',fontFamily:'monospace'}}>{l.toUpperCase()}</span></div>))}</div>)}
+              {!editing&&(<div style={{display:'flex',gap:isMobile?'16px':'20px',marginTop:'12px',paddingTop:'12px',borderTop:`1px solid var(--owf-border)`}}>{[[String(userSignals.length),'Posts'],['0','Followers'],['0','Following'],['0','Chapters']].map(([n,l],idx,arr)=>(<div key={l} className="owf-card-lift" style={{cursor:'pointer',paddingRight:idx<arr.length-1?isMobile?'16px':'20px':'0',borderRight:idx<arr.length-1?'1px solid var(--owf-border)':'none'}}><span style={{fontSize:isMobile?'16px':'18px',fontWeight:300,color:'var(--owf-text)',letterSpacing:'-0.02em'}}>{n}</span><span style={{fontSize:'9px',fontWeight:700,marginLeft:'5px',letterSpacing:'0.12em',color:'var(--owf-text-muted)',fontFamily:'monospace'}}>{l.toUpperCase()}</span></div>))}</div>)}
             </div>
 
             {/* MOBILE: Widget icon row */}
@@ -719,35 +728,12 @@ export default function ProfilePage(){
               {/* FEED */}
               <div className={!isMobile?'feed-col':'ns'} style={{paddingBottom:isMobile?'90px':'32px'}}>
                 {tab==='posts'&&(<>
-                  {/* Post sub-tabs */}
-                  <div style={{display:'flex',gap:'6px',marginBottom:'16px',flexWrap:'wrap'}}>
-                    {(['all','text','images','video'] as const).map(pt=>{
-                      const counts={all:SAMPLE_POSTS.length,text:SAMPLE_POSTS.filter(p=>!p.hasImage&&!p.hasVideo).length,images:SAMPLE_POSTS.filter(p=>p.hasImage).length,video:SAMPLE_POSTS.filter(p=>p.hasVideo).length};
-                      const labels={all:'All',text:'Text',images:'Images',video:'Video'};
-                      const active=postTab===pt;
-                      const mc=MOOD_COLORS[SAMPLE_POSTS[0]?.mood]||accent;
-                      return(<button key={pt} onClick={()=>setPostTab(pt)} style={{
-                        display:'flex',alignItems:'center',gap:'5px',
-                        padding:'6px 14px',borderRadius:'99px',cursor:'pointer',
-                        fontSize:'12px',fontWeight:active?700:500,
-                        background:active?accent:'transparent',
-                        color:active?'#fff':T.textMuted,
-                        border:active?'none':`1px solid ${T.border}`,
-                        transition:'all .15s',
-                      }}>
-                        {labels[pt]}
-                        {counts[pt]>0&&<span style={{
-                          fontSize:'10px',fontWeight:700,
-                          padding:'1px 6px',borderRadius:'99px',
-                          background:active?'rgba(255,255,255,0.25)':T.isDark?'var(--owf-border)':'rgba(0,0,0,0.06)',
-                          color:active?'#fff':T.textMuted,
-                        }}>{counts[pt]}</span>}
-                      </button>);
-                    })}
-                  </div>
-                  {/* Filtered posts */}
-                  {(postTab==='all'?SAMPLE_POSTS:postTab==='text'?SAMPLE_POSTS.filter(p=>!p.hasImage&&!p.hasVideo):postTab==='images'?SAMPLE_POSTS.filter(p=>p.hasImage):SAMPLE_POSTS.filter(p=>p.hasVideo)).map((p,i)=><ProfilePostCard key={p.id} post={p} index={i} accent={accent} displayName={profile.displayName} handle={profile.handle} ini={ini}/>)}
-                  {(postTab==='text'&&SAMPLE_POSTS.filter(p=>!p.hasImage&&!p.hasVideo).length===0)||(postTab==='images'&&SAMPLE_POSTS.filter(p=>p.hasImage).length===0)||(postTab==='video'&&SAMPLE_POSTS.filter(p=>p.hasVideo).length===0)?(<div style={{textAlign:'center',padding:'40px 20px',color:T.textMuted}}><p style={{fontSize:'32px',marginBottom:'8px'}}>{postTab==='images'?'◎':postTab==='video'?'▶':'◎'}</p><p style={{fontSize:'13px'}}>No {postTab} posts yet</p></div>):null}
+                  {userSignals.length>0?userSignals.map((s,i)=><SignalCard key={s.id} signal={s} index={i}/>):(
+                    <div style={{textAlign:'center',padding:'40px 20px',color:T.textMuted}}>
+                      <p style={{fontSize:'32px',marginBottom:'8px'}}>◎</p>
+                      <p style={{fontSize:'13px'}}>No posts yet</p>
+                    </div>
+                  )}
                 </>)}
                 {tab==='notebook'&&(<div>
                   <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px'}}><p style={LS}>YOUR CHAPTERS</p><button style={{fontSize:'12px',fontWeight:700,padding:'8px 16px',borderRadius:'99px',cursor:'pointer',background:accent,color:'#fff',border:'none',boxShadow:`0 4px 14px ${accent}50`}}>+ New</button></div>

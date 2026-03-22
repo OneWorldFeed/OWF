@@ -2,6 +2,7 @@ node_modules/
 dist/
 .env
 .env.*
+!.env.local.example
 *.local
 .DS_Store
 Thumbs.db

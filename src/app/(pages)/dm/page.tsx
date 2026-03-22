@@ -1,6 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import { sanitizeDmText, checkRateLimit, RATE_LIMITS } from "@/lib/sanitize";
+import { useModeration } from "@/hooks/useModeration";
 import { CONVOS, MESSAGES } from "@/data/dm";
 import type { Conversation, Message } from "@/types/dm";
 import ConvoRow from "@/components/dm/ConvoRow";
@@ -25,6 +26,7 @@ export default function DMPage() {
   const [unlockCycle,  setUnlockCycle]  = useState<OwlCycle | null>(null);
   const [dismissed,   setDismissed]   = useState<Set<string>>(new Set());
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { check: moderateCheck, result: modResult, checking: moderating, reset: resetModeration } = useModeration();
 
   const active = convos.find(c => c.id === activeId)!;
   const thread = messages[activeId] ?? [];
@@ -33,13 +35,19 @@ export default function DMPage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [activeId, thread.length]);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     const safeText = sanitizeDmText(input);
-    if (!safeText.trim()) return;
+    if (!safeText.trim() || moderating) return;
     if (!checkRateLimit('dm', RATE_LIMITS.dm)) {
       console.warn('DM rate limit hit');
       return;
     }
+    resetModeration();
+
+    // Moderation gate — crisis content shows banner but still sends
+    const allowed = await moderateCheck(safeText, 'dm');
+    if (!allowed) return;
+
     const msg: Message = {
       id: `msg_${Date.now()}`,
       senderId: "me",
@@ -164,6 +172,45 @@ export default function DMPage() {
           ))}
           <div ref={bottomRef}/>
         </div>
+
+        {/* Moderation warning */}
+        {modResult && !modResult.allowed && (
+          <div style={{
+            padding: "10px 16px",
+            fontSize: 12, fontWeight: 600, color: "#fff",
+            background: modResult.crisisResources ? "#1e3a5f" : "#7f1d1d",
+          }}>
+            {modResult.crisisResources ? (
+              <p style={{ margin: 0 }}>
+                {modResult.message}{" "}
+                If you or someone you know is in crisis, please visit{" "}
+                <a href="https://findahelpline.com" target="_blank" rel="noopener noreferrer"
+                  style={{ color: "#93c5fd", textDecoration: "underline", fontWeight: 700 }}>
+                  findahelpline.com
+                </a>
+              </p>
+            ) : (
+              <p style={{ margin: 0 }}>{modResult.message}</p>
+            )}
+          </div>
+        )}
+
+        {/* Crisis-only banner (allowed but flagged) */}
+        {modResult && modResult.allowed && modResult.crisisResources && (
+          <div style={{
+            padding: "10px 16px",
+            fontSize: 12, fontWeight: 600, color: "#fff",
+            background: "#1e3a5f",
+          }}>
+            <p style={{ margin: 0 }}>
+              If you or someone you know is in crisis, please visit{" "}
+              <a href="https://findahelpline.com" target="_blank" rel="noopener noreferrer"
+                style={{ color: "#93c5fd", textDecoration: "underline", fontWeight: 700 }}>
+                findahelpline.com
+              </a>
+            </p>
+          </div>
+        )}
 
         {/* Input */}
         <div style={{
