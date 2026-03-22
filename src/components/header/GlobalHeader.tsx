@@ -1,9 +1,11 @@
 'use client';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
+import Composer from '@/components/composer/Composer';
 
 export default function GlobalHeader() {
   const [scrolled, setScrolled] = useState(false);
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -12,6 +14,7 @@ export default function GlobalHeader() {
   }, []);
 
   return (
+    <>
     <header
       className="fixed top-0 left-0 right-0 z-50"
       style={{
@@ -78,6 +81,7 @@ export default function GlobalHeader() {
         {/* Right */}
         <div className="flex items-center gap-3 flex-shrink-0">
           <button
+            onClick={() => setIsComposerOpen(true)}
             className="text-white text-sm font-semibold px-4 py-1.5 rounded-full owf-card-lift"
             style={{ backgroundColor: 'var(--owf-gold)', boxShadow: '0 0 14px var(--owf-glow)' }}
           >
@@ -92,5 +96,10 @@ export default function GlobalHeader() {
         </div>
       </div>
     </header>
+
+      {isComposerOpen && (
+        <Composer onClose={() => setIsComposerOpen(false)} />
+      )}
+    </>
   );
 }
