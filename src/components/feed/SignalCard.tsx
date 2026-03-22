@@ -1,9 +1,11 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { Signal } from "@/types/signal"
+import { useState, useEffect, useRef, useCallback } from "react"
+import type { Signal } from "@/types/signal"
+import { translateText } from "@/lib/freeapis"
 
-// ── Mood accent colours — semantic, independent of theme ──────────────────────
+/* ── Mood accent colours ──────────────────────────────────────────────────── */
+
 const MOOD_ACCENT: Record<string, string> = {
   wonder: "#6366F1",
   cosmos: "#8B5CF6",
@@ -11,19 +13,10 @@ const MOOD_ACCENT: Record<string, string> = {
   aurora: "#3B82F6",
   fire:   "#EF4444",
 }
-function moodAccent(m: string) { return MOOD_ACCENT[m] ?? "#6366F1" }
+function accent(m: string) { return MOOD_ACCENT[m] ?? "#6366F1" }
 
-// Dark tone per mood for the thumbnail gradient (keeps emoji visible)
-const MOOD_THUMB_BG: Record<string, string> = {
-  wonder: "radial-gradient(ellipse at 40% 35%, #1e1b4b 0%, #0f0e23 100%)",
-  cosmos: "radial-gradient(ellipse at 50% 30%, #2e1065 0%, #12062a 100%)",
-  earth:  "radial-gradient(ellipse at 35% 45%, #064e3b 0%, #022c22 100%)",
-  aurora: "radial-gradient(ellipse at 50% 30%, #1e3a8a 0%, #0a1836 100%)",
-  fire:   "radial-gradient(ellipse at 45% 40%, #7f1d1d 0%, #3b0a0a 100%)",
-}
-function thumbBg(m: string) { return MOOD_THUMB_BG[m] ?? MOOD_THUMB_BG.wonder }
+/* ── Scroll reveal ────────────────────────────────────────────────────────── */
 
-// ── Scroll-reveal hook ────────────────────────────────────────────────────────
 function useScrollReveal(delay = 0) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
@@ -31,7 +24,7 @@ function useScrollReveal(delay = 0) {
     const el = ref.current; if (!el) return
     const obs = new IntersectionObserver(
       ([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect() } },
-      { threshold: 0.06 }
+      { threshold: 0.06 },
     )
     obs.observe(el)
     return () => obs.disconnect()
@@ -46,291 +39,397 @@ function useScrollReveal(delay = 0) {
   }
 }
 
-// ── Shared constants ──────────────────────────────────────────────────────────
-const DARK  = "#0F1924"
-const DARK2 = "rgba(15,25,36,0.55)"
-const DARK3 = "rgba(15,25,36,0.35)"
+/* ── Compact number ───────────────────────────────────────────────────────── */
 
-// ── SignalCard ────────────────────────────────────────────────────────────────
+function fmtNum(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`
+  return String(n)
+}
+
+/* ── Props ────────────────────────────────────────────────────────────────── */
+
 interface SignalCardProps {
   signal:  Signal
   onWatch: (signal: Signal) => void
   index?:  number
 }
 
-export function SignalCard({ signal, onWatch, index = 0 }: SignalCardProps) {
-  const reveal  = useScrollReveal(index * 55)
-  const [open, setOpen] = useState(false)
-  const [hov,  setHov]  = useState(false)
-  const accent  = moodAccent(signal.mood)
-  const isVideo = signal.type === "stream"
-  const isLive  = signal.duration === "LIVE"
+/* ── Component ────────────────────────────────────────────────────────────── */
 
-  const cardBorder = hov || open
-    ? `1px solid rgba(var(--owf-horizon-rgb), 0.30)`
-    : "1px solid rgba(0,0,0,0.09)"
-  const cardShadow = hov || open
-    ? `0 0 0 3px rgba(var(--owf-horizon-rgb), 0.07), 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)`
-    : "0 1px 4px rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.04)"
+export function SignalCard({ signal, onWatch, index = 0 }: SignalCardProps) {
+  const reveal = useScrollReveal(index * 55)
+  const mc = accent(signal.mood)
+  const ix = signal.interactions
+
+  // Card states
+  type CardState = "default" | "expanded" | "minimized"
+  const [state, setState] = useState<CardState>("default")
+  const [hov, setHov]     = useState(false)
+
+  // Interactions (local)
+  const [liked, setLiked]         = useState(false)
+  const [likeCount, setLikeCount] = useState(ix?.likes ?? 0)
+  const [bookmarked, setBookmarked] = useState(false)
+
+  // Overflow menu
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  // Repost dropdown
+  const [repostOpen, setRepostOpen] = useState(false)
+  const repostRef = useRef<HTMLDivElement>(null)
+
+  // Video
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [muted, setMuted]   = useState(true)
+  const [playing, setPlaying] = useState(true)
+
+  // Translate
+  const [translated, setTranslated] = useState<string | null>(null)
+  const [translating, setTranslating] = useState(false)
+
+  // Ask Owl
+  const [owlResponse, setOwlResponse] = useState<string | null>(null)
+  const [owlLoading, setOwlLoading]   = useState(false)
+
+  // Blurb expand
+  const isExpanded = state === "expanded"
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (menuOpen && menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false)
+      if (repostOpen && repostRef.current && !repostRef.current.contains(e.target as Node)) setRepostOpen(false)
+    }
+    document.addEventListener("mousedown", handleClick)
+    return () => document.removeEventListener("mousedown", handleClick)
+  }, [menuOpen, repostOpen])
+
+  // Handlers
+  const toggleLike = () => { setLiked(l => !l); setLikeCount(c => liked ? c - 1 : c + 1) }
+  const toggleBookmark = () => setBookmarked(b => !b)
+
+  const toggleVideo = useCallback(() => {
+    const v = videoRef.current; if (!v) return
+    if (v.paused) { v.play(); setPlaying(true) } else { v.pause(); setPlaying(false) }
+  }, [])
+
+  const toggleMute = useCallback(() => {
+    const v = videoRef.current; if (!v) return
+    v.muted = !v.muted; setMuted(v.muted)
+  }, [])
+
+  const handleTranslate = async () => {
+    if (translated) { setTranslated(null); return }
+    setTranslating(true)
+    const result = await translateText(signal.blurb)
+    setTranslated(result ?? signal.blurb)
+    setTranslating(false)
+  }
+
+  const handleAskOwl = async () => {
+    if (owlResponse) { setOwlResponse(null); return }
+    setOwlLoading(true)
+    try {
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lens: "social", message: `${signal.title} ${signal.blurb}` }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setOwlResponse(data.text ?? data.content?.[0]?.text ?? "No response")
+      } else {
+        setOwlResponse("Owl is unavailable right now.")
+      }
+    } catch {
+      setOwlResponse("Owl is unavailable right now.")
+    }
+    setOwlLoading(false)
+  }
+
+  // Media rendering
+  const mt = signal.mediaType
+  const hasMedia = mt && mt !== "text" && signal.mediaUrl
+  const isVertical = mt === "image-vertical" || mt === "video-vertical"
+  const isVideo = mt === "video-horizontal" || mt === "video-vertical"
+  const aspectPadding = isVertical ? "125%" : "56.25%"
+
+  // Minimized state — avatar + title only
+  if (state === "minimized") {
+    return (
+      <div ref={reveal.ref} style={reveal.style}>
+        {/* Repost header */}
+        {signal.repostedBy && (
+          <div style={{ fontSize: "11px", color: "var(--owf-card-text-sub)", padding: "0 0 4px 52px" }}>
+            ↩ {signal.repostedBy.displayName} reposted
+          </div>
+        )}
+        <div
+          onClick={() => setState("default")}
+          onMouseEnter={() => setHov(true)}
+          onMouseLeave={() => setHov(false)}
+          style={{
+            background:    "#ffffff",
+            borderRadius:  "16px",
+            border:        "1px solid var(--owf-card-border)",
+            padding:       "10px 14px",
+            display:       "flex",
+            alignItems:    "center",
+            gap:           "10px",
+            cursor:        "pointer",
+            boxShadow:     hov ? `0 0 0 2px ${mc}18, 0 4px 16px rgba(0,0,0,0.06)` : "0 1px 4px rgba(0,0,0,0.04)",
+            transition:    "box-shadow 0.2s",
+          }}
+        >
+          {/* Avatar */}
+          <div style={{
+            width: "32px", height: "32px", borderRadius: "50%", flexShrink: 0,
+            border: `2px solid ${mc}`, overflow: "hidden",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "16px", background: `${mc}14`,
+          }}>
+            {signal.authorAvatar
+              ? <img src={signal.authorAvatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              : signal.thumb}
+          </div>
+          <p style={{ fontSize: "13px", fontWeight: 600, color: "var(--owf-card-text)", flex: 1, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {signal.title}
+          </p>
+          <span style={{ fontSize: "10px", color: "var(--owf-card-text-sub)", flexShrink: 0 }}>{signal.duration}</span>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div ref={reveal.ref} style={reveal.style}>
+      {/* Repost header — outside card shell */}
+      {signal.repostedBy && (
+        <div style={{ fontSize: "11px", color: "var(--owf-card-text-sub)", padding: "0 0 4px 52px" }}>
+          ↩ {signal.repostedBy.displayName} reposted
+        </div>
+      )}
+
       <div
         onMouseEnter={() => setHov(true)}
         onMouseLeave={() => setHov(false)}
         style={{
-          background:  "#ffffff",
-          border:      cardBorder,
-          borderRadius:"0",
-          overflow:    "hidden",
-          boxShadow:   cardShadow,
-          transition:  "border-color 0.2s ease, box-shadow 0.25s ease",
-          position:    "relative",
+          background:    "#ffffff",
+          borderRadius:  "16px",
+          border:        "1px solid var(--owf-card-border)",
+          overflow:      "hidden",
+          boxShadow:     hov
+            ? `0 0 0 3px ${mc}12, 0 8px 32px rgba(0,0,0,0.1)`
+            : "0 1px 4px rgba(0,0,0,0.04), 0 2px 12px rgba(0,0,0,0.03)",
+          transition:    "box-shadow 0.25s, border-color 0.2s",
+          borderColor:   hov ? `${mc}40` : undefined,
         }}
       >
 
-        {/* ── Header row ───────────────────────────────────────────────────── */}
-        <div
-          onClick={() => setOpen(o => !o)}
-          style={{
-            display:    "flex",
-            alignItems: "flex-start",
-            gap:        "12px",
-            padding:    "14px 16px 10px",
-            cursor:     "pointer",
-          }}
-        >
-          {/* Avatar — mood-coloured ring around emoji */}
+        {/* ── HEADER ──────────────────────────────────────────────── */}
+        <div style={{ display: "flex", alignItems: "flex-start", gap: "10px", padding: "14px 14px 10px" }}>
+          {/* Avatar */}
           <div style={{
-            width:        "40px",
-            height:       "40px",
-            borderRadius: "50%",
-            flexShrink:   0,
-            display:      "flex",
-            alignItems:   "center",
-            justifyContent: "center",
-            fontSize:     "20px",
-            background:   `${accent}14`,
-            border:       `2px solid ${accent}40`,
-            boxShadow:    `0 0 0 3px ${accent}12`,
-            transition:   "box-shadow 0.2s",
+            width: "40px", height: "40px", borderRadius: "50%", flexShrink: 0,
+            border: `2px solid ${mc}`, overflow: "hidden",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: "20px", background: `${mc}14`,
           }}>
-            {signal.thumb}
+            {signal.authorAvatar
+              ? <img src={signal.authorAvatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              : signal.thumb}
           </div>
 
-          {/* Title + meta */}
+          {/* Author info */}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{
-              fontSize:    "14px",
-              fontWeight:  600,
-              color:       DARK,
-              lineHeight:  1.35,
-              marginBottom:"3px",
-              letterSpacing: "-0.01em",
-            }}>
-              {signal.title}
-            </p>
-            <div style={{
-              display:    "flex",
-              alignItems: "center",
-              gap:        "8px",
-              flexWrap:   "wrap",
-            }}>
-              {/* Location */}
-              <span style={{
-                fontSize:  "11px",
-                color:     DARK3,
-                letterSpacing: "0.01em",
-              }}>
-                {signal.location}
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+              <span style={{ fontSize: "13px", fontWeight: 700, color: "var(--owf-card-text)" }}>
+                {signal.authorHandle?.replace(".feed", "") ?? "OWF"}
               </span>
-              <span style={{ color: DARK3, fontSize: "10px" }}>·</span>
-              {/* Viewers / time */}
-              <span style={{
-                fontSize:  "11px",
-                color:     DARK3,
-              }}>
-                {signal.viewers} watching
-              </span>
+              {signal.authorHandle && (
+                <span style={{ fontSize: "11px", color: "var(--owf-card-text-sub)" }}>
+                  {signal.authorHandle}
+                </span>
+              )}
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "11px", color: "var(--owf-card-text-sub)", marginTop: "1px" }}>
+              <span>{signal.location}</span>
+              <span>·</span>
+              <span>{signal.duration}</span>
             </div>
           </div>
 
-          {/* Right side: mood badge + collapse button when open */}
+          {/* Right: mood badge + overflow */}
           <div style={{ display: "flex", alignItems: "center", gap: "6px", flexShrink: 0 }}>
             <span style={{
-              fontSize:      "9px",
-              fontWeight:    700,
-              letterSpacing: "0.12em",
-              textTransform: "uppercase",
-              color:         accent,
-              background:    `${accent}12`,
-              border:        `1px solid ${accent}30`,
-              padding:       "2px 7px",
-              borderRadius:  "3px",
+              fontSize: "9px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+              color: mc, background: `${mc}14`, border: `1px solid ${mc}30`,
+              padding: "2px 8px", borderRadius: "6px",
             }}>
               {signal.mood}
             </span>
-            {open && (
+
+            {/* Overflow menu */}
+            <div ref={menuRef} style={{ position: "relative" }}>
               <button
-                onClick={e => { e.stopPropagation(); setOpen(false) }}
+                onClick={() => setMenuOpen(o => !o)}
                 style={{
-                  width:        "24px",
-                  height:       "24px",
-                  borderRadius: "50%",
-                  border:       "1px solid rgba(0,0,0,0.12)",
-                  background:   "rgba(0,0,0,0.04)",
-                  cursor:       "pointer",
-                  display:      "flex",
-                  alignItems:   "center",
-                  justifyContent:"center",
-                  fontSize:     "11px",
-                  color:        DARK2,
-                  flexShrink:   0,
-                  lineHeight:   1,
+                  background: "none", border: "none", cursor: "pointer",
+                  fontSize: "14px", color: "var(--owf-card-text-sub)", padding: "4px",
+                  lineHeight: 1, letterSpacing: "2px",
                 }}
               >
-                ✕
+                •••
               </button>
+              {menuOpen && (
+                <div style={{
+                  position: "absolute", right: 0, top: "100%", zIndex: 20,
+                  background: "#ffffff", border: "1px solid var(--owf-card-border)",
+                  borderRadius: "10px", boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                  minWidth: "140px", overflow: "hidden",
+                }}>
+                  {["Mute", "Block", "Report", "Copy link"].map(item => (
+                    <button key={item} onClick={() => setMenuOpen(false)} style={{
+                      display: "block", width: "100%", textAlign: "left",
+                      padding: "9px 14px", fontSize: "12px", fontWeight: 500,
+                      color: item === "Block" || item === "Report" ? "#EF4444" : "var(--owf-card-text)",
+                      background: "none", border: "none", cursor: "pointer",
+                    }}>
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ── MEDIA BLOCK ─────────────────────────────────────────── */}
+        {hasMedia && (
+          <div style={{ position: "relative", width: "100%", paddingTop: aspectPadding, overflow: "hidden", background: "#0a0a0a" }}>
+            {isVideo ? (
+              <>
+                <video
+                  ref={videoRef}
+                  src={signal.mediaUrl}
+                  autoPlay muted loop playsInline
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+                />
+                {/* Play/pause toggle */}
+                <button onClick={toggleVideo} style={{
+                  position: "absolute", inset: 0, background: "transparent",
+                  border: "none", cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  {!playing && (
+                    <div style={{
+                      width: "52px", height: "52px", borderRadius: "50%",
+                      background: "rgba(255,255,255,0.9)", boxShadow: "0 2px 16px rgba(0,0,0,0.25)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                      <svg width="18" height="18" viewBox="0 0 16 16" fill={mc}>
+                        <polygon points="4,2 14,8 4,14" />
+                      </svg>
+                    </div>
+                  )}
+                </button>
+                {/* Mute toggle — bottom right */}
+                <button onClick={toggleMute} style={{
+                  position: "absolute", bottom: "10px", right: "10px",
+                  width: "30px", height: "30px", borderRadius: "50%",
+                  background: "rgba(0,0,0,0.5)", border: "none", cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: "12px", color: "#fff",
+                }}>
+                  {muted ? "🔇" : "🔊"}
+                </button>
+                {/* Duration badge */}
+                <div style={{
+                  position: "absolute", bottom: "10px", left: "10px",
+                  fontSize: "9px", fontWeight: 700, letterSpacing: "0.08em",
+                  padding: "3px 8px", borderRadius: "4px",
+                  background: signal.duration === "LIVE" ? `${mc}22` : "rgba(0,0,0,0.7)",
+                  border: `1px solid ${signal.duration === "LIVE" ? mc + "60" : "rgba(255,255,255,0.18)"}`,
+                  color: signal.duration === "LIVE" ? mc : "rgba(255,255,255,0.88)",
+                }}>
+                  {signal.duration === "LIVE" ? "● LIVE" : signal.duration}
+                </div>
+              </>
+            ) : (
+              <img
+                src={signal.mediaUrl}
+                alt={signal.title}
+                style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
+              />
             )}
           </div>
-        </div>
+        )}
 
-        {/* ── Thumbnail — 16:9, always visible ─────────────────────────────── */}
-        <div
-          onClick={() => setOpen(o => !o)}
-          style={{
-            position:   "relative",
-            width:      "100%",
-            paddingTop: "56.25%",
-            background: thumbBg(signal.mood),
-            overflow:   "hidden",
-            cursor:     "pointer",
-          }}
-        >
-          {/* Emoji centred */}
-          <div style={{
-            position:       "absolute",
-            inset:          0,
-            display:        "flex",
-            alignItems:     "center",
-            justifyContent: "center",
-            fontSize:       "54px",
-            filter:         `drop-shadow(0 0 28px ${accent}90)`,
-            transform:      hov ? "scale(1.05)" : "scale(1)",
-            transition:     "transform 0.4s ease",
-          }}>
-            {signal.thumb}
-          </div>
-
-          {/* Soft glow orb */}
-          <div style={{
-            position:     "absolute",
-            top:          "30%", left: "50%",
-            transform:    "translate(-50%,-50%)",
-            width:        "55%", height: "55%",
-            borderRadius: "50%",
-            background:   `radial-gradient(circle, ${accent}30 0%, transparent 70%)`,
-            pointerEvents:"none",
-          }} />
-
-          {/* Vignette — dark at bottom so thumb text is readable */}
-          <div style={{
-            position:     "absolute",
-            inset:        0,
-            background:   "linear-gradient(to bottom, transparent 45%, rgba(0,0,0,0.55) 100%)",
-            pointerEvents:"none",
-          }} />
-
-          {/* Video play overlay */}
-          {isVideo && (
-            <div style={{
-              position:       "absolute",
-              inset:          0,
-              display:        "flex",
-              alignItems:     "center",
-              justifyContent: "center",
-              pointerEvents:  "none",
-            }}>
-              <div style={{
-                width:        "48px",
-                height:       "48px",
-                borderRadius: "50%",
-                background:   "rgba(255,255,255,0.92)",
-                boxShadow:    "0 2px 16px rgba(0,0,0,0.25)",
-                display:      "flex",
-                alignItems:   "center",
-                justifyContent:"center",
-                transform:    hov ? "scale(1.08)" : "scale(1)",
-                transition:   "transform 0.2s ease",
-              }}>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill={accent}>
-                  <polygon points="4,2 14,8 4,14" />
-                </svg>
-              </div>
-            </div>
-          )}
-
-          {/* Duration badge — bottom-right */}
-          {isVideo && (
-            <div style={{
-              position:     "absolute",
-              bottom:       "10px",
-              right:        "10px",
-              fontSize:     "9px",
-              fontWeight:   700,
-              letterSpacing:"0.08em",
-              padding:      "3px 8px",
-              background:   isLive ? `${accent}22` : "rgba(0,0,0,0.72)",
-              border:       `1px solid ${isLive ? accent + "60" : "rgba(255,255,255,0.18)"}`,
-              color:        isLive ? accent : "rgba(255,255,255,0.88)",
-            }}>
-              {isLive
-                ? <span style={{ display:"flex", alignItems:"center", gap:"5px" }}>
-                    <span style={{
-                      width: 5, height: 5, borderRadius: "50%",
-                      background: accent, display: "inline-block",
-                      boxShadow: `0 0 6px ${accent}`,
-                      animation: "owfLivePulse 1.8s infinite",
-                    }} />
-                    LIVE
-                  </span>
-                : signal.duration
-              }
-            </div>
-          )}
-        </div>
-
-        {/* ── Collapsed body ─ always visible ──────────────────────────────── */}
-        <div
-          onClick={() => setOpen(o => !o)}
-          style={{ padding: "12px 16px 0", cursor: "pointer" }}
-        >
-          {/* Blurb — 2-line clamp when collapsed */}
-          <p style={{
-            fontSize:       "13px",
-            lineHeight:     1.6,
-            color:          DARK2,
-            marginBottom:   "10px",
-            display:        "-webkit-box",
-            WebkitBoxOrient:"vertical",
-            WebkitLineClamp: open ? "none" : 2,
-            overflow:       open ? "visible" : "hidden",
-          } as React.CSSProperties}>
-            {signal.blurb}
+        {/* ── BODY ────────────────────────────────────────────────── */}
+        <div style={{ padding: "12px 14px 0" }}>
+          {/* Title */}
+          <p style={{ fontSize: "15px", fontWeight: 700, color: "var(--owf-card-text)", margin: "0 0 6px", lineHeight: 1.35 }}>
+            {signal.title}
           </p>
 
+          {/* Blurb */}
+          <div style={{ position: "relative", marginBottom: "8px" }}>
+            <p style={{
+              fontSize: "13px", lineHeight: 1.6, color: "var(--owf-card-text-sub)", margin: 0,
+              ...(isExpanded ? {} : {
+                display: "-webkit-box",
+                WebkitBoxOrient: "vertical" as const,
+                WebkitLineClamp: 3,
+                overflow: "hidden",
+              }),
+            } as React.CSSProperties}>
+              {translated ?? signal.blurb}
+            </p>
+            {!isExpanded && (
+              <div style={{
+                position: "absolute", bottom: 0, left: 0, right: 0, height: "24px",
+                background: "linear-gradient(transparent, #ffffff)",
+                pointerEvents: "none",
+              }} />
+            )}
+          </div>
+
+          {/* Read more / collapse */}
+          <button
+            onClick={() => setState(isExpanded ? "default" : "expanded")}
+            style={{
+              background: "none", border: "none", cursor: "pointer",
+              fontSize: "12px", fontWeight: 600, color: mc, padding: 0, marginBottom: "8px",
+            }}
+          >
+            {isExpanded ? "Show less" : "Read more"}
+          </button>
+
+          {/* Why it matters — expanded only */}
+          {isExpanded && signal.whyMatters && (
+            <div style={{
+              padding: "10px 12px", marginBottom: "10px",
+              borderLeft: `3px solid ${mc}`, background: `${mc}08`,
+              borderRadius: "0 8px 8px 0",
+            }}>
+              <p style={{ fontSize: "8px", fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase", color: mc, margin: "0 0 4px" }}>
+                WHY IT MATTERS
+              </p>
+              <p style={{ fontSize: "12px", lineHeight: 1.65, color: "var(--owf-card-text-sub)", margin: 0 }}>
+                {signal.whyMatters}
+              </p>
+            </div>
+          )}
+
           {/* Tags */}
-          <div style={{
-            display:      "flex",
-            gap:          "10px",
-            flexWrap:     "wrap",
-            marginBottom: "12px",
-          }}>
-            {signal.tags.slice(0, open ? 99 : 3).map(t => (
+          <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "12px" }}>
+            {signal.tags.slice(0, 5).map(t => (
               <span key={t} style={{
-                fontSize:      "11px",
-                color:         accent,
-                letterSpacing: "0.03em",
+                fontSize: "11px", fontWeight: 600, color: mc,
+                background: `${mc}14`, padding: "3px 10px", borderRadius: "99px",
+                cursor: "pointer",
               }}>
                 {t}
               </span>
@@ -338,308 +437,140 @@ export function SignalCard({ signal, onWatch, index = 0 }: SignalCardProps) {
           </div>
         </div>
 
-        {/* ── Expanded section ─ animated ───────────────────────────────────── */}
+        {/* ── INTERACTION BAR ─────────────────────────────────────── */}
         <div style={{
-          maxHeight:  open ? "800px" : "0px",
-          overflow:   "hidden",
-          transition: "max-height 0.35s ease",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          padding: "8px 14px 10px", borderTop: "1px solid var(--owf-card-border)",
+          flexWrap: "wrap", gap: "6px",
         }}>
-          <div style={{ padding: "0 16px 16px" }}>
-
-            {/* Accent divider */}
-            <div style={{
-              height:       "1px",
-              background:   `linear-gradient(90deg, ${accent}50, transparent)`,
-              marginBottom: "14px",
-            }} />
-
-            {/* Why it matters */}
-            {signal.whyMatters && (
-              <div style={{
-                padding:      "10px 12px",
-                borderLeft:   `3px solid ${accent}`,
-                background:   `${accent}08`,
-                borderRadius: "0 6px 6px 0",
-                marginBottom: "14px",
-              }}>
-                <p style={{
-                  fontSize:      "8px",
-                  fontWeight:    800,
-                  letterSpacing: "0.16em",
-                  textTransform: "uppercase",
-                  color:         accent,
-                  marginBottom:  "5px",
-                }}>
-                  WHY IT MATTERS
-                </p>
-                <p style={{ fontSize: "12px", lineHeight: 1.65, color: DARK2 }}>
-                  {signal.whyMatters}
-                </p>
-              </div>
-            )}
-
-            {/* Video player shell (expanded video cards) */}
-            {isVideo && (
-              <div style={{
-                borderRadius: "6px",
-                overflow:     "hidden",
-                background:   "#111",
-                border:       "1px solid rgba(0,0,0,0.12)",
-                marginBottom: "14px",
-                position:     "relative",
-              }}>
-                {/* Player viewport */}
-                <div style={{
-                  position:   "relative",
-                  paddingTop: "56.25%",
-                  background: thumbBg(signal.mood),
-                }}>
-                  <div style={{
-                    position:       "absolute",
-                    inset:          0,
-                    display:        "flex",
-                    alignItems:     "center",
-                    justifyContent: "center",
-                    fontSize:       "64px",
-                    filter:         `drop-shadow(0 0 32px ${accent}80)`,
-                  }}>
-                    {signal.thumb}
-                  </div>
-                  {/* Big play button */}
-                  <button
-                    onClick={e => { e.stopPropagation(); onWatch(signal) }}
-                    style={{
-                      position:       "absolute",
-                      inset:          0,
-                      background:     "transparent",
-                      border:         "none",
-                      cursor:         "pointer",
-                      display:        "flex",
-                      alignItems:     "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <div style={{
-                      width:        "64px",
-                      height:       "64px",
-                      borderRadius: "50%",
-                      background:   "rgba(255,255,255,0.92)",
-                      boxShadow:    "0 4px 24px rgba(0,0,0,0.3)",
-                      display:      "flex",
-                      alignItems:   "center",
-                      justifyContent:"center",
-                    }}>
-                      <svg width="22" height="22" viewBox="0 0 16 16" fill={accent}>
-                        <polygon points="4,2 14,8 4,14" />
-                      </svg>
-                    </div>
-                  </button>
-                  {/* Live / duration pill */}
-                  <div style={{
-                    position:   "absolute",
-                    bottom:     "10px",
-                    right:      "10px",
-                    fontSize:   "9px",
-                    fontWeight: 700,
-                    padding:    "3px 10px",
-                    background: isLive ? `${accent}22` : "rgba(0,0,0,0.72)",
-                    border:     `1px solid ${isLive ? accent + "60" : "rgba(255,255,255,0.18)"}`,
-                    color:      isLive ? accent : "rgba(255,255,255,0.88)",
-                    letterSpacing: "0.08em",
-                  }}>
-                    {isLive ? "● LIVE" : signal.duration}
-                  </div>
-                </div>
-                {/* Minimal controls bar */}
-                <div style={{
-                  display:    "flex",
-                  alignItems: "center",
-                  gap:        "10px",
-                  padding:    "8px 12px",
-                  background: "#0a0a0a",
-                }}>
-                  <div style={{
-                    flex:         1,
-                    height:       "3px",
-                    background:   "rgba(255,255,255,0.12)",
-                    borderRadius: "99px",
-                    overflow:     "hidden",
-                  }}>
-                    <div style={{
-                      width:        isLive ? "100%" : "32%",
-                      height:       "100%",
-                      background:   accent,
-                      borderRadius: "99px",
-                      animation:    isLive ? "none" : undefined,
-                    }} />
-                  </div>
-                  <span style={{
-                    fontSize:     "10px",
-                    color:        "rgba(255,255,255,0.45)",
-                    fontFamily:   "monospace",
-                    whiteSpace:   "nowrap",
-                  }}>
-                    {isLive ? "● LIVE" : signal.duration}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {/* Highlights */}
-            {signal.highlights?.length > 0 && (
-              <div style={{
-                display:      "flex",
-                gap:          "0",
-                flexWrap:     "wrap",
-                marginBottom: "14px",
-                border:       "1px solid rgba(0,0,0,0.07)",
-              }}>
-                {signal.highlights.map((h, i) => (
-                  <span key={i} style={{
-                    fontSize:      "11px",
-                    color:         DARK2,
-                    padding:       "6px 12px",
-                    borderRight:   i < signal.highlights.length - 1 ? "1px solid rgba(0,0,0,0.07)" : "none",
-                    fontFamily:    "monospace",
-                    letterSpacing: "0.04em",
-                  }}>
-                    {h}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Action row */}
-            <div style={{
-              display:        "flex",
-              alignItems:     "center",
-              justifyContent: "space-between",
-              paddingTop:     "12px",
-              borderTop:      "1px solid rgba(0,0,0,0.07)",
+          {/* Left cluster */}
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {/* Like */}
+            <button onClick={toggleLike} style={{
+              display: "flex", alignItems: "center", gap: "4px",
+              background: "none", border: "none", cursor: "pointer",
+              fontSize: "12px", color: liked ? "#EF4444" : "var(--owf-card-text-sub)",
+              fontWeight: liked ? 700 : 400, transition: "color .15s, transform .15s",
+              transform: liked ? "scale(1.1)" : "scale(1)",
             }}>
-              {/* Primary CTA */}
-              <PrimaryButton
-                label={isVideo ? "Watch Live" : "Read More"}
-                accent={accent}
-                onClick={e => { e.stopPropagation(); onWatch(signal) }}
-              />
+              {liked ? "♥" : "♡"} {fmtNum(likeCount)}
+            </button>
 
-              {/* Secondary actions */}
-              <div style={{ display:"flex", gap:"4px" }}>
-                {[["◎", "Save"], ["↗", "Share"]].map(([icon, label]) => (
-                  <button
-                    key={label}
-                    onClick={e => e.stopPropagation()}
-                    style={{
-                      background:  "none",
-                      border:      "1px solid rgba(0,0,0,0.08)",
-                      cursor:      "pointer",
-                      padding:     "6px 12px",
-                      display:     "flex",
-                      alignItems:  "center",
-                      gap:         "4px",
-                      color:       DARK3,
-                      fontSize:    "11px",
-                      transition:  "border-color 0.15s, color 0.15s",
-                    }}
-                    onMouseEnter={e => {
-                      const b = e.currentTarget as HTMLButtonElement
-                      b.style.borderColor = `${accent}50`
-                      b.style.color = accent
-                    }}
-                    onMouseLeave={e => {
-                      const b = e.currentTarget as HTMLButtonElement
-                      b.style.borderColor = "rgba(0,0,0,0.08)"
-                      b.style.color = DARK3
-                    }}
-                  >
-                    <span>{icon}</span>
-                    <span style={{ fontSize:"9px", textTransform:"uppercase", letterSpacing:"0.08em" }}>
-                      {label}
-                    </span>
-                  </button>
-                ))}
-              </div>
+            {/* Comment */}
+            <button style={{
+              display: "flex", alignItems: "center", gap: "4px",
+              background: "none", border: "none", cursor: "pointer",
+              fontSize: "12px", color: "var(--owf-card-text-sub)",
+            }}>
+              💬 {fmtNum(ix?.comments ?? 0)}
+            </button>
+
+            {/* Repost */}
+            <div ref={repostRef} style={{ position: "relative" }}>
+              <button onClick={() => setRepostOpen(o => !o)} style={{
+                display: "flex", alignItems: "center", gap: "4px",
+                background: "none", border: "none", cursor: "pointer",
+                fontSize: "12px", color: "var(--owf-card-text-sub)",
+              }}>
+                ↩ {fmtNum(ix?.reposts ?? 0)}
+              </button>
+              {repostOpen && (
+                <div style={{
+                  position: "absolute", bottom: "100%", left: 0, zIndex: 20,
+                  background: "#ffffff", border: "1px solid var(--owf-card-border)",
+                  borderRadius: "10px", boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                  minWidth: "130px", overflow: "hidden", marginBottom: "4px",
+                }}>
+                  {["Repost", "Quote repost"].map(item => (
+                    <button key={item} onClick={() => setRepostOpen(false)} style={{
+                      display: "block", width: "100%", textAlign: "left",
+                      padding: "9px 14px", fontSize: "12px", fontWeight: 500,
+                      color: "var(--owf-card-text)", background: "none",
+                      border: "none", cursor: "pointer",
+                    }}>
+                      {item}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+
+            {/* Bookmark */}
+            <button onClick={toggleBookmark} style={{
+              display: "flex", alignItems: "center", gap: "2px",
+              background: "none", border: "none", cursor: "pointer",
+              fontSize: "13px", color: bookmarked ? "#F59E0B" : "var(--owf-card-text-sub)",
+              transition: "color .15s, transform .15s",
+              transform: bookmarked ? "scale(1.15)" : "scale(1)",
+            }}>
+              {bookmarked ? "🔖" : "🔖"}
+            </button>
+          </div>
+
+          {/* Right cluster */}
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            {/* Reach */}
+            {ix?.reach && (
+              <span style={{ fontSize: "10px", color: "var(--owf-card-text-sub)", whiteSpace: "nowrap" }}>
+                🌍 {ix.reach.cities} cities · {ix.reach.countries} countries
+              </span>
+            )}
+
+            {/* Translate */}
+            <button onClick={handleTranslate} disabled={translating} style={{
+              background: "none", border: "none", cursor: "pointer",
+              fontSize: "12px", color: translated ? mc : "var(--owf-card-text-sub)",
+              fontWeight: translated ? 600 : 400, padding: "2px",
+            }}>
+              🌐 {translating ? "…" : translated ? "Original" : "Translate"}
+            </button>
+
+            {/* Ask Owl */}
+            <button onClick={handleAskOwl} disabled={owlLoading} style={{
+              background: "none", border: "none", cursor: "pointer",
+              fontSize: "12px", color: owlResponse ? mc : "var(--owf-card-text-sub)",
+              fontWeight: owlResponse ? 600 : 400, padding: "2px",
+            }}>
+              🦉 {owlLoading ? "…" : owlResponse ? "Close" : "Ask Owl"}
+            </button>
           </div>
         </div>
 
-        {/* ── Expand / collapse footer ──────────────────────────────────────── */}
+        {/* ── OWL RESPONSE PANEL ──────────────────────────────────── */}
+        {owlResponse && (
+          <div style={{
+            padding: "12px 14px", borderTop: "1px solid var(--owf-card-border)",
+            background: `${mc}06`,
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "6px" }}>
+              <span style={{ fontSize: "14px" }}>🦉</span>
+              <span style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: mc }}>
+                OWF OWL
+              </span>
+            </div>
+            <p style={{ fontSize: "12px", lineHeight: 1.65, color: "var(--owf-card-text-sub)", margin: 0 }}>
+              {owlResponse}
+            </p>
+          </div>
+        )}
+
+        {/* ── MINIMIZE BUTTON ─────────────────────────────────────── */}
         <button
-          onClick={() => setOpen(o => !o)}
+          onClick={() => setState("minimized")}
           style={{
-            width:          "100%",
-            display:        "flex",
-            alignItems:     "center",
-            justifyContent: "center",
-            gap:            "8px",
-            padding:        "8px 16px",
-            background:     open ? `${accent}06` : "transparent",
-            border:         "none",
-            borderTop:      "1px solid rgba(0,0,0,0.06)",
-            cursor:         "pointer",
-            transition:     "background 0.15s",
+            width: "100%", display: "flex", alignItems: "center", justifyContent: "center",
+            gap: "8px", padding: "7px 14px",
+            background: "transparent", border: "none", borderTop: "1px solid var(--owf-card-border)",
+            cursor: "pointer",
           }}
         >
-          <div style={{
-            width:      "20px",
-            height:     "1px",
-            background: open ? accent : "rgba(0,0,0,0.15)",
-            transition: "background 0.2s",
-          }} />
-          <span style={{
-            fontSize:      "8px",
-            fontWeight:    700,
-            letterSpacing: "0.14em",
-            textTransform: "uppercase",
-            color:         open ? accent : DARK3,
-            transition:    "color 0.2s",
-          }}>
-            {open ? "Collapse" : "Expand"}
+          <div style={{ width: "20px", height: "1px", background: "var(--owf-card-text-sub)", opacity: 0.3 }} />
+          <span style={{ fontSize: "8px", fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--owf-card-text-sub)", opacity: 0.5 }}>
+            Minimize
           </span>
-          <div style={{
-            width:      "20px",
-            height:     "1px",
-            background: open ? accent : "rgba(0,0,0,0.15)",
-            transition: "background 0.2s",
-          }} />
+          <div style={{ width: "20px", height: "1px", background: "var(--owf-card-text-sub)", opacity: 0.3 }} />
         </button>
-
       </div>
     </div>
-  )
-}
-
-// ── PrimaryButton ─────────────────────────────────────────────────────────────
-function PrimaryButton({
-  label,
-  accent,
-  onClick,
-}: {
-  label: string
-  accent: string
-  onClick: React.MouseEventHandler<HTMLButtonElement>
-}) {
-  const [hov, setHov] = useState(false)
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        fontSize:      "11px",
-        fontWeight:    700,
-        letterSpacing: "0.10em",
-        textTransform: "uppercase",
-        padding:       "8px 18px",
-        background:    hov ? accent : "#ffffff",
-        border:        `1px solid ${accent}`,
-        color:         hov ? "#ffffff" : accent,
-        cursor:        "pointer",
-        transition:    "background 0.15s, color 0.15s",
-      }}
-    >
-      {label}
-    </button>
   )
 }
