@@ -16,10 +16,8 @@ function filterByTab(signals: Signal[], tab: Tab): Signal[] {
 
 export default function FeedTabs({
   signals,
-  onWatch,
 }: {
   signals: Signal[];
-  onWatch?: (signal: Signal) => void;
 }) {
   const [activeTab, setActiveTab] = useState<Tab>('All');
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -95,7 +93,6 @@ export default function FeedTabs({
               key={signal.id}
               signal={signal}
               index={i}
-              onWatch={onWatch ?? (() => {})}
             />
           ))
         ) : (

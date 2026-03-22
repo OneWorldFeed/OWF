@@ -1,10 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Signal } from "@/types/signal"
 import { SIGNALS } from "@/data/signals"
 import FeedTabs from "@/components/feed/FeedTabs"
-import { SignalModal } from "@/components/feed/SignalModal"
 import { GlobalMomentsStrip } from "@/components/feed/GlobalMomentsStrip"
 
 const CYAN = 'var(--owf-horizon)'
@@ -22,7 +20,6 @@ const MOCK_VIDEOS = [
 ]
 
 export default function HomePage() {
-  const [activeSignal, setActiveSignal] = useState<Signal | null>(null)
   const [activeTab, setActiveTab]       = useState(0)
   const [videoTab, setVideoTab]         = useState<'vertical' | 'horizontal'>('vertical')
 
@@ -180,15 +177,7 @@ export default function HomePage() {
       </div>
 
       {/* ── Signal Feed ────────────────────────────────────────────────── */}
-      <FeedTabs signals={signals} onWatch={setActiveSignal} />
-
-      {/* Modal */}
-      {activeSignal && (
-        <SignalModal
-          signal={activeSignal}
-          onClose={() => setActiveSignal(null)}
-        />
-      )}
+      <FeedTabs signals={signals} />
     </div>
   )
 }

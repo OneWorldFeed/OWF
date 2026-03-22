@@ -728,7 +728,7 @@ export default function ProfilePage(){
               {/* FEED */}
               <div className={!isMobile?'feed-col':'ns'} style={{paddingBottom:isMobile?'90px':'32px'}}>
                 {tab==='posts'&&(<>
-                  {userSignals.length>0?userSignals.map((s,i)=><SignalCard key={s.id} signal={s} onWatch={()=>{}} index={i}/>):(
+                  {userSignals.length>0?userSignals.map((s,i)=><SignalCard key={s.id} signal={s} index={i}/>):(
                     <div style={{textAlign:'center',padding:'40px 20px',color:T.textMuted}}>
                       <p style={{fontSize:'32px',marginBottom:'8px'}}>◎</p>
                       <p style={{fontSize:'13px'}}>No posts yet</p>

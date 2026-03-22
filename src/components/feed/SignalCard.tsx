@@ -51,13 +51,12 @@ function fmtNum(n: number): string {
 
 interface SignalCardProps {
   signal:  Signal
-  onWatch: (signal: Signal) => void
   index?:  number
 }
 
 /* ── Component ────────────────────────────────────────────────────────────── */
 
-export function SignalCard({ signal, onWatch, index = 0 }: SignalCardProps) {
+export function SignalCard({ signal, index = 0 }: SignalCardProps) {
   const reveal = useScrollReveal(index * 55)
   const mc = accent(signal.mood)
   const ix = signal.interactions
