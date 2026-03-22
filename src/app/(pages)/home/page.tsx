@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Signal } from "@/types/signal"
 import { SIGNALS } from "@/data/signals"
-import { SignalCard } from "@/components/feed/SignalCard"
+import FeedTabs from "@/components/feed/FeedTabs"
 import { SignalModal } from "@/components/feed/SignalModal"
 import { GlobalMomentsStrip } from "@/components/feed/GlobalMomentsStrip"
 
@@ -179,24 +179,8 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* ── Signal Grid ─────────────────────────────────────────────────── */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-        gap: '1px',
-        border: '1px solid var(--owf-border)',
-        background: 'var(--owf-border)',
-      }}>
-        {signals.map((signal, i) => (
-          <div key={signal.id} style={{ background: 'var(--owf-bg)' }}>
-            <SignalCard
-              signal={signal}
-              index={i}
-              onWatch={setActiveSignal}
-            />
-          </div>
-        ))}
-      </div>
+      {/* ── Signal Feed ────────────────────────────────────────────────── */}
+      <FeedTabs signals={signals} onWatch={setActiveSignal} />
 
       {/* Modal */}
       {activeSignal && (
