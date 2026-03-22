@@ -171,7 +171,7 @@ export function SignalCard({ signal, index = 0 }: SignalCardProps) {
           onMouseEnter={() => setHov(true)}
           onMouseLeave={() => setHov(false)}
           style={{
-            background:    "#ffffff",
+            background:    "var(--owf-card)",
             borderRadius:  "16px",
             border:        "1px solid var(--owf-card-border)",
             padding:       "10px 14px",
@@ -216,7 +216,7 @@ export function SignalCard({ signal, index = 0 }: SignalCardProps) {
         onMouseEnter={() => setHov(true)}
         onMouseLeave={() => setHov(false)}
         style={{
-          background:    "#ffffff",
+          background:    "var(--owf-card)",
           borderRadius:  "16px",
           border:        "1px solid var(--owf-card-border)",
           overflow:      "hidden",
@@ -286,7 +286,7 @@ export function SignalCard({ signal, index = 0 }: SignalCardProps) {
               {menuOpen && (
                 <div style={{
                   position: "absolute", right: 0, top: "100%", zIndex: 20,
-                  background: "#ffffff", border: "1px solid var(--owf-card-border)",
+                  background: "var(--owf-card)", border: "1px solid var(--owf-card-border)",
                   borderRadius: "10px", boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
                   minWidth: "140px", overflow: "hidden",
                 }}>
@@ -390,7 +390,7 @@ export function SignalCard({ signal, index = 0 }: SignalCardProps) {
             {!isExpanded && (
               <div style={{
                 position: "absolute", bottom: 0, left: 0, right: 0, height: "24px",
-                background: "linear-gradient(transparent, #ffffff)",
+                background: "linear-gradient(transparent, var(--owf-card))",
                 pointerEvents: "none",
               }} />
             )}
@@ -477,7 +477,7 @@ export function SignalCard({ signal, index = 0 }: SignalCardProps) {
               {repostOpen && (
                 <div style={{
                   position: "absolute", bottom: "100%", left: 0, zIndex: 20,
-                  background: "#ffffff", border: "1px solid var(--owf-card-border)",
+                  background: "var(--owf-card)", border: "1px solid var(--owf-card-border)",
                   borderRadius: "10px", boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
                   minWidth: "130px", overflow: "hidden", marginBottom: "4px",
                 }}>
